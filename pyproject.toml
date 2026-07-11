@@ -1,0 +1,78 @@
+[tool.poetry]
+name = "qnlp-hpc"
+version = "0.1.0"
+description = "Accelerating hybrid quantum-classical machine learning tasks on HPC platforms (topic-aware QNLP classifier)."
+authors = ["Saif Ibna Ezhar Arko <temorarymail01@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/saifibnaezhararko/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms"
+repository = "https://github.com/saifibnaezhararko/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms"
+packages = [{ include = "qnlp_hpc", from = "src" }]
+
+# ---------------------------------------------------------------------------
+# Runtime dependencies (CPU baseline — see software stack in CLAUDE.md §7).
+# GPU packages live in the optional [gpu] group so CI / Windows can resolve.
+# ---------------------------------------------------------------------------
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+numpy = "~1.26"                # 1.26.x — stable ecosystem
+networkx = "^3.0"             # lambeq dependency
+lambeq = "0.5.0"              # QNLP: sentence -> string diagram -> circuit
+qiskit = "^2.0"              # current SDK
+qiskit-aer = "^0.15"        # CPU simulator (GPU variant in [gpu] extra)
+pytket = "*"                # TKet SDK (original prototype backend)
+
+[tool.poetry.dependencies.torch]
+version = "^2.4"             # optional classical ML backend; heavy, keep optional
+optional = true
+
+# Optional GPU / HPC acceleration — install on the Linux HPC node with CUDA 12.4–12.6.
+# Poetry:  poetry install --with gpu
+[tool.poetry.group.gpu]
+optional = true
+
+[tool.poetry.group.gpu.dependencies]
+qiskit-aer-gpu = "^0.17"    # GPU simulator (requires CUDA toolkit + NVIDIA driver 550+)
+cuquantum-python = "*"      # NVIDIA cuQuantum bindings (24.11+)
+
+# Development tooling — lint, format, type-check, test, hooks.
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-cov = "^5.0"
+ruff = "^0.6"
+black = "^24.0"
+mypy = "^1.11"
+pre-commit = "^3.8"
+
+[tool.poetry.extras]
+torch = ["torch"]
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
+
+# ---------------------------------------------------------------------------
+# Tool configuration
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]   # pyflakes, pycodestyle, isort, pyupgrade, bugbear
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+ignore_missing_imports = true   # quantum libs ship partial stubs
+packages = ["qnlp_hpc"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --cov=qnlp_hpc --cov-report=term-missing"
+testpaths = ["tests"]

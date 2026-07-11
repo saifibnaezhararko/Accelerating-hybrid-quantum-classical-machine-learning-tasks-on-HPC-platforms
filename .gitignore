@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual envs
+.venv/
+venv/
+qnlp_env/
+env/
+
+# Poetry
+poetry.lock.bak
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Data / models (keep raw out of git; track via DVC/Kaggle scripts)
+data/raw/
+data/interim/
+*.pt
+*.ckpt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Large media (kept locally, not tracked)
+*.webm
+
+# Local project guide (not tracked)
+CLAUDE.md
+
+# Proposal / planning docs (kept locally, not tracked)
+*.pdf
+*.docx
