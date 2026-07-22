@@ -47,3 +47,4 @@ CLAUDE.md
 # Proposal / planning docs (kept locally, not tracked)
 *.pdf
 *.docx
+outputs/
