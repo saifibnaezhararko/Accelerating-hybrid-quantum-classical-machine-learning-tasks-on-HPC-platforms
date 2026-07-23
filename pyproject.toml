@@ -19,7 +19,8 @@ numpy = "~1.26"                # 1.26.x — stable ecosystem
 networkx = "^3.0"             # lambeq dependency
 lambeq = "0.5.0"              # QNLP: sentence -> string diagram -> circuit
 qiskit = "^2.0"              # current SDK
-qiskit-aer = "^0.15"        # CPU simulator (GPU variant in [gpu] extra)
+qiskit-aer = "^0.17"        # CPU simulator (GPU variant in [gpu] extra); 0.17 is
+                            # required by pennylane-qiskit >=0.43 (see [quantum] group)
 pytket = "*"                # TKet SDK (original prototype backend)
 pandas = "2.2.3"
 scikit-learn = "1.5.2"
@@ -27,7 +28,12 @@ matplotlib = "^3.9"         # benchmark plots (qnlp_hpc.mc1_spider.reporting)
 pyyaml = "^6.0"             # experiment config files in configs/
 # Required, not optional: qnlp_hpc.mc1_spider imports torch unconditionally
 # (PytorchModel / PytorchTrainer). Heavy, but the package will not import without it.
-torch = "^2.4"
+# Floor is 2.5, not 2.4: transformers (pulled in by lambeq -> bobcat) does an
+# unconditional `from torch.distributed.tensor import DTensor` at import time, and
+# DTensor only exists at that path from torch 2.5.0. On torch 2.4.x lambeq fails to
+# import, which broke the backend probe tests in CI. See the [quantum] group note —
+# pennylane-qiskit <0.43 pins sympy <1.13, which used to drag torch back down to 2.4.
+torch = ">=2.5,<3"
 
 # Optional GPU / HPC acceleration — install on the Linux HPC node with CUDA 12.4–12.6.
 # Poetry:  poetry install --with gpu
@@ -48,10 +54,18 @@ cuquantum-python = "*"      # NVIDIA cuQuantum bindings (24.11+)
 [tool.poetry.group.quantum]
 optional = true
 
+# NOTE: pennylane-qiskit <0.43 requires `sympy <1.13`, but torch >=2.5 requires
+# `sympy >=1.13.1`. Because Poetry locks every group (optional or not) into one
+# consistent graph, that old cap forced torch down to 2.4.x for the whole project
+# — which broke lambeq's import (see the `torch` note above). pennylane-qiskit 0.43
+# drops the sympy cap and moves to qiskit 2.x / qiskit-aer 0.17.x (hence the main
+# `qiskit-aer = "^0.17"` bump). This also lifts pennylane past lambeq 0.5.0's
+# tested `<0.37` range, so verify.py's PennyLane path should be re-checked by the
+# Quantum ML Lead — it is not exercised in CI (the quantum group is not installed).
 [tool.poetry.group.quantum.dependencies]
-pennylane = "^0.38"          # torch-differentiable quantum layer (lambeq PennyLaneModel)
-pennylane-qiskit = "^0.38"   # PennyLane -> Qiskit Aer: the PyTorch<->Qiskit seam
-pytket-qiskit = "*"          # TketModel -> Aer, the original prototype path
+pennylane = ">=0.43,<0.46"        # torch-differentiable quantum layer (lambeq PennyLaneModel)
+pennylane-qiskit = ">=0.43,<0.46" # PennyLane -> Qiskit Aer: the PyTorch<->Qiskit seam
+pytket-qiskit = "*"               # TketModel -> Aer, the original prototype path
 
 # Dataset acquisition — only needed when pulling new corpora.
 # Poetry:  poetry install --with data
