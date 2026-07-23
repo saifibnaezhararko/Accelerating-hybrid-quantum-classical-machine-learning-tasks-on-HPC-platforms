@@ -21,6 +21,8 @@ lambeq = "0.5.0"              # QNLP: sentence -> string diagram -> circuit
 qiskit = "^2.0"              # current SDK
 qiskit-aer = "^0.15"        # CPU simulator (GPU variant in [gpu] extra)
 pytket = "*"                # TKet SDK (original prototype backend)
+pandas = "2.2.3"
+scikit-learn = "1.5.2"
 
 [tool.poetry.dependencies.torch]
 version = "^2.4"             # optional classical ML backend; heavy, keep optional
@@ -71,6 +73,7 @@ python_version = "3.11"
 warn_unused_ignores = true
 ignore_missing_imports = true   # quantum libs ship partial stubs
 packages = ["qnlp_hpc"]
+
 
 [tool.pytest.ini_options]
 minversion = "8.0"
