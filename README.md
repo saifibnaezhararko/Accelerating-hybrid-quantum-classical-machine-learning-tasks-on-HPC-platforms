@@ -3,8 +3,15 @@
 Topic-aware QNLP sentence classifier (programming vs cooking), accelerated from a
 >1hr/6-word-sentence CPU prototype toward GPU-based quantum simulation on HPC.
 
-- **Role:** Software Development Lead — dependency mgmt, backend integration, CI/CD, data pipeline.
-- **Docs:** project guide + progress log in [`CLAUDE.md`](CLAUDE.md); layout in [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md).
+## Team Roles
+
+* **Saif Ibna Ezhar Arko — Software Development Lead:** Dependency management, backend integration, CI/CD, data pipeline.
+
+* **Evelyn (Yueying) Wu — Quantum Machine Learning Researcher & Developer:** QNLP methodology, SpiderAnsatz model implementation, MC1 experiment design, reusable training and evaluation pipeline development, benchmarking, testing, and reproducibility validation.
+
+## Docs
+
+* project guide + progress log in [`CLAUDE.md`](CLAUDE.md); layout in [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md).
 
 ## Quick start
 
