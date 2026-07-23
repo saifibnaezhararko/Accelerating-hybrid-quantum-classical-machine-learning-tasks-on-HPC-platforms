@@ -23,10 +23,11 @@ qiskit-aer = "^0.15"        # CPU simulator (GPU variant in [gpu] extra)
 pytket = "*"                # TKet SDK (original prototype backend)
 pandas = "2.2.3"
 scikit-learn = "1.5.2"
-
-[tool.poetry.dependencies.torch]
-version = "^2.4"             # optional classical ML backend; heavy, keep optional
-optional = true
+matplotlib = "^3.9"         # benchmark plots (qnlp_hpc.mc1_spider.reporting)
+pyyaml = "^6.0"             # experiment config files in configs/
+# Required, not optional: qnlp_hpc.mc1_spider imports torch unconditionally
+# (PytorchModel / PytorchTrainer). Heavy, but the package will not import without it.
+torch = "^2.4"
 
 # Optional GPU / HPC acceleration — install on the Linux HPC node with CUDA 12.4–12.6.
 # Poetry:  poetry install --with gpu
@@ -37,6 +38,24 @@ optional = true
 qiskit-aer-gpu = "^0.17"    # GPU simulator (requires CUDA toolkit + NVIDIA driver 550+)
 cuquantum-python = "*"      # NVIDIA cuQuantum bindings (24.11+)
 
+# Circuit-based simulation backends (CPU). See qnlp_hpc.backends.
+# Poetry:  poetry install --with quantum
+[tool.poetry.group.quantum]
+optional = true
+
+[tool.poetry.group.quantum.dependencies]
+pennylane = "^0.38"          # torch-differentiable quantum layer (lambeq PennyLaneModel)
+pennylane-qiskit = "^0.38"   # PennyLane -> Qiskit Aer: the PyTorch<->Qiskit seam
+pytket-qiskit = "*"          # TketModel -> Aer, the original prototype path
+
+# Dataset acquisition — only needed when pulling new corpora.
+# Poetry:  poetry install --with data
+[tool.poetry.group.data]
+optional = true
+
+[tool.poetry.group.data.dependencies]
+kaggle = "^1.6"             # Kaggle API client (scripts/prepare_data.py --kaggle)
+
 # Development tooling — lint, format, type-check, test, hooks.
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
@@ -45,9 +64,6 @@ ruff = "^0.6"
 black = "^24.0"
 mypy = "^1.11"
 pre-commit = "^3.8"
-
-[tool.poetry.extras]
-torch = ["torch"]
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
@@ -60,6 +76,9 @@ build-backend = "poetry.core.masonry.api"
 line-length = 100
 target-version = "py311"
 src = ["src", "tests"]
+# Standalone reference script kept verbatim as contributed (Zijia, SpiderAnsatz
+# baseline). It is not part of the package and is not linted or reformatted.
+extend-exclude = ["tests/Zijia_spider_test.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "UP", "B"]   # pyflakes, pycodestyle, isort, pyupgrade, bugbear
@@ -67,6 +86,7 @@ select = ["E", "F", "I", "W", "UP", "B"]   # pyflakes, pycodestyle, isort, pyupg
 [tool.black]
 line-length = 100
 target-version = ["py311"]
+extend-exclude = "tests/Zijia_spider_test\\.py"
 
 [tool.mypy]
 python_version = "3.11"
@@ -79,3 +99,9 @@ packages = ["qnlp_hpc"]
 minversion = "8.0"
 addopts = "-ra --cov=qnlp_hpc --cov-report=term-missing"
 testpaths = ["tests"]
+# Collect only `test_*.py`. Without this, pytest's default also matches
+# `*_test.py`, which would pick up tests/Zijia_spider_test.py and execute a full
+# 150-epoch training run (plus a blocking plt.show()) during collection.
+python_files = ["test_*.py"]
+# Trainer checkpoint dirs written by lambeq — nothing to collect in them.
+norecursedirs = ["runs", "outputs", ".git", "*.egg-info"]

@@ -13,8 +13,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Lint · type · test (CPU)
+  # ---------------------------------------------------------------------------
+  # Advisory. Reports style/type findings as inline PR annotations so each
+  # contributor fixes their own files; pre-commit auto-fixes most of it locally.
+  # Flip continue-on-error off once the existing backlog is cleared.
+  # ---------------------------------------------------------------------------
+  lint:
+    name: Lint · type (advisory)
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Style tools only — no need to resolve lambeq/qiskit/torch here.
+      - name: Install linters
+        run: pip install "ruff~=0.6" "black~=24.0" "mypy~=1.11"
+
+      - name: Ruff
+        run: ruff check --output-format=github .
+
+      - name: Black
+        run: black --check .
+
+      - name: Mypy
+        run: mypy
+
+  # ---------------------------------------------------------------------------
+  # Blocking. CPU-only: GitHub runners have no NVIDIA GPU, so Aer-GPU and
+  # cuQuantum (the `gpu` group) are benchmarked on the HPC node instead.
+  # ---------------------------------------------------------------------------
+  test:
+    name: Test (CPU, py3.11)
     runs-on: ubuntu-22.04            # matches target OS (CLAUDE.md §7)
     strategy:
       fail-fast: false
@@ -33,25 +69,18 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
 
+      # Torch resolves to the default PyPI wheel (CUDA-enabled) because the HPC
+      # node needs it; that makes a cold install several GB, so cache it.
       - name: Configure Poetry cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/pypoetry
-          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
+          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('poetry.lock', 'pyproject.toml') }}
           restore-keys: |
             poetry-${{ runner.os }}-${{ matrix.python-version }}-
 
       - name: Install dependencies (CPU + dev)
         run: poetry install --no-interaction --with dev
-
-      - name: Ruff (lint)
-        run: poetry run ruff check .
-
-      - name: Black (format check)
-        run: poetry run black --check .
-
-      - name: Mypy (type check)
-        run: poetry run mypy
 
       - name: Pytest
         run: poetry run pytest

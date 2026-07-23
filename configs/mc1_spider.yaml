@@ -1,0 +1,36 @@
+# MC1 SpiderAnsatz sentence-pair baseline.
+#
+# These values reproduce the defaults in src/qnlp_hpc/mc1_spider/config.py exactly,
+# so running with this file changes nothing about the experiment. Vary a parameter
+# here (or with --set on the command line) instead of editing that module.
+#
+#   poetry run python scripts/run_experiment.py --config configs/mc1_spider.yaml
+#   poetry run python scripts/run_experiment.py --set seed=7 --set sentence_dim=8
+
+name: mc1_spider_baseline
+
+data:
+  # Relative paths resolve against the repository root, not the working directory.
+  path: data/processed/MC1.txt
+  test_size: 0.20
+  validation_size_within_train: 0.20
+
+training:
+  seed: 2
+  batch_size: 8
+  epochs: 150
+  learning_rate: 0.002
+  weight_decay: 0.00001
+  early_stopping_patience: 20
+
+ansatz:
+  noun_dim: 4
+  sentence_dim: 4
+  max_order: 2
+
+classifier:
+  hidden_dim: 16
+  dropout: 0.0
+
+output:
+  dir: outputs/mc1_spider

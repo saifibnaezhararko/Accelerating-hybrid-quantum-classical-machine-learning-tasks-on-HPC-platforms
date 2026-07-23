@@ -1,10 +1,16 @@
+# Contributor-side auto-fix. Ruff lints (with --fix), black is the single
+# formatter — ruff-format is deliberately NOT enabled, the two disagree.
+# Install once per clone:  poetry run pre-commit install
+
+# Standalone reference script kept verbatim as contributed — never rewritten.
+exclude: '^tests/(Zijia_spider_test\.py|runs/)'
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
     hooks:
       - id: ruff
         args: [--fix]
-      - id: ruff-format
 
   - repo: https://github.com/psf/black
     rev: 24.8.0

@@ -1,0 +1,34 @@
+# Fast end-to-end check of the pipeline — not a real experiment.
+#
+# Three epochs on the smallest useful ansatz: enough to catch a broken import,
+# a shape mismatch, or a missing data file in well under a minute on a laptop.
+# Do not report numbers from this config.
+#
+#   poetry run python scripts/run_experiment.py --config configs/mc1_spider_smoke.yaml
+
+name: mc1_spider_smoke
+
+data:
+  path: data/processed/MC1.txt
+  test_size: 0.20
+  validation_size_within_train: 0.20
+
+training:
+  seed: 2
+  batch_size: 8
+  epochs: 3
+  learning_rate: 0.002
+  weight_decay: 0.00001
+  early_stopping_patience: 20
+
+ansatz:
+  noun_dim: 2
+  sentence_dim: 2
+  max_order: 2
+
+classifier:
+  hidden_dim: 8
+  dropout: 0.0
+
+output:
+  dir: outputs/mc1_spider_smoke

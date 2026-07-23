@@ -23,22 +23,151 @@ qnlp-hpc/
 ├── src/
 │   └── qnlp_hpc/               # importable package
 │       ├── __init__.py
+│       ├── paths.py            # repo-root anchoring (QNLP_HPC_ROOT override for HPC jobs)
+│       ├── config.py           # experiment config: load/validate YAML, apply to the pipeline
+│       ├── sweep.py            # repetition planning + aggregation (mean/std/95% CI)
 │       ├── data/               # data acquisition + format conversion (Kaggle API, CSV/TSV/JSON)
+│       │   ├── schema.py       #   canonical sentence-pair schema + validation
+│       │   ├── convert.py      #   CSV/TSV/JSON/JSONL/MC1 -> canonical pairs
+│       │   └── acquire.py      #   Kaggle download (optional `data` group)
 │       ├── pipeline/           # sentence -> diagram -> circuit (lambeq/DisCoPy wrappers)
-│       ├── backends/           # quantum <-> classical interop (Aer, PyTorch, JAX, PennyLane)
-│       └── training/           # training loops, optimizers, checkpointing
+│       ├── backends/           # quantum <-> classical interop (Aer, PyTorch, PennyLane)
+│       │   ├── probe.py        #   what this machine can actually run
+│       │   ├── registry.py     #   backend specs: model, trainer, kind, requirements
+│       │   └── verify.py       #   real forward/backward pass per backend
+│       ├── training/           # training loops, optimizers, checkpointing
+│       └── mc1_spider/         # MC1 sentence-pair SpiderAnsatz experiment (Quantum ML Lead)
+│           ├── config.py       #   hyperparameters + paths
+│           ├── data.py         #   MC1 loading, validation, train/dev/test split
+│           ├── diagrams.py     #   spiders_reader -> SpiderAnsatz tensor diagrams
+│           ├── model.py        #   Siamese pair classifier + losses/metrics
+│           ├── experiment.py   #   run orchestration
+│           └── reporting.py    #   benchmark plots
 │
 ├── tests/                      # pytest suite
-│   └── test_smoke.py
+│   ├── test_smoke.py
+│   ├── test_config.py          # config loading/validation + defaults-drift tripwire
+│   ├── test_data_pipeline.py   # schema, conversion, dataset validation
+│   ├── test_backends.py        # registry integrity, probing, verification
+│   ├── test_sweep.py           # sweep planning + aggregation
+│   ├── test_mc1_data.py
+│   └── Zijia_spider_test.py    # standalone baseline, kept verbatim — NOT collected
 │
 ├── notebooks/                  # exploratory notebooks (baseline, experiments)
 ├── scripts/                    # CLI / automation entrypoints
-├── configs/                    # experiment config files (YAML/TOML)
+│   ├── prepare_data.py         # acquire -> convert -> validate -> data/processed/
+│   ├── run_experiment.py       # run an experiment from a config file
+│   ├── run_sweep.py            # N repetitions + aggregation with 95% CI
+│   ├── check_backends.py       # probe/verify the simulation backends
+│   └── train_mc1_spider.py     # contributed entrypoint (constants as written, repo root)
+├── configs/                    # experiment config files (YAML)
+│   ├── mc1_spider.yaml         # baseline — mirrors mc1_spider/config.py exactly
+│   └── mc1_spider_smoke.yaml   # 3-epoch pipeline check, not a result
+├── outputs/                    # gitignored — run artefacts (history, plots, checkpoints)
 └── data/
     ├── raw/                    # gitignored — pulled via scripts
     ├── interim/                # gitignored
     └── processed/              # tracked small processed splits
+        └── MC1.txt             # 100 sentence pairs (cooking vs programming)
 ```
+
+### Files kept verbatim
+
+`tests/Zijia_spider_test.py` and its artefacts (`tests/runs/`, `tests/MC1.txt`,
+`tests/spider_*.csv|png`) are the original single-file baseline. They are excluded
+from pytest collection (`python_files = ["test_*.py"]`), ruff, black, and
+pre-commit so nobody's contribution gets rewritten by tooling. Without the pytest
+setting, `*_test.py` matches the default glob and collection would trigger a full
+training run.
+
+## Data pipeline
+
+`qnlp_hpc.data` is the single funnel from any source format to the one the trainer
+reads. `scripts/prepare_data.py` drives it: **acquire → convert → validate → write**.
+
+| Stage | Module | Notes |
+|-------|--------|-------|
+| acquire | `data/acquire.py` | Kaggle API into `data/raw/`; reuses existing downloads. Optional `kaggle` dep — `poetry install --with data`. |
+| convert | `data/convert.py` | CSV / TSV / JSON / JSONL / MC1 text. `ColumnMapping` names the source columns; `label_map` translates non-numeric labels. |
+| validate | `data/schema.py` | Canonical `SentencePair`; whitespace normalisation, label range, class balance, deduplication. |
+| write | `data/schema.py` | Emits MC1 format and re-checks it. |
+
+The on-disk format is comma-delimited and parsed with `rsplit(',', 2)`, so a comma
+**inside** a sentence would shift the delimiter and silently corrupt the label.
+The schema rejects that outright rather than letting it reach training.
+
+Duplicate pairs are dropped by default: at 100 rows, one repeated pair landing on
+both sides of the train/test split is a measurable leak.
+
+## Experiment configuration
+
+Hyperparameters live in `configs/*.yaml`, loaded and validated by
+`qnlp_hpc.config`, and run through `scripts/run_experiment.py`:
+
+```bash
+python scripts/run_experiment.py --config configs/mc1_spider.yaml
+python scripts/run_experiment.py --set seed=7 --set sentence_dim=8
+python scripts/run_experiment.py --print-config --dry-run
+```
+
+`qnlp_hpc.mc1_spider.config` holds its hyperparameters as module-level constants.
+Rather than change that contributed module, `apply_to_mc1_spider()` sets the
+constants on it before the pipeline is imported, and resolves the paths against the
+repo root so a run no longer depends on the working directory.
+
+**Ordering constraint:** `mc1_spider.data`/`diagrams`/`model`/`reporting`/`experiment`
+bind those constants with `from ... import NAME` at import time. Overrides applied
+after they are imported would be silently ignored, so `apply_to_mc1_spider()`
+raises if any of them is already in `sys.modules`. `run_experiment.py` therefore
+imports the pipeline lazily, after the config is applied.
+
+`configs/mc1_spider.yaml` reproduces the contributed defaults exactly, and
+`tests/test_config.py` fails if the two drift apart — otherwise a "baseline" run
+would quietly stop being the baseline.
+
+## Backends
+
+`qnlp_hpc.backends` is the seam between the quantum layer and the classical ML
+side. It is declarative: `registry.py` says what each backend needs, `probe.py`
+reports what this machine has, `verify.py` proves it by running something.
+
+Nothing imports an optional simulator at module level, so the registry can be
+listed on a machine with none of them installed — that is the point of
+`scripts/check_backends.py`.
+
+Two axes decide whether two backends are interchangeable:
+
+* **kind** — `tensor` backends consume `SpiderAnsatz` diagrams (today's MC1
+  pipeline); `circuit` backends consume `IQPAnsatz`-style quantum circuits.
+  Crossing that line means re-running the ansatz — the Quantum ML Lead's port,
+  not a config switch.
+* **trainer** — `pytorch` backends are `torch.nn.Module`s that differentiate
+  through the simulator, so they use `PytorchTrainer`; `quantum` backends are
+  gradient-free and need `QuantumTrainer` with SPSA.
+
+GPU detection reads `AerSimulator().available_devices()` rather than checking for
+an installed package: `qiskit-aer` and `qiskit-aer-gpu` share an import name, so
+the device list is the only honest signal.
+
+### Findings from `--verify` on the dev box
+
+* `pennylane-qiskit-aer` works and gradients flow, but two 3-word sentences take
+  ~6.5 s versus ~0.05 s on `pennylane-default` — concrete motivation for the GPU work.
+* Adjoint differentiation is **not** usable with lambeq's circuits on
+  `lightning.qubit`: they post-select, and lightning rejects adjoint for them
+  ("does not support adjoint with requested circuit"). The registry therefore
+  leaves `diff_method` at lambeq's default. Worth re-testing on `lightning.gpu`.
+
+## Benchmark sweeps
+
+`qnlp_hpc.sweep` plans repetitions and aggregates them; `scripts/run_sweep.py` is
+the CLI. Repetitions cannot share a process — the pipeline binds hyperparameters at
+import time — so each runs as a subprocess of `run_experiment.py` with its own
+output directory. That costs a few seconds of import overhead per run and buys
+crash isolation: one bad seed cannot take a 30-run sweep down.
+
+Aggregation uses Student's *t* rather than 1.96: at 30 repetitions the difference
+is small but real, and ansatz comparisons are often run with far fewer.
 
 ## Dependency management — Poetry
 
@@ -52,20 +181,37 @@ poetry install --with dev
 # On the HPC node (CUDA 12.4–12.6, driver 550+): add GPU simulators
 poetry install --with dev,gpu
 
-# optional classical ML backend
-poetry install --extras torch
+# circuit-based simulation backends (PennyLane, pytket-qiskit)
+poetry install --with quantum
+
+# only when pulling new datasets from Kaggle
+poetry install --with data
 ```
 
 Core runtime deps (per CLAUDE.md §7): `numpy~1.26`, `networkx^3`, `lambeq 0.5.0`,
-`qiskit^2`, `qiskit-aer` (CPU) / `qiskit-aer-gpu` (GPU group), `pytket`.
+`qiskit^2`, `qiskit-aer` (CPU) / `qiskit-aer-gpu` (GPU group), `pytket`, plus
+`torch`, `pandas`, `scikit-learn`, `matplotlib` for the training pipeline.
+
+`torch` is a **required** dependency, not an extra: `qnlp_hpc.mc1_spider` imports it
+unconditionally (`PytorchModel` / `PytorchTrainer`), so the package will not import
+without it. It resolves to the default PyPI wheel — CUDA-enabled, because the HPC
+node needs GPU support — which makes a cold install several GB.
 
 ## CI — GitHub Actions
 
-`.github/workflows/ci.yml` runs on push/PR to `main`:
+`.github/workflows/ci.yml` runs on push/PR to `main`, in two jobs:
 
-1. Checkout + Python 3.11 (ubuntu-22.04, matches target OS)
-2. Install Poetry, cache `~/.cache/pypoetry`
-3. `poetry install --with dev` (CPU only — no GPU on runners)
-4. `ruff check` → `black --check` → `mypy` → `pytest`
+| Job | Blocking? | Steps |
+|-----|-----------|-------|
+| `lint` | no (advisory) | `ruff check` (GitHub inline annotations) → `black --check` → `mypy` |
+| `test` | **yes** | Poetry install (`--with dev`, cached) → `pytest` |
+
+Lint is advisory on purpose: findings surface as annotations on the contributor's
+own diff instead of being fixed by rewriting their files, and `pre-commit` fixes
+most of them locally before the commit lands. Flip `continue-on-error` off once the
+existing backlog is cleared.
+
+Formatting is **black only** — `ruff-format` is deliberately not enabled in
+`.pre-commit-config.yaml`, since the two formatters disagree and would fight.
 
 GPU/HPC runs are **not** on CI runners (no NVIDIA GPU); benchmark those on the HPC node.
