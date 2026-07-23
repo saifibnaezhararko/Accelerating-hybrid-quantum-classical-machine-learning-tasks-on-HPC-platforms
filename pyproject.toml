@@ -35,7 +35,12 @@ torch = "^2.4"
 optional = true
 
 [tool.poetry.group.gpu.dependencies]
-qiskit-aer-gpu = "^0.17"    # GPU simulator (requires CUDA toolkit + NVIDIA driver 550+)
+# 0.15.1 is the newest qiskit-aer-gpu on PyPI (the CUDA 12 build). CLAUDE.md section 7
+# asks for 0.17.x, which does not exist under this name: only qiskit-aer-gpu-cu11
+# reached 0.17.2, and that is a CUDA 11 wheel. Requesting ^0.17 made Poetry fail
+# to resolve, which broke `poetry install` in CI even though this group is optional
+# (Poetry locks every group, optional or not).
+qiskit-aer-gpu = "^0.15"    # GPU simulator (requires CUDA toolkit + NVIDIA driver 550+)
 cuquantum-python = "*"      # NVIDIA cuQuantum bindings (24.11+)
 
 # Circuit-based simulation backends (CPU). See qnlp_hpc.backends.

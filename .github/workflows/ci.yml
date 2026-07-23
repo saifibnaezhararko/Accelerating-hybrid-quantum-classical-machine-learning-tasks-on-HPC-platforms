@@ -21,7 +21,9 @@ jobs:
   lint:
     name: Lint · type (advisory)
     runs-on: ubuntu-22.04
-    continue-on-error: true
+    # continue-on-error is set per step, not on the job: at job level the job's own
+    # conclusion is still reported as "failure", which puts a red X on the commit.
+    # Per step, the job finishes green and the findings stay visible as annotations.
 
     steps:
       - name: Checkout
@@ -37,12 +39,19 @@ jobs:
         run: pip install "ruff~=0.6" "black~=24.0" "mypy~=1.11"
 
       - name: Ruff
+        continue-on-error: true
         run: ruff check --output-format=github .
 
       - name: Black
+        continue-on-error: true
         run: black --check .
 
       - name: Mypy
+        continue-on-error: true
+        # The package is not installed in this job (linters only), so point mypy
+        # at the source tree instead of relying on it being importable.
+        env:
+          MYPYPATH: src
         run: mypy
 
   # ---------------------------------------------------------------------------
