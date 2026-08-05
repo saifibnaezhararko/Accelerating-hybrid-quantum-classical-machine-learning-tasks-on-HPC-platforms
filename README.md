@@ -3,6 +3,22 @@
 Topic-aware QNLP sentence classifier (programming vs cooking), accelerated from a
 >1hr/6-word-sentence CPU prototype toward GPU-based quantum simulation on HPC.
 
+## Project status
+
+| Component | Current status |
+|---|---|
+| MC1 data preparation and validation | Implemented |
+| SpiderAnsatz tensor baseline | Implemented with config-driven and direct entrypoints |
+| IQPAnsatz quantum-classical CPU reference | Implemented with sentence-disjoint evaluation |
+| Backend capability probing and forward/backward verification | Implemented |
+| GPU simulator configurations | Registered as HPC targets; verification depends on the target node |
+| Repeated CPU-versus-GPU benchmark results | Not yet reported in the repository |
+
+The current IQP experiment is a CPU tensor-contraction reference implementation.
+Registered Aer, PennyLane, and GPU configurations are backend targets and must be
+verified on the machine where they will run; their presence in the registry is not
+itself a benchmark result.
+
 ## Team Roles
 
 * **Saif Ibna Ezhar Arko — Software Development Lead:** Dependency management, backend integration, CI/CD, data pipeline.
@@ -13,9 +29,21 @@ Topic-aware QNLP sentence classifier (programming vs cooking), accelerated from 
 
 ## Docs
 
-* project guide + progress log in [`CLAUDE.md`](CLAUDE.md); layout in [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md).
+* Repository layout and implementation notes are documented in
+  [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md).
 
 ## Quick start
+
+### Requirements
+
+* Git;
+* Python `>=3.11,<3.12`;
+* [Poetry](https://python-poetry.org/).
+
+```bash
+git clone https://github.com/saifibnaezhararko/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms.git
+cd Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms
+```
 
 ```bash
 poetry install --with dev          # CPU baseline + tooling (includes torch)
@@ -26,10 +54,24 @@ poetry run pre-commit install      # enable git hooks
 On the HPC node (CUDA 12.4–12.6, NVIDIA driver 550+):
 
 ```bash
-poetry install --with dev,gpu      # add qiskit-aer-gpu + cuQuantum
+poetry install --with dev,quantum,gpu  # circuit backends + GPU packages
 ```
 
 ## Data pipeline
+
+### Tracked MC1 dataset
+
+The tracked [`data/processed/MC1.txt`](data/processed/MC1.txt) contains 100
+sentence pairs built from 83 unique sentences. It has 47 label-`0` pairs and 53
+label-`1` pairs. Each non-empty line has the form
+
+```text
+sentence 1, sentence 2, label
+```
+
+The repository does not currently document the original provenance or
+redistribution terms of `MC1.txt`. The dataset source and licence should be
+confirmed by the project team before a formal release or publication.
 
 One funnel for every dataset: acquire → convert → validate → `data/processed/`.
 
@@ -211,6 +253,11 @@ statistics, and the cross-split pairs excluded from evaluation.
 
 ## Backends
 
+Backend availability is machine-dependent. The registry describes target
+configurations; `--verify` provides the runtime evidence that a configuration can
+execute and, where applicable, propagate gradients on the current machine. GPU
+backends are not exercised by the CPU-only GitHub Actions workflow.
+
 ```bash
 poetry run python scripts/check_backends.py            # what this machine can run
 poetry run python scripts/check_backends.py --verify   # prove it: real forward/backward
@@ -229,14 +276,18 @@ script.
 | `pytorch-tensor` | tensor | PyTorch | SpiderAnsatz tensor baseline; CUDA when torch reports it |
 | `numpy` | circuit | Quantum | Exact statevector — the reference for the Aer paths |
 | `pennylane-default` / `-lightning` | circuit | PyTorch | CPU circuit simulation, torch autograd |
-| `pennylane-lightning-gpu` | circuit | PyTorch | cuStateVec/cuQuantum on the HPC node |
-| `pennylane-qiskit-aer` / `-gpu` | circuit | PyTorch | Qiskit Aer through PennyLane — Experiments 1 and 2 |
+| `pennylane-lightning-gpu` | circuit | PyTorch | Target cuStateVec/cuQuantum configuration; verify on the HPC node |
+| `pennylane-qiskit-aer` / `-gpu` | circuit | PyTorch | Qiskit Aer through PennyLane; verify the selected CPU/GPU device locally |
 | `tket-aer` | circuit | Quantum | The original prototype path, shot-based + SPSA |
 
 Circuit backends need `poetry install --with quantum`; the GPU ones additionally
 need `--with gpu` (or `pennylane-lightning[gpu]`) on a CUDA node.
 
 ## Benchmark sweeps
+
+The current sweep entrypoint is wired to the config-driven SpiderAnsatz
+experiment. The direct IQP entrypoint is not yet integrated into this sweep
+runner.
 
 ```bash
 poetry run python scripts/run_sweep.py --seeds 0-29                      # 30 repetitions
@@ -256,7 +307,51 @@ take the sweep down.
 contributed. It is excluded from pytest collection, lint, and formatting — run it
 by hand from `tests/` if you want the original numbers.
 
+## Limitations
+
+* MC1 contains only 100 sentence pairs and represents a small two-domain
+  classification task.
+* The SpiderAnsatz and IQPAnsatz pipelines currently use different split
+  protocols, so their test accuracies are not directly comparable.
+* The merged IQP pipeline uses exact CPU tensor contraction through
+  `PytorchQuantumModel`; it does not yet report Aer-GPU, shot-based, or quantum
+  hardware results.
+* GPU backends are target configurations that require verification and
+  benchmarking on the actual HPC node.
+* No repeated CPU-versus-GPU performance table is currently committed, and the
+  repository makes no quantum-advantage claim.
+* The repository does not currently track `poetry.lock`, so exact dependency
+  resolutions can vary between installations.
+
+## Contributing
+
+Before opening a pull request, install the development dependencies and run the
+local checks:
+
+```bash
+poetry install --with dev
+poetry run pre-commit run --all-files
+poetry run pytest
+```
+
+Backend changes should also be checked with:
+
+```bash
+poetry run python scripts/check_backends.py --verify
+```
+
+GPU-related claims should include the simulator version, CPU/GPU model, CUDA
+version, differentiation method, precision, dataset split, repetitions, and wall
+time measured on the target HPC node.
+
+## License
+
+The package metadata in [`pyproject.toml`](pyproject.toml) declares the MIT
+licence, but the repository does not currently contain a `LICENSE` file. The
+maintainers should add the agreed licence file before formal redistribution.
+
 ## Stack
 
 Python 3.11 · lambeq 0.5.0 · Qiskit 2.x · Qiskit Aer (CPU) / Aer-GPU + cuQuantum (HPC) · pytket.
-See `CLAUDE.md` §7 for full version matrix.
+See [`pyproject.toml`](pyproject.toml) for the exact dependency constraints and
+optional dependency groups.
