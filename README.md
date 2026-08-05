@@ -7,7 +7,8 @@ Topic-aware QNLP sentence classifier (programming vs cooking), accelerated from 
 
 * **Saif Ibna Ezhar Arko — Software Development Lead:** Dependency management, backend integration, CI/CD, data pipeline.
 
-* **Evelyn (Yueying) Wu — Quantum Machine Learning Researcher & Developer:** QNLP methodology, SpiderAnsatz model implementation, MC1 experiment design, reusable training and evaluation pipeline development, benchmarking, testing, and reproducibility validation.
+* **Evelyn (Yueying) Wu** — **Quantum Machine Learning Researcher & Developer:** QNLP methodology; SpiderAnsatz model development; implementation of a `cups_reader`–`IQPAnsatz` sentence-pair QNN using lambeq’s `PytorchQuantumModel`; MC1 experiment and sentence-disjoint evaluation design; and development of reusable training, evaluation, benchmarking, testing, and reproducibility workflows.
+
 
 ## Docs
 
