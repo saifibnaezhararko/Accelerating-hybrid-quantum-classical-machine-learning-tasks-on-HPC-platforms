@@ -1,0 +1,59 @@
+PyTorch: 2.13.0+cu126
+Training device: CPU (lambeq tensor contraction)
+Reading: /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/data/processed/MC1.txt
+Training configuration: lr=0.001, weight_decay=1e-05, hidden_dim=16, dropout=0.05, patience=20, iqp_layers=1, sentence_qubits=2
+Loaded 100 examples.
+Complete sentences are disjoint across training/development/test.
+Retained 90 of 100 pairs; dropped 10 cross-split pairs.
+   training:  64 examples | labels {0: 29, 1: 35}
+development:  13 examples | labels {0: 6, 1: 7}
+       test:  13 examples | labels {0: 7, 1: 6}
+Built 83 cups_reader diagrams in 0.02 s.
+Applied 1-layer two-qubit lambeq IQPAnsatz to 83 diagrams in 0.79 s.
+Trainable lambeq symbols: 49
+Circuit output dimension: 4
+Epoch 5:    train/loss: 0.6913   valid/loss: 0.6721   train/time: 23.94s   valid/time: 3.73s   train/acc: 0.5469   train/loss: 0.6779   valid/acc: 0.5385   valid/loss: 0.6721
+Epoch 10:   train/loss: 0.5825   valid/loss: 0.5791   train/time: 22.85s   valid/time: 3.82s   train/acc: 0.9688   train/loss: 0.5878   valid/acc: 0.8462   valid/loss: 0.5791
+Epoch 15:   train/loss: 0.3044   valid/loss: 0.3261   train/time: 22.53s   valid/time: 3.76s   train/acc: 1.0000   train/loss: 0.3369   valid/acc: 1.0000   valid/loss: 0.3261
+Epoch 20:   train/loss: 0.1089   valid/loss: 0.1169   train/time: 22.66s   valid/time: 3.75s   train/acc: 1.0000   train/loss: 0.1161   valid/acc: 1.0000   valid/loss: 0.1169
+Epoch 25:   train/loss: 0.0261   valid/loss: 0.0571   train/time: 22.65s   valid/time: 3.77s   train/acc: 1.0000   train/loss: 0.0479   valid/acc: 1.0000   valid/loss: 0.0571
+Epoch 30:   train/loss: 0.0168   valid/loss: 0.0243   train/time: 22.75s   valid/time: 3.77s   train/acc: 1.0000   train/loss: 0.0226   valid/acc: 1.0000   valid/loss: 0.0243
+Epoch 35:   train/loss: 0.0177   valid/loss: 0.0125   train/time: 22.70s   valid/time: 3.77s   train/acc: 1.0000   train/loss: 0.0131   valid/acc: 1.0000   valid/loss: 0.0125
+Epoch 40:   train/loss: 0.0118   valid/loss: 0.0095   train/time: 23.67s   valid/time: 4.36s   train/acc: 1.0000   train/loss: 0.0093   valid/acc: 1.0000   valid/loss: 0.0095
+Epoch 45:   train/loss: 0.0058   valid/loss: 0.0067   train/time: 23.87s   valid/time: 3.97s   train/acc: 1.0000   train/loss: 0.0071   valid/acc: 1.0000   valid/loss: 0.0067
+Epoch 50:   train/loss: 0.0079   valid/loss: 0.0057   train/time: 23.44s   valid/time: 4.34s   train/acc: 1.0000   train/loss: 0.0049   valid/acc: 1.0000   valid/loss: 0.0057
+Epoch 55:   train/loss: 0.0031   valid/loss: 0.0039   train/time: 24.04s   valid/time: 3.51s   train/acc: 1.0000   train/loss: 0.0038   valid/acc: 1.0000   valid/loss: 0.0039
+Epoch 60:   train/loss: 0.0050   valid/loss: 0.0024   train/time: 22.38s   valid/time: 3.75s   train/acc: 1.0000   train/loss: 0.0031   valid/acc: 1.0000   valid/loss: 0.0024
+Epoch 65:   train/loss: 0.0015   valid/loss: 0.0041   train/time: 22.40s   valid/time: 3.73s   train/acc: 1.0000   train/loss: 0.0027   valid/acc: 1.0000   valid/loss: 0.0041
+Epoch 70:   train/loss: 0.0012   valid/loss: 0.0021   train/time: 22.15s   valid/time: 4.02s   train/acc: 1.0000   train/loss: 0.0023   valid/acc: 1.0000   valid/loss: 0.0021
+Epoch 75:   train/loss: 0.0013   valid/loss: 0.0015   train/time: 22.79s   valid/time: 3.80s   train/acc: 1.0000   train/loss: 0.0025   valid/acc: 1.0000   valid/loss: 0.0015
+Epoch 80:   train/loss: 0.0010   valid/loss: 0.0014   train/time: 22.76s   valid/time: 4.19s   train/acc: 1.0000   train/loss: 0.0018   valid/acc: 1.0000   valid/loss: 0.0014
+Epoch 85:   train/loss: 0.0009   valid/loss: 0.0012   train/time: 24.52s   valid/time: 3.54s   train/acc: 1.0000   train/loss: 0.0016   valid/acc: 1.0000   valid/loss: 0.0012
+Epoch 90:   train/loss: 0.0009   valid/loss: 0.0008   train/time: 23.95s   valid/time: 3.96s   train/acc: 1.0000   train/loss: 0.0013   valid/acc: 1.0000   valid/loss: 0.0008
+Epoch 95:   train/loss: 0.0016   valid/loss: 0.0014   train/time: 24.09s   valid/time: 4.02s   train/acc: 1.0000   train/loss: 0.0011   valid/acc: 1.0000   valid/loss: 0.0014
+Epoch 100:  train/loss: 0.0008   valid/loss: 0.0010   train/time: 23.67s   valid/time: 4.41s   train/acc: 1.0000   train/loss: 0.0010   valid/acc: 1.0000   valid/loss: 0.0010
+Epoch 105:  train/loss: 0.0010   valid/loss: 0.0012   train/time: 23.22s   valid/time: 3.97s   train/acc: 1.0000   train/loss: 0.0009   valid/acc: 1.0000   valid/loss: 0.0012
+Epoch 110:  train/loss: 0.0005   valid/loss: 0.0008   train/time: 22.75s   valid/time: 4.09s   train/acc: 1.0000   train/loss: 0.0008   valid/acc: 1.0000   valid/loss: 0.0008
+Epoch 115:  train/loss: 0.0009   valid/loss: 0.0006   train/time: 24.00s   valid/time: 3.94s   train/acc: 1.0000   train/loss: 0.0007   valid/acc: 1.0000   valid/loss: 0.0006
+Epoch 120:  train/loss: 0.0007   valid/loss: 0.0008   train/time: 24.12s   valid/time: 3.51s   train/acc: 1.0000   train/loss: 0.0007   valid/acc: 1.0000   valid/loss: 0.0008
+
+Training completed!
+train/time: 9m18s   train/time_per_epoch: 4.65s   train/time_per_step: 0.58s   valid/time: 1m33s   valid/time_per_eval: 0.78s
+Training completed in 653.24 s.
+Loaded best checkpoint: /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/outputs/mc1_iqp_cups/training_logs/best_model.lt
+Training prediction counts: {0: 29, 1: 35}
+Development prediction counts: {0: 6, 1: 7}
+Test prediction counts: {0: 7, 1: 6}
+Selected epoch: 118 (minimum development loss)
+Selected development metrics: accuracy=1.0000, loss=0.0005
+Test accuracy: 1.0000
+                      precision    recall  f1-score   support
+
+different domain (0)     1.0000    1.0000    1.0000         7
+     same domain (1)     1.0000    1.0000    1.0000         6
+
+            accuracy                         1.0000        13
+           macro avg     1.0000    1.0000    1.0000        13
+        weighted avg     1.0000    1.0000    1.0000        13
+
+Outputs saved in: /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/outputs/mc1_iqp_cups
