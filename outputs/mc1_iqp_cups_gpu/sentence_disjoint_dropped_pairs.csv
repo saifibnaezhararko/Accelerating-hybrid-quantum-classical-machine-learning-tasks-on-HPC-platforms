@@ -1,0 +1,11 @@
+sentence_1,sentence_2,label
+programmer creates code,programmer creates advanced code,1
+programmer creates code,devoted hacker writes code,1
+programmer writes advanced code,hacker writes code,1
+chef creates tasty meal,skilful programmer writes advanced code,0
+cook creates meal,chef creates dish,1
+chef creates dish,programmer creates complicated code,0
+programmer writes code,cook prepares complicated meal,0
+hacker writes advanced code,hacker creates code,1
+programmer creates code,cook creates dish,0
+programmer writes code,chef creates meal,0

@@ -1,0 +1,84 @@
+sentence,split
+chef creates complicated dish,training
+chef creates complicated meal,training
+chef creates tasty dish,training
+chef prepares complicated dish,training
+chef prepares dish,training
+chef prepares meal,training
+chef prepares tasty meal,training
+cook creates complicated dish,training
+cook creates complicated meal,training
+cook creates dish,training
+cook creates meal,training
+cook creates tasty dish,training
+cook prepares dish,training
+cook prepares tasty dish,training
+cook prepares tasty meal,training
+devoted hacker creates advanced code,training
+devoted hacker creates code,training
+devoted hacker creates complicated code,training
+devoted hacker writes advanced code,training
+devoted hacker writes code,training
+devoted hacker writes complicated code,training
+devoted programmer creates complicated code,training
+devoted programmer writes code,training
+experienced chef creates dish,training
+experienced chef creates meal,training
+experienced chef creates tasty meal,training
+experienced chef prepares complicated dish,training
+experienced cook creates dish,training
+experienced cook creates meal,training
+experienced cook prepares dish,training
+experienced cook prepares tasty dish,training
+experienced cook prepares tasty meal,training
+hacker creates code,training
+hacker writes code,training
+hacker writes complicated code,training
+programmer creates advanced code,training
+programmer creates complicated code,training
+programmer writes code,training
+skilful chef creates complicated dish,training
+skilful chef creates dish,training
+skilful chef creates meal,training
+skilful chef creates tasty dish,training
+skilful chef creates tasty meal,training
+skilful chef prepares dish,training
+skilful chef prepares tasty meal,training
+skilful cook creates complicated dish,training
+skilful cook creates meal,training
+skilful cook prepares complicated meal,training
+skilful cook prepares tasty dish,training
+skilful cook prepares tasty meal,training
+skilful hacker creates advanced code,training
+skilful hacker creates code,training
+skilful hacker creates complicated code,training
+skilful hacker writes advanced code,training
+skilful hacker writes code,training
+skilful hacker writes complicated code,training
+skilful programmer creates advanced code,training
+skilful programmer creates code,training
+chef creates meal,development
+chef prepares tasty dish,development
+cook prepares meal,development
+devoted programmer creates advanced code,development
+experienced chef creates complicated meal,development
+experienced cook prepares complicated dish,development
+programmer writes complicated code,development
+skilful chef prepares complicated dish,development
+skilful chef prepares tasty dish,development
+skilful cook creates tasty dish,development
+skilful cook prepares meal,development
+skilful programmer creates complicated code,development
+skilful programmer writes advanced code,development
+skilful programmer writes code,development
+chef creates dish,test
+chef creates tasty meal,test
+cook prepares complicated dish,test
+cook prepares complicated meal,test
+experienced chef creates complicated dish,test
+experienced chef prepares meal,test
+experienced cook prepares meal,test
+hacker creates advanced code,test
+hacker writes advanced code,test
+programmer creates code,test
+programmer writes advanced code,test

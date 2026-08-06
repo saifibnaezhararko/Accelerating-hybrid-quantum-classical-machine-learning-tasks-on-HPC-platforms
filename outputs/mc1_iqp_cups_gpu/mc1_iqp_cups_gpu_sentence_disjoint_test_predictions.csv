@@ -1,0 +1,14 @@
+sentence_1,sentence_2,label,predicted_label,correct,probability_label_0,probability_label_1
+experienced cook prepares meal,experienced chef prepares meal,1,1,True,0.0008303643,0.9991697
+programmer creates code,cook prepares complicated dish,0,0,True,0.99964106,0.0003589361
+chef creates dish,programmer writes advanced code,0,0,True,0.99963903,0.00036098852
+experienced chef creates complicated dish,experienced chef prepares meal,1,1,True,0.00083027955,0.9991697
+chef creates tasty meal,cook prepares complicated dish,1,1,True,0.00083027326,0.9991697
+cook prepares complicated dish,hacker writes advanced code,0,0,True,0.99963915,0.0003608034
+cook prepares complicated meal,cook prepares complicated dish,1,1,True,0.000830278,0.9991697
+hacker creates advanced code,chef creates dish,0,0,True,0.9996393,0.00036069143
+experienced chef prepares meal,programmer creates code,0,0,True,0.99964106,0.00035897797
+hacker creates advanced code,programmer creates code,1,1,True,0.00064614904,0.9993538
+programmer writes advanced code,hacker creates advanced code,1,1,True,0.000646544,0.99935347
+hacker writes advanced code,chef creates dish,0,0,True,0.99963915,0.0003608034
+programmer creates code,chef creates dish,0,0,True,0.99964106,0.0003589361

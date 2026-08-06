@@ -1,0 +1,6 @@
+split,pairs,unique_sentences,label_0,label_1
+training,64,58,29,35
+development,13,14,6,7
+test,13,11,7,6
+dropped_cross_split,10,16,5,5
+full_input,100,83,47,53
