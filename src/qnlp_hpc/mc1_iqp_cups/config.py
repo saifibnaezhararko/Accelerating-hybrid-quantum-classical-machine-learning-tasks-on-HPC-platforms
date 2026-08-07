@@ -1,8 +1,9 @@
-"""Configuration for the MC1 cups_reader and IQP experiment."""
+"""Configuration for the TREC pair cups_reader and IQP experiment."""
 
 from qnlp_hpc.paths import OUTPUTS_DIR, PROCESSED_DIR
 
 SEED = 2
+GPU_DEVICE = 0
 
 BATCH_SIZE = 8
 EPOCHS = 120
@@ -18,42 +19,18 @@ IQP_LAYERS = 1
 N_SINGLE_QUBIT_PARAMS = 3
 CIRCUIT_OUTPUT_DIM = 2**SENTENCE_QUBITS
 
-DATA_PATH = PROCESSED_DIR / "MC1.txt"
-OUTPUT_DIR = OUTPUTS_DIR / "mc1_iqp_cups"
+# TREC sentence-pair dataset
+DATA_PATH = PROCESSED_DIR / "trec_pairs_1000.txt"
+
+# 90% train+development, 10% final test
+TEST_RATIO = 0.10
+
+# Take 10% of the remaining 90% as development
+# Final sizes for 1000 samples:
+# train = 810
+# development = 90
+# test = 100
+DEVELOPMENT_RATIO = 0.10
+
+OUTPUT_DIR = OUTPUTS_DIR / "trec_iqp_cups_gpu"
 LOG_DIR = OUTPUT_DIR / "training_logs"
-
-# Every sentence not listed here is assigned to training.
-DEVELOPMENT_SENTENCES = frozenset(
-    {
-        "chef creates meal",
-        "chef prepares tasty dish",
-        "cook prepares meal",
-        "devoted programmer creates advanced code",
-        "experienced chef creates complicated meal",
-        "experienced cook prepares complicated dish",
-        "programmer writes complicated code",
-        "skilful chef prepares complicated dish",
-        "skilful chef prepares tasty dish",
-        "skilful cook creates tasty dish",
-        "skilful cook prepares meal",
-        "skilful programmer creates complicated code",
-        "skilful programmer writes advanced code",
-        "skilful programmer writes code",
-    }
-)
-
-TEST_SENTENCES = frozenset(
-    {
-        "chef creates dish",
-        "chef creates tasty meal",
-        "cook prepares complicated dish",
-        "cook prepares complicated meal",
-        "experienced chef creates complicated dish",
-        "experienced chef prepares meal",
-        "experienced cook prepares meal",
-        "hacker creates advanced code",
-        "hacker writes advanced code",
-        "programmer creates code",
-        "programmer writes advanced code",
-    }
-)

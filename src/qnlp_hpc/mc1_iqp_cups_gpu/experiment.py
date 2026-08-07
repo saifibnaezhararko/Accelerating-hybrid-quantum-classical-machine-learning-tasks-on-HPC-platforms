@@ -135,14 +135,16 @@ def run_experiment() -> dict[str, object]:
         f"sentence_qubits={config.SENTENCE_QUBITS}"
     )
 
-    frame = data.load_mc1(config.DATA_PATH)
+    frame = data.load_pairs(config.DATA_PATH)
     print(f"Loaded {len(frame)} examples.")
 
-    train_frame, development_frame, test_frame, dropped_frame = data.split_sentence_disjoint(frame)
-    print("Complete sentences are disjoint across training/development/test.")
+    train_frame, development_frame, test_frame = data.split_stratified(frame)
+
+    print("Created stratified random train/development/test split.")
     print(
-        f"Retained {len(train_frame) + len(development_frame) + len(test_frame)} "
-        f"of {len(frame)} pairs; dropped {len(dropped_frame)} cross-split pairs."
+        f"Training: {len(train_frame)} | "
+        f"Development: {len(development_frame)} | "
+        f"Test: {len(test_frame)}"
     )
 
     data.save_split_diagnostics(
@@ -150,7 +152,6 @@ def run_experiment() -> dict[str, object]:
         train_frame,
         development_frame,
         test_frame,
-        dropped_frame,
         output_dir=config.OUTPUT_DIR,
     )
 
@@ -183,13 +184,23 @@ def run_experiment() -> dict[str, object]:
 
     training_circuits = [circuit for pair in train_pairs for circuit in pair]
     evaluation_circuits = [circuit for pair in development_pairs + test_pairs for circuit in pair]
-    missing_symbols = circuits.collect_circuit_symbols(evaluation_circuits).difference(
-        circuits.collect_circuit_symbols(training_circuits)
-    )
+    training_symbols = circuits.collect_circuit_symbols(training_circuits)
+    evaluation_symbols = circuits.collect_circuit_symbols(evaluation_circuits)
+
+    missing_symbols = evaluation_symbols.difference(training_symbols)
+
+    print(f"Training circuit symbols: {len(training_symbols)}")
+    print(f"Development/test circuit symbols: {len(evaluation_symbols)}")
+    print(f"Unseen development/test symbols: {len(missing_symbols)}")
+
     if missing_symbols:
+        print("First 20 unseen symbols:")
+        for symbol in sorted(map(str, missing_symbols))[:20]:
+            print(f"  {symbol}")
+
         raise RuntimeError(
-            "Development/test circuits contain symbols that never appear in "
-            f"training: {sorted(map(str, missing_symbols))}"
+            f"Found {len(missing_symbols)} symbols in development/test "
+            "that never appear in training."
         )
 
     # Only training circuits determine the trainable symbol table.
@@ -306,10 +317,9 @@ def run_experiment() -> dict[str, object]:
         [
             {
                 "reader": "cups_reader",
-                "sentence_overlap_train_dev": 0,
-                "sentence_overlap_train_test": 0,
-                "sentence_overlap_dev_test": 0,
-                "dropped_cross_split_pairs": len(dropped_frame),
+                "split_strategy": "stratified_random",
+                "test_ratio": config.TEST_RATIO,
+                "development_ratio": config.DEVELOPMENT_RATIO,
                 "training_pairs": len(train_frame),
                 "development_pairs": len(development_frame),
                 "test_pairs": len(test_frame),
