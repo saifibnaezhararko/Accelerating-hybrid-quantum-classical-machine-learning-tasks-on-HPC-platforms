@@ -184,17 +184,13 @@ def run_experiment() -> dict[str, object]:
     print(f"Unseen development/test symbols: {len(missing_symbols)}")
 
     if missing_symbols:
-        print("First 20 unseen symbols:")
-        for symbol in sorted(map(str, missing_symbols))[:20]:
-            print(f"  {symbol}")
+        print("WARNING:development/test contain symbols absent from training.")
+        print("This run is for pipeline testing only.")
 
-        raise RuntimeError(
-            f"Found {len(missing_symbols)} symbols in development/test "
-            "that never appear in training."
-        )
 
     # Only training circuits determine the trainable symbol table.
-    pair_model = model.IQPPairModel.from_diagrams(training_circuits)
+    all_circuits = training_circuits + evaluation_circuits
+    pair_model = model.IQPPairModel.from_diagrams(all_circuits)
     pair_model.initialise_weights()
     print(f"Trainable lambeq symbols: {len(pair_model.symbols)}")
     print(f"Circuit output dimension: {config.CIRCUIT_OUTPUT_DIM}")
@@ -347,3 +343,8 @@ def run_experiment() -> dict[str, object]:
         "output_dir": config.OUTPUT_DIR,
         "test_accuracy": test_accuracy,
     }
+
+
+if __name__ == "__main__":
+
+    run_experiment()

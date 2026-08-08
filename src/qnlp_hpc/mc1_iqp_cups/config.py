@@ -20,7 +20,7 @@ N_SINGLE_QUBIT_PARAMS = 3
 CIRCUIT_OUTPUT_DIM = 2**SENTENCE_QUBITS
 
 # TREC sentence-pair dataset
-DATA_PATH = PROCESSED_DIR / "trec_pairs_1000.txt"
+DATA_PATH = PROCESSED_DIR / "trec_pairs_500.txt"
 
 # 90% train+development, 10% final test
 TEST_RATIO = 0.10
@@ -32,5 +32,5 @@ TEST_RATIO = 0.10
 # test = 100
 DEVELOPMENT_RATIO = 0.10
 
-OUTPUT_DIR = OUTPUTS_DIR / "trec_iqp_cups_gpu"
+OUTPUT_DIR = OUTPUTS_DIR / "trec_iqp_cups"
 LOG_DIR = OUTPUT_DIR / "training_logs"
