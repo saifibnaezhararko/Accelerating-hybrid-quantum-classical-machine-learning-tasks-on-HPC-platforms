@@ -1,0 +1,51 @@
+sentence_1,sentence_2,label,predicted_label,correct,probability_label_0,probability_label_1
+What international organization was founded by Clara Barton ?,What organization has a Security Council ?,1,1,True,0.49165896,0.5083411
+What is SVHS ?,What does the abbreviation OAS stand for ?,1,1,True,0.49165434,0.5083457
+What does IQ stand for ?,What is RCD ?,1,1,True,0.49165207,0.5083479
+What is AFS ?,What is BPH ?,1,1,True,0.49166498,0.508335
+What U.S. city is The Queen of the Pacific ?,Who co-starred with Julie Andrews in Mary Poppins ?,0,1,False,0.49168828,0.50831175
+About how many soldiers died in World War II ?,What percentage of American men are alcoholic ?,1,1,True,0.49165723,0.50834274
+What is Tetrinet ?,How do cameras take pictures ?,1,1,True,0.49166763,0.5083323
+In what county is Eckley Colorado ?,What direction do most baseball pitchers pitch toward ?,1,1,True,0.49165514,0.5083448
+Who is the sexiest women in the world ?,What radio station did Paul Harvey work for ?,1,0,False,0.5310818,0.4689182
+What is a `` False Moon '' ?,Who is the owner of CNN ?,0,1,False,0.49166036,0.50833964
+What is the abbreviation of General Motors ?,What is the abbreviation of the International Olympic Committee ?,1,0,False,0.50881046,0.49118954
+What is Dr. Seuss ' most popular book ?,What is RCD ?,0,1,False,0.49165857,0.50834143
+What was Marilyn Monroe 's real name ?,Woodrow Wilson served as president of what university ?,1,1,True,0.49166322,0.5083368
+What does U.S.S.R. stand for ?,What is the abbreviation for Original Equipment Manufacturer ?,1,0,False,0.51268476,0.48731524
+What is witch hazel ?,What does NASA stand for ?,0,1,False,0.4916544,0.5083456
+Where did Gulliver find a race of tiny people ?,What measures did Clinton take to avoid the draft ?,0,1,False,0.4916585,0.5083415
+Where do the Grimace and Mayor McCheese live ?,What sea is Bombay on ?,1,1,True,0.49165642,0.5083436
+What is a green bog ?,How does a chick breathe inside an egg ?,1,1,True,0.4916552,0.5083448
+What 's the mystery of the Bermuda Triangle ?,What is a fear of machinery ?,0,1,False,0.49165586,0.5083442
+What does HIV stand for ?,"In a computer , what does SCSI mean ?",1,1,True,0.49166116,0.50833887
+Where is the Isle of Man ?,Which area produces the least acidic coffee ?,1,1,True,0.49165902,0.508341
+Who wrote ` The Pines of Rome ' ?,Where did the world come from ?,0,1,False,0.49182057,0.5081794
+What does SIDS stand for ?,What is a fear of children ?,0,1,False,0.4916552,0.5083448
+What famed library can you reach by dialing 22-287-5 ?,What sea separates Naples and Algiers ?,1,1,True,0.49165863,0.5083414
+How many people did Randy Craft kill ?,What is the chromosome number of an elephant ?,1,1,True,0.49168575,0.50831425
+What does NASDAQ stand for ?,What is the origin of Boxing Day ?,0,1,False,0.49166098,0.508339
+What film or films has Jude Law appeared in ?,What movie did Steven Spielberg direct in 1975 ?,1,1,True,0.49988884,0.50011116
+Who painted the Sistine Chapel ?,How do I tie a tie ?,0,1,False,0.49166328,0.5083367
+What is SAP ?,What is the best-selling book of all time ?,0,1,False,0.49166116,0.5083388
+What does the channel ESPN stand for ?,Where can I read about Abraham Lincoln ?,0,1,False,0.49166393,0.50833607
+What attorney-general ordered the closing of Alcatraz ?,What lake is Sheboygan on ?,0,1,False,0.49165124,0.50834876
+What tragedy befell the city of Dogtown in 1899 ?,When is the Thai New Year ?,0,1,False,0.49168167,0.50831836
+What does CNN stand for ?,What does the abbreviation IOC stand for ?,1,1,True,0.491651,0.508349
+What was William F. Cody 's better-known name ?,Who would you use the Heimlich maneuver on ?,1,1,True,0.49165702,0.508343
+What is humidity ?,What is the largest city in the world ?,0,0,True,0.5402427,0.45975733
+What is the oldest profession ?,Who 's The King of Swing ?,1,1,True,0.49167138,0.5083286
+What is state tree of Nebraska ?,What does a pedometer measure ?,1,1,True,0.4916628,0.5083372
+What are the Valdez Principles ?,When was the Parthenon built ?,0,1,False,0.49166682,0.5083332
+Mississippi has what name for a state nickname ?,Who is the leader of Brunei ?,0,0,True,0.54824567,0.45175436
+Where is the Danube ?,Who were the four famous founders of United Artists ?,0,1,False,0.49167153,0.50832844
+Where was Poe born ?,What city has the world 's longest subway system ?,1,1,True,0.491673,0.50832707
+What is SAP ?,What animals do you find in the stock market ?,0,1,False,0.4916651,0.5083349
+What age is Benny Carter ?,What 's the main vegetable in vichyssoise ?,0,1,False,0.49166024,0.50833976
+What is the chromosome number of an elephant ?,What U.S. state has the second-longest coastline ?,0,1,False,0.4916824,0.5083176
+Who bestowed great power upon Captain Britain ?,What comedian was The Perfect Fool ?,1,1,True,0.4916557,0.5083443
+What 's the abbreviation for limited partnership ?,What is the abbreviation of the International Olympic Committee ?,1,0,False,0.51003003,0.48997
+How many people did Randy Steven Craft murder ?,What is the first book of the Old Testament ?,0,1,False,0.4916627,0.5083373
+What is RAM in the computer ?,What will happen when sodium is put in water ?,0,1,False,0.49166933,0.5083307
+What is SVHS ?,How big is the largest diamond ?,0,1,False,0.49166146,0.5083385
+What were the causes of the Civil War ?,When was Yemen reunified ?,0,1,False,0.4916699,0.5083301

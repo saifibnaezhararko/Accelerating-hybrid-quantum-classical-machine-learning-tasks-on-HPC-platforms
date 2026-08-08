@@ -2,22 +2,67 @@ PyTorch: 2.13.0+cu126
 PyTorch CUDA build: 12.6
 Training device: cuda:0 (Tesla V100S-PCIE-32GB)
 Reading: /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/data/processed/trec_pairs_500.txt
-Training configuration: lr=0.001, weight_decay=1e-05, hidden_dim=16, dropout=0.05, patience=20, iqp_layers=1, sentence_qubits=2
+Training configuration: lr=0.001, weight_decay=1e-05, hidden_dim=16, dropout=0.05, patience=120, iqp_layers=1, sentence_qubits=2
 Loaded 500 examples.
 Created stratified random train/development/test split.
 Training: 405 | Development: 45 | Test: 50
    training: 405 examples | labels {0: 202, 1: 203}
 development:  45 examples | labels {0: 23, 1: 22}
        test:  50 examples | labels {0: 25, 1: 25}
-Built 179 cups_reader diagrams in 0.38 s.
-Applied 1-layer two-qubit lambeq IQPAnsatz to 179 diagrams in 4.37 s.
-Training circuit symbols: 2197
-Development/test circuit symbols: 1441
-Unseen development/test symbols: 15
-WARNING: development/test contain symbols absent from training.
+Built 799 cups_reader diagrams in 0.62 s.
+Applied 1-layer two-qubit lambeq IQPAnsatz to 799 diagrams in 16.41 s.
+Training circuit symbols: 4915
+Development/test circuit symbols: 1567
+Unseen development/test symbols: 690
+WARNING:development/test contain symbols absent from training.
 This run is for pipeline testing only.
-Trainable lambeq symbols: 2212
+Trainable lambeq symbols: 5605
 Circuit output dimension: 4
 /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/.venv/lib/python3.12/site-packages/torch/__init__.py:1332: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/tensor/python_tensor.cpp:434.)
   _C._set_default_tensor_type(t)
 Model parameter device: cuda:0
+Epoch 5:    train/loss: 0.7041   valid/loss: 0.6973   train/time: 7m58s   valid/time: 38.68s   train/acc: 0.5802   train/loss: 0.6727   valid/acc: 0.4667   valid/loss: 0.6973
+Epoch 10:   train/loss: 0.7495   valid/loss: 0.8269   train/time: 7m50s   valid/time: 37.21s   train/acc: 0.7901   train/loss: 0.4302   valid/acc: 0.5333   valid/loss: 0.8269
+Epoch 15:   train/loss: 0.4783   valid/loss: 1.1796   train/time: 7m45s   valid/time: 36.11s   train/acc: 0.9432   train/loss: 0.1513   valid/acc: 0.4667   valid/loss: 1.1796
+Epoch 20:   train/loss: 0.0327   valid/loss: 1.5549   train/time: 7m37s   valid/time: 35.15s   train/acc: 0.9827   train/loss: 0.0690   valid/acc: 0.4222   valid/loss: 1.5549
+Epoch 25:   train/loss: 0.0615   valid/loss: 1.5587   train/time: 7m50s   valid/time: 33.98s   train/acc: 0.9926   train/loss: 0.0419   valid/acc: 0.4000   valid/loss: 1.5587
+Epoch 30:   train/loss: 0.0070   valid/loss: 1.5447   train/time: 7m52s   valid/time: 38.38s   train/acc: 0.9926   train/loss: 0.0389   valid/acc: 0.5333   valid/loss: 1.5447
+Epoch 35:   train/loss: 0.0010   valid/loss: 1.6455   train/time: 7m32s   valid/time: 37.24s   train/acc: 0.9951   train/loss: 0.0176   valid/acc: 0.5333   valid/loss: 1.6455
+Epoch 40:   train/loss: 0.0364   valid/loss: 1.7930   train/time: 7m34s   valid/time: 36.12s   train/acc: 1.0000   train/loss: 0.0084   valid/acc: 0.5333   valid/loss: 1.7930
+Epoch 45:   train/loss: 0.0009   valid/loss: 1.8687   train/time: 7m39s   valid/time: 37.56s   train/acc: 1.0000   train/loss: 0.0044   valid/acc: 0.5333   valid/loss: 1.8687
+Epoch 50:   train/loss: 0.0018   valid/loss: 2.0004   train/time: 7m34s   valid/time: 38.69s   train/acc: 1.0000   train/loss: 0.0037   valid/acc: 0.5333   valid/loss: 2.0004
+Epoch 55:   train/loss: 0.0192   valid/loss: 2.0847   train/time: 7m26s   valid/time: 34.10s   train/acc: 0.9975   train/loss: 0.0200   valid/acc: 0.5333   valid/loss: 2.0847
+Epoch 60:   train/loss: 0.0003   valid/loss: 2.2248   train/time: 7m55s   valid/time: 38.81s   train/acc: 1.0000   train/loss: 0.0025   valid/acc: 0.5556   valid/loss: 2.2248
+Epoch 65:   train/loss: 0.0002   valid/loss: 2.3501   train/time: 7m48s   valid/time: 37.38s   train/acc: 1.0000   train/loss: 0.0033   valid/acc: 0.5111   valid/loss: 2.3501
+Epoch 70:   train/loss: 0.0013   valid/loss: 2.4666   train/time: 7m43s   valid/time: 35.09s   train/acc: 1.0000   train/loss: 0.0019   valid/acc: 0.5111   valid/loss: 2.4666
+Epoch 75:   train/loss: 0.0001   valid/loss: 2.5697   train/time: 7m47s   valid/time: 38.27s   train/acc: 1.0000   train/loss: 0.0014   valid/acc: 0.5556   valid/loss: 2.5697
+Epoch 80:   train/loss: 0.0000   valid/loss: 2.5517   train/time: 7m31s   valid/time: 33.12s   train/acc: 1.0000   train/loss: 0.0010   valid/acc: 0.5778   valid/loss: 2.5517
+Epoch 85:   train/loss: 0.0001   valid/loss: 2.6971   train/time: 7m41s   valid/time: 38.30s   train/acc: 1.0000   train/loss: 0.0010   valid/acc: 0.5778   valid/loss: 2.6971
+Epoch 90:   train/loss: 0.0006   valid/loss: 2.3765   train/time: 7m47s   valid/time: 38.66s   train/acc: 1.0000   train/loss: 0.0030   valid/acc: 0.5333   valid/loss: 2.3765
+Epoch 95:   train/loss: 0.0003   valid/loss: 2.1932   train/time: 7m56s   valid/time: 34.95s   train/acc: 0.9975   train/loss: 0.0133   valid/acc: 0.6000   valid/loss: 2.1932
+Epoch 100:  train/loss: 0.0006   valid/loss: 1.9310   train/time: 7m45s   valid/time: 38.46s   train/acc: 0.9951   train/loss: 0.0204   valid/acc: 0.5778   valid/loss: 1.9310
+Epoch 105:  train/loss: 0.0003   valid/loss: 2.0273   train/time: 7m41s   valid/time: 34.96s   train/acc: 1.0000   train/loss: 0.0021   valid/acc: 0.5556   valid/loss: 2.0273
+Epoch 110:  train/loss: 0.0003   valid/loss: 1.8809   train/time: 7m44s   valid/time: 39.22s   train/acc: 1.0000   train/loss: 0.0019   valid/acc: 0.5778   valid/loss: 1.8809
+Epoch 115:  train/loss: 0.0002   valid/loss: 2.0196   train/time: 7m41s   valid/time: 36.39s   train/acc: 1.0000   train/loss: 0.0019   valid/acc: 0.6000   valid/loss: 2.0196
+Epoch 120:  train/loss: 0.0011   valid/loss: 2.1575   train/time: 7m38s   valid/time: 37.69s   train/acc: 1.0000   train/loss: 0.0009   valid/acc: 0.5778   valid/loss: 2.1575
+
+Training completed!
+train/time: 3h5m15s   train/time_per_epoch: 1m33s   train/time_per_step: 1.82s   valid/time: 14m45s   valid/time_per_eval: 7.37s
+Training completed in 12016.69 s.
+Loaded best checkpoint: /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/outputs/trec_iqp_cups_gpu/training_logs/best_model.lt
+Training prediction counts: {0: 70, 1: 335}
+Development prediction counts: {0: 7, 1: 38}
+Test prediction counts: {0: 6, 1: 44}
+Selected epoch: 3 (minimum development loss)
+Selected development metrics: accuracy=0.5556, loss=0.6850
+Test accuracy: 0.4600
+                      precision    recall  f1-score   support
+
+different domain (0)     0.3333    0.0800    0.1290        25
+     same domain (1)     0.4773    0.8400    0.6087        25
+
+            accuracy                         0.4600        50
+           macro avg     0.4053    0.4600    0.3689        50
+        weighted avg     0.4053    0.4600    0.3689        50
+
+Outputs saved in: /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/outputs/trec_iqp_cups_gpu
