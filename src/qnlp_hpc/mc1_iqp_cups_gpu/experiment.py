@@ -194,7 +194,7 @@ def run_experiment() -> dict[str, object]:
     print(f"Unseen development/test symbols: {len(missing_symbols)}")
 
     if missing_symbols:
-        print("WARNING: development/test contain symbols absent from training.")
+        print("WARNING:development/test contain symbols absent from training.")
         print("This run is for pipeline testing only.")
 
     # Only training circuits determine the trainable symbol table.
