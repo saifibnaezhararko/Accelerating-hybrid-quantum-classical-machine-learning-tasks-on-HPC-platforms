@@ -1,0 +1,5 @@
+split,pairs,unique_sentences,label_0,label_1
+training,405,178,202,203
+development,45,64,23,22
+test,50,81,25,25
+full_input,500,179,250,250

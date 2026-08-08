@@ -1,0 +1,19 @@
+PyTorch: 2.13.0+cu126
+Training device: CPU (lambeq tensor contraction)
+Reading: /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/data/processed/trec_pairs_500.txt
+Training configuration: lr=0.001, weight_decay=1e-05, hidden_dim=16, dropout=0.05, patience=20, iqp_layers=1, sentence_qubits=2
+Loaded 500 examples.
+Created stratified random train/development/test split.
+Training: 405 | Development: 45 | Test: 50
+   training: 405 examples | labels {0: 202, 1: 203}
+development:  45 examples | labels {0: 23, 1: 22}
+       test:  50 examples | labels {0: 25, 1: 25}
+Built 179 cups_reader diagrams in 0.47 s.
+Applied 1-layer two-qubit lambeq IQPAnsatz to 179 diagrams in 4.65 s.
+Training circuit symbols: 2197
+Development/test circuit symbols: 1441
+Unseen development/test symbols: 15
+WARNING:development/test contain symbols absent from training.
+This run is for pipeline testing only.
+Trainable lambeq symbols: 2212
+Circuit output dimension: 4
