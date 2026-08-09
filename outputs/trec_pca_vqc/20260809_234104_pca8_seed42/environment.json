@@ -1,0 +1,9 @@
+{
+  "python": "3.12.8",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "pytorch": "2.12.1+cpu",
+  "pytorch_cuda_build": null,
+  "cuda_available": false,
+  "cuda_device": null,
+  "scikit_learn": "1.9.0"
+}

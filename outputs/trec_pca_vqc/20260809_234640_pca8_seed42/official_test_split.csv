@@ -1,0 +1,501 @@
+text,coarse_label,fine_label,label,source_line
+how far is it from denver to aspen ?,NUM,dist,5,1
+"what county is modesto , california in ?",LOC,city,4,2
+who was galileo ?,HUM,desc,3,3
+what is an atom ?,DESC,def,1,4
+when did hawaii become a state ?,NUM,date,5,5
+how tall is the sears building ?,NUM,dist,5,6
+george bush purchased a small interest in which baseball team ?,HUM,gr,3,7
+what is australia 's national flower ?,ENTY,plant,2,8
+why does the moon turn orange ?,DESC,reason,1,9
+what is autism ?,DESC,def,1,10
+what city had a world fair in 1900 ?,LOC,city,4,11
+what person 's head is on a dime ?,HUM,ind,3,12
+what is the average weight of a yellow labrador ?,NUM,weight,5,13
+who was the first man to fly across the pacific ocean ?,HUM,ind,3,14
+when did idaho become a state ?,NUM,date,5,15
+what is the life expectancy for crickets ?,NUM,other,5,16
+what metal has the highest melting point ?,ENTY,substance,2,17
+who developed the vaccination against polio ?,HUM,ind,3,18
+what is epilepsy ?,DESC,def,1,19
+what year did the titanic sink ?,NUM,date,5,20
+who was the first american to walk in space ?,HUM,ind,3,21
+what is a biosphere ?,DESC,def,1,22
+what river in the us is known as the big muddy ?,LOC,other,4,23
+what is bipolar disorder ?,DESC,def,1,24
+what is cholesterol ?,DESC,def,1,25
+who developed the macintosh computer ?,HUM,ind,3,26
+what is caffeine ?,DESC,def,1,27
+what imaginary line is halfway between the north and south poles ?,LOC,other,4,28
+where is john wayne airport ?,LOC,other,4,29
+what hemisphere is the philippines in ?,LOC,other,4,30
+what is the average speed of the horses at the kentucky derby ?,NUM,speed,5,31
+where are the rocky mountains ?,LOC,mount,4,32
+what are invertebrates ?,DESC,def,1,33
+what is the temperature at the center of the earth ?,NUM,temp,5,34
+when did john f. kennedy get elected as president ?,NUM,date,5,35
+how old was elvis presley when he died ?,NUM,period,5,36
+where is the orinoco river ?,LOC,other,4,37
+how far is the service line from the net in tennis ?,NUM,dist,5,38
+how much fiber should you have per day ?,NUM,count,5,39
+how many great lakes are there ?,NUM,count,5,40
+material called linen is made from what plant ?,ENTY,plant,2,41
+what is teflon ?,DESC,def,1,42
+what is amitriptyline ?,DESC,def,1,43
+what is a shaman ?,DESC,def,1,44
+what is the proper name for a female walrus ?,ENTY,animal,2,45
+what is a group of turkeys called ?,ENTY,animal,2,46
+how long did rip van winkle sleep ?,NUM,period,5,47
+what are triglycerides ?,DESC,def,1,48
+how many liters in a gallon ?,NUM,count,5,49
+what is the name of the chocolate company in san francisco ?,HUM,gr,3,50
+what are amphibians ?,DESC,def,1,51
+who discovered x-rays ?,HUM,ind,3,52
+which comedian 's signature line is `` can we talk '' ?,HUM,ind,3,53
+what is fibromyalgia ?,DESC,def,1,54
+what is done with worn or outdated flags ?,DESC,desc,1,55
+what does cc in engines mean ?,DESC,def,1,56
+when did elvis presley die ?,NUM,date,5,57
+what is the capital of yugoslavia ?,LOC,city,4,58
+where is milan ?,LOC,city,4,59
+what is the speed hummingbirds fly ?,NUM,speed,5,60
+what is the oldest city in the united states ?,LOC,city,4,61
+what was w.c. fields ' real name ?,HUM,ind,3,62
+"what river flows between fargo , north dakota and moorhead , minnesota ?",LOC,other,4,63
+what do bats eat ?,ENTY,food,2,64
+what state did the battle of bighorn take place in ?,LOC,state,4,65
+who was abraham lincoln ?,HUM,desc,3,66
+what do you call a newborn kangaroo ?,ENTY,termeq,2,67
+what are spider veins ?,DESC,def,1,68
+what day and month did john lennon die ?,NUM,date,5,69
+what strait separates north america from asia ?,LOC,other,4,70
+what is the population of seattle ?,NUM,other,5,71
+how much was a ticket for the titanic ?,NUM,money,5,72
+what is the largest city in the world ?,LOC,city,4,73
+what american composer wrote the music for `` west side story '' ?,HUM,ind,3,74
+where is the mall of the america ?,LOC,other,4,75
+what is the ph scale ?,DESC,def,1,76
+what type of currency is used in australia ?,ENTY,currency,2,77
+"how tall is the gateway arch in st. louis , mo ?",NUM,dist,5,78
+how much does the human adult female brain weigh ?,NUM,weight,5,79
+who was the first governor of alaska ?,HUM,ind,3,80
+what is a prism ?,DESC,def,1,81
+when was the first liver transplant ?,NUM,date,5,82
+who was elected president of south africa in 1994 ?,HUM,ind,3,83
+what is the population of china ?,NUM,other,5,84
+when was rosa parks born ?,NUM,date,5,85
+why is a ladybug helpful ?,DESC,reason,1,86
+what is amoxicillin ?,DESC,def,1,87
+who was the first female united states representative ?,HUM,ind,3,88
+what are xerophytes ?,DESC,def,1,89
+what country did ponce de leon come from ?,LOC,country,4,90
+the u.s. department of treasury first issued paper currency for the u.s. during which war ?,ENTY,event,2,91
+what is desktop publishing ?,DESC,def,1,92
+what is the temperature of the sun 's surface ?,NUM,temp,5,93
+what year did canada join the united nations ?,NUM,date,5,94
+what is the oldest university in the us ?,HUM,gr,3,95
+where is prince edward island ?,LOC,other,4,96
+"mercury , what year was it discovered ?",NUM,date,5,97
+what is cryogenics ?,DESC,def,1,98
+what are coral reefs ?,DESC,def,1,99
+what is the longest major league baseball-winning streak ?,ENTY,other,2,100
+what is neurology ?,DESC,def,1,101
+who invented the calculator ?,HUM,ind,3,102
+how do you measure earthquakes ?,DESC,manner,1,103
+who is duke ellington ?,HUM,desc,3,104
+"what county is phoenix , az in ?",LOC,city,4,105
+what is a micron ?,DESC,def,1,106
+"the sun 's core , what is the temperature ?",NUM,temp,5,107
+what is the ohio state bird ?,ENTY,animal,2,108
+when were william shakespeare 's twins born ?,NUM,date,5,109
+what is the highest dam in the u.s. ?,LOC,other,4,110
+what color is a poison arrow frog ?,ENTY,color,2,111
+what is acupuncture ?,DESC,def,1,112
+what is the length of the coastline of the state of alaska ?,NUM,dist,5,113
+what is the name of neil armstrong 's wife ?,HUM,ind,3,114
+what is hawaii 's state flower ?,ENTY,plant,2,115
+who won ms. american in 1989 ?,HUM,ind,3,116
+when did the hindenberg crash ?,NUM,date,5,117
+what mineral helps prevent osteoporosis ?,ENTY,substance,2,118
+what was the last year that the chicago cubs won the world series ?,NUM,date,5,119
+where is perth ?,LOC,other,4,120
+what year did wwii begin ?,NUM,date,5,121
+what is the diameter of a golf ball ?,NUM,dist,5,122
+what is an eclipse ?,DESC,def,1,123
+who discovered america ?,HUM,ind,3,124
+what is the earth 's diameter ?,NUM,dist,5,125
+which president was unmarried ?,HUM,ind,3,126
+how wide is the milky way galaxy ?,NUM,dist,5,127
+during which season do most thunderstorms occur ?,NUM,date,5,128
+what is wimbledon ?,DESC,def,1,129
+what is the gestation period for a cat ?,NUM,period,5,130
+how far is a nautical mile ?,NUM,dist,5,131
+who was the abolitionist who led the raid on harper 's ferry in 1859 ?,HUM,ind,3,132
+what does target heart rate mean ?,DESC,def,1,133
+what was the first satellite to go into space ?,ENTY,product,2,134
+what is foreclosure ?,DESC,def,1,135
+what is the major fault line near kentucky ?,ENTY,other,2,136
+where is the holland tunnel ?,LOC,other,4,137
+who wrote the hymn `` amazing grace '' ?,HUM,ind,3,138
+what position did willie davis play in baseball ?,HUM,title,3,139
+what are platelets ?,DESC,def,1,140
+what is severance pay ?,DESC,def,1,141
+what is the name of roy roger 's dog ?,ENTY,animal,2,142
+where are the national archives ?,LOC,other,4,143
+what is a baby turkey called ?,ENTY,animal,2,144
+what is poliomyelitis ?,DESC,def,1,145
+what is the longest bone in the human body ?,ENTY,body,2,146
+who is a german philosopher ?,HUM,ind,3,147
+what were christopher columbus ' three ships ?,ENTY,veh,2,148
+what does phi beta kappa mean ?,DESC,def,1,149
+what is nicotine ?,DESC,def,1,150
+what is another name for vitamin b1 ?,ENTY,termeq,2,151
+who discovered radium ?,HUM,ind,3,152
+what are sunspots ?,DESC,def,1,153
+when was algeria colonized ?,NUM,date,5,154
+what baseball team was the first to make numbers part of their uniform ?,HUM,gr,3,155
+what continent is egypt on ?,LOC,other,4,156
+what is the capital of mongolia ?,LOC,city,4,157
+what is nanotechnology ?,DESC,def,1,158
+in the late 1700 's british convicts were used to populate which colony ?,LOC,other,4,159
+what state is the geographic center of the lower 48 states ?,LOC,state,4,160
+what is an obtuse angle ?,DESC,def,1,161
+what are polymers ?,DESC,def,1,162
+when is hurricane season in the caribbean ?,NUM,date,5,163
+where is the volcano mauna loa ?,LOC,other,4,164
+what is another astronomic term for the northern lights ?,ENTY,termeq,2,165
+what peninsula is spain part of ?,LOC,other,4,166
+when was lyndon b. johnson born ?,NUM,date,5,167
+what is acetaminophen ?,DESC,def,1,168
+what state has the least amount of rain per year ?,LOC,state,4,169
+who founded american red cross ?,HUM,ind,3,170
+what year did the milwaukee braves become the atlanta braves ?,NUM,date,5,171
+how fast is alcohol absorbed ?,NUM,speed,5,172
+when is the summer solstice ?,NUM,date,5,173
+what is supernova ?,DESC,def,1,174
+where is the shawnee national forest ?,LOC,other,4,175
+what u.s. state 's motto is `` live free or die '' ?,LOC,state,4,176
+where is the lourve ?,LOC,other,4,177
+when was the first stamp issued ?,NUM,date,5,178
+what primary colors do you mix to make orange ?,ENTY,color,2,179
+how far is pluto from the sun ?,NUM,dist,5,180
+what body of water are the canary islands in ?,LOC,other,4,181
+what is neuropathy ?,DESC,def,1,182
+where is the euphrates river ?,LOC,other,4,183
+what is cryptography ?,DESC,def,1,184
+what is natural gas composed of ?,ENTY,substance,2,185
+who is the prime minister of canada ?,HUM,ind,3,186
+what french ruler was defeated at the battle of waterloo ?,HUM,ind,3,187
+what is leukemia ?,DESC,def,1,188
+where did howard hughes die ?,LOC,other,4,189
+what is the birthstone for june ?,ENTY,substance,2,190
+what is the sales tax in minnesota ?,ENTY,other,2,191
+what is the distance in miles from the earth to the sun ?,NUM,dist,5,192
+what is the average life span for a chicken ?,NUM,period,5,193
+when was the first wal-mart store opened ?,NUM,date,5,194
+what is relative humidity ?,DESC,def,1,195
+what city has the zip code of 35824 ?,LOC,city,4,196
+what currency is used in algeria ?,ENTY,currency,2,197
+who invented the hula hoop ?,HUM,ind,3,198
+what was the most popular toy in 1957 ?,ENTY,product,2,199
+what is pastrami made of ?,ENTY,substance,2,200
+what is the name of the satellite that the soviet union sent into space in 1957 ?,ENTY,product,2,201
+what city 's newspaper is called `` the enquirer '' ?,LOC,city,4,202
+who invented the slinky ?,HUM,ind,3,203
+what are the animals that don 't have backbones called ?,ENTY,animal,2,204
+what is the melting point of copper ?,NUM,other,5,205
+where is the volcano olympus mons located ?,LOC,other,4,206
+who was the 23rd president of the united states ?,HUM,ind,3,207
+what is the average body temperature ?,NUM,temp,5,208
+what does a defibrillator do ?,DESC,desc,1,209
+what is the effect of acid rain ?,DESC,desc,1,210
+what year did the united states abolish the draft ?,NUM,date,5,211
+how fast is the speed of light ?,NUM,speed,5,212
+what province is montreal in ?,LOC,state,4,213
+what new york city structure is also known as the twin towers ?,LOC,other,4,214
+what is fungus ?,DESC,def,1,215
+what is the most frequently spoken language in the netherlands ?,ENTY,lang,2,216
+what is sodium chloride ?,DESC,def,1,217
+what are the spots on dominoes called ?,ENTY,termeq,2,218
+how many pounds in a ton ?,NUM,count,5,219
+what is influenza ?,DESC,def,1,220
+what is ozone depletion ?,DESC,def,1,221
+what year was the mona lisa painted ?,NUM,date,5,222
+what does `` sitting shiva '' mean ?,DESC,def,1,223
+"what is the electrical output in madrid , spain ?",ENTY,other,2,224
+which mountain range in north america stretches from maine to georgia ?,LOC,mount,4,225
+what is plastic made of ?,ENTY,substance,2,226
+what is the population of nigeria ?,NUM,other,5,227
+what does your spleen do ?,DESC,desc,1,228
+where is the grand canyon ?,LOC,other,4,229
+who invented the telephone ?,HUM,ind,3,230
+what year did the u.s. buy alaska ?,NUM,date,5,231
+what is the name of the leader of ireland ?,HUM,ind,3,232
+what is phenylalanine ?,DESC,def,1,233
+how many gallons of water are there in a cubic foot ?,NUM,count,5,234
+what are the two houses of the legislative branch ?,ENTY,other,2,235
+what is sonar ?,DESC,def,1,236
+"in poland , where do most people live ?",LOC,other,4,237
+what is phosphorus ?,DESC,def,1,238
+what is the location of the sea of tranquility ?,LOC,other,4,239
+how fast is sound ?,NUM,speed,5,240
+what french province is cognac produced in ?,LOC,state,4,241
+what is valentine 's day ?,DESC,def,1,242
+what causes gray hair ?,DESC,reason,1,243
+what is hypertension ?,DESC,def,1,244
+what is bandwidth ?,DESC,def,1,245
+what is the longest suspension bridge in the u.s. ?,LOC,other,4,246
+what is a parasite ?,DESC,def,1,247
+what is home equity ?,DESC,def,1,248
+what do meteorologists do ?,DESC,desc,1,249
+what is the criterion for being legally blind ?,ENTY,other,2,250
+who is the tallest man in the world ?,HUM,ind,3,251
+what are the twin cities ?,LOC,city,4,252
+what did edward binney and howard smith invent in 1903 ?,ENTY,other,2,253
+what is the statue of liberty made of ?,ENTY,substance,2,254
+what is pilates ?,DESC,def,1,255
+what planet is known as the `` red '' planet ?,LOC,other,4,256
+what is the depth of the nile river ?,NUM,dist,5,257
+what is the colorful korean traditional dress called ?,ENTY,termeq,2,258
+what is mardi gras ?,DESC,def,1,259
+mexican pesos are worth what in u.s. dollars ?,NUM,money,5,260
+who was the first african american to play for the brooklyn dodgers ?,HUM,ind,3,261
+who was the first prime minister of canada ?,HUM,ind,3,262
+how many admirals are there in the u.s. navy ?,NUM,count,5,263
+what instrument did glenn miller play ?,ENTY,instru,2,264
+how old was joan of arc when she died ?,NUM,period,5,265
+what does the word fortnight mean ?,DESC,def,1,266
+what is dianetics ?,DESC,def,1,267
+what is the capital of ethiopia ?,LOC,city,4,268
+for how long is an elephant pregnant ?,NUM,period,5,269
+how did janice joplin die ?,DESC,manner,1,270
+what is the primary language in iceland ?,ENTY,lang,2,271
+what is the difference between am radio stations and fm radio stations ?,DESC,desc,1,272
+what is osteoporosis ?,DESC,def,1,273
+who was the first woman governor in the u.s. ?,HUM,ind,3,274
+what is peyote ?,DESC,def,1,275
+what is the esophagus used for ?,DESC,reason,1,276
+what is viscosity ?,DESC,def,1,277
+what year did oklahoma become a state ?,NUM,date,5,278
+what is the abbreviation for texas ?,ABBR,abb,0,279
+what is a mirror made out of ?,ENTY,substance,2,280
+where on the body is a mortarboard worn ?,LOC,other,4,281
+what was j.f.k. 's wife 's name ?,HUM,ind,3,282
+what does i.v. stand for ?,ABBR,exp,0,283
+what is the chunnel ?,DESC,def,1,284
+where is hitler buried ?,LOC,other,4,285
+what are antacids ?,DESC,def,1,286
+what is pulmonary fibrosis ?,DESC,def,1,287
+what are quaaludes ?,DESC,def,1,288
+what is naproxen ?,DESC,def,1,289
+what is strep throat ?,DESC,def,1,290
+what is the largest city in the u.s. ?,LOC,city,4,291
+what is foot and mouth disease ?,ENTY,dismed,2,292
+what is the life expectancy of a dollar bill ?,NUM,other,5,293
+what do you call a professional map drawer ?,ENTY,termeq,2,294
+what are aborigines ?,DESC,def,1,295
+what is hybridization ?,DESC,def,1,296
+what color is indigo ?,ENTY,color,2,297
+how old do you have to be in order to rent a car in italy ?,NUM,period,5,298
+what does a barometer measure ?,ENTY,other,2,299
+what color is a giraffe 's tongue ?,ENTY,color,2,300
+what does usps stand for ?,ABBR,exp,0,301
+what year did the nfl go on strike ?,NUM,date,5,302
+what is solar wind ?,DESC,def,1,303
+what date did neil armstrong land on the moon ?,NUM,date,5,304
+when was hiroshima bombed ?,NUM,date,5,305
+where is the savannah river ?,LOC,other,4,306
+who was the first woman killed in the vietnam war ?,HUM,ind,3,307
+what planet has the strongest magnetic field of all the planets ?,LOC,other,4,308
+who is the governor of alaska ?,HUM,ind,3,309
+what year did mussolini seize power in italy ?,NUM,date,5,310
+what is the capital of persia ?,LOC,city,4,311
+where is the eiffel tower ?,LOC,other,4,312
+how many hearts does an octopus have ?,NUM,count,5,313
+what is pneumonia ?,DESC,def,1,314
+what is the deepest lake in the us ?,LOC,other,4,315
+what is a fuel cell ?,DESC,def,1,316
+who was the first u.s. president to appear on tv ?,HUM,ind,3,317
+where is the little league museum ?,LOC,other,4,318
+what are the two types of twins ?,ENTY,other,2,319
+what is the brightest star ?,LOC,other,4,320
+what is diabetes ?,DESC,def,1,321
+when was president kennedy shot ?,NUM,date,5,322
+what is tmj ?,ABBR,exp,0,323
+what color is yak milk ?,ENTY,color,2,324
+what date was dwight d. eisenhower born ?,NUM,date,5,325
+what does the technical term isdn mean ?,ABBR,exp,0,326
+why is the sun yellow ?,DESC,reason,1,327
+what is the conversion rate between dollars and pounds ?,NUM,money,5,328
+when was abraham lincoln born ?,NUM,date,5,329
+what is the milky way ?,DESC,def,1,330
+what is mold ?,DESC,def,1,331
+what year was mozart born ?,NUM,date,5,332
+what is a group of frogs called ?,ENTY,animal,2,333
+what is the name of william penn 's ship ?,ENTY,veh,2,334
+what is the melting point of gold ?,NUM,other,5,335
+what is the street address of the white house ?,LOC,other,4,336
+what is semolina ?,DESC,def,1,337
+what fruit is melba sauce made from ?,ENTY,food,2,338
+what is ursa major ?,DESC,def,1,339
+what is the percentage of water content in the human body ?,NUM,perc,5,340
+how much does water weigh ?,NUM,weight,5,341
+what was president lyndon johnson 's reform program called ?,ENTY,event,2,342
+"what is the murder rate in windsor , ontario ?",NUM,perc,5,343
+who is the only president to serve 2 non-consecutive terms ?,HUM,ind,3,344
+what is the population of australia ?,NUM,other,5,345
+who painted the ceiling of the sistine chapel ?,HUM,ind,3,346
+name a stimulant .,ENTY,dismed,2,347
+what is the effect of volcanoes on the climate ?,DESC,desc,1,348
+what year did the andy griffith show begin ?,NUM,date,5,349
+what is acid rain ?,DESC,def,1,350
+what is the date of mexico 's independence ?,NUM,date,5,351
+what is the location of lake champlain ?,LOC,other,4,352
+what is the illinois state flower ?,ENTY,plant,2,353
+what is maryland 's state bird ?,ENTY,animal,2,354
+what is quicksilver ?,DESC,def,1,355
+who wrote `` the divine comedy '' ?,HUM,ind,3,356
+what is the speed of light ?,NUM,speed,5,357
+what is the width of a football field ?,NUM,dist,5,358
+why in tennis are zero points called love ?,DESC,reason,1,359
+what kind of dog was toto in the wizard of oz ?,ENTY,animal,2,360
+what is a thyroid ?,DESC,def,1,361
+what does ciao mean ?,DESC,def,1,362
+what is the only artery that carries blue blood from the heart to the lungs ?,ENTY,body,2,363
+how often does old faithful erupt at yellowstone national park ?,NUM,other,5,364
+what is acetic acid ?,DESC,def,1,365
+"what is the elevation of st. louis , mo ?",NUM,dist,5,366
+what color does litmus paper turn when it comes into contact with a strong acid ?,ENTY,color,2,367
+what are the colors of the german flag ?,ENTY,color,2,368
+what is the moulin rouge ?,DESC,def,1,369
+what soviet seaport is on the black sea ?,LOC,other,4,370
+what is the atomic weight of silver ?,NUM,weight,5,371
+what currency do they use in brazil ?,ENTY,currency,2,372
+what are pathogens ?,DESC,def,1,373
+what is mad cow disease ?,DESC,def,1,374
+name a food high in zinc .,ENTY,food,2,375
+when did north carolina enter the union ?,NUM,date,5,376
+where do apple snails live ?,LOC,other,4,377
+what are ethics ?,DESC,def,1,378
+what does cpr stand for ?,ABBR,exp,0,379
+what is an annuity ?,DESC,def,1,380
+who killed john f. kennedy ?,HUM,ind,3,381
+who was the first vice president of the u.s. ?,HUM,ind,3,382
+what birthstone is turquoise ?,ENTY,substance,2,383
+who was the first us president to ride in an automobile to his inauguration ?,HUM,ind,3,384
+how old was the youngest president of the united states ?,NUM,period,5,385
+when was ulysses s. grant born ?,NUM,date,5,386
+what is muscular dystrophy ?,DESC,def,1,387
+who lived in the neuschwanstein castle ?,HUM,ind,3,388
+what is propylene glycol ?,DESC,def,1,389
+what is a panic disorder ?,DESC,def,1,390
+who invented the instant polaroid camera ?,HUM,ind,3,391
+what is a carcinogen ?,DESC,def,1,392
+what is a baby lion called ?,ENTY,animal,2,393
+what is the world 's population ?,NUM,other,5,394
+what is nepotism ?,DESC,def,1,395
+what is die-casting ?,DESC,def,1,396
+what is myopia ?,DESC,def,1,397
+what is the sales tax rate in new york ?,NUM,other,5,398
+developing nations comprise what percentage of the world 's population ?,NUM,perc,5,399
+what is the fourth highest mountain in the world ?,LOC,mount,4,400
+what is shakespeare 's nickname ?,HUM,ind,3,401
+what is the heaviest naturally occurring element ?,ENTY,substance,2,402
+when is father 's day ?,NUM,date,5,403
+what does the acronym nasa stand for ?,ABBR,exp,0,404
+how long is the columbia river in miles ?,NUM,dist,5,405
+what city 's newspaper is called `` the star '' ?,LOC,city,4,406
+what is carbon dioxide ?,DESC,def,1,407
+where is the mason/dixon line ?,LOC,other,4,408
+when was the boston tea party ?,NUM,date,5,409
+what is metabolism ?,DESC,def,1,410
+which u.s.a. president appeared on `` laugh-in '' ?,HUM,ind,3,411
+what are cigarettes made of ?,ENTY,substance,2,412
+what is the capital of zimbabwe ?,LOC,city,4,413
+what does nasa stand for ?,ABBR,exp,0,414
+what is the state flower of michigan ?,ENTY,plant,2,415
+what are semiconductors ?,DESC,def,1,416
+what is nuclear power ?,DESC,def,1,417
+what is a tsunami ?,DESC,def,1,418
+who is the congressman from state of texas on the armed forces committee ?,HUM,ind,3,419
+who was president in 1913 ?,HUM,ind,3,420
+when was the first kidney transplant ?,NUM,date,5,421
+what are canada 's two territories ?,LOC,other,4,422
+what was the name of the plane lindbergh flew solo across the atlantic ?,ENTY,veh,2,423
+what is genocide ?,DESC,def,1,424
+what continent is argentina on ?,LOC,other,4,425
+what monastery was raided by vikings in the late eighth century ?,ENTY,other,2,426
+what is an earthquake ?,DESC,def,1,427
+where is the tallest roller coaster located ?,LOC,other,4,428
+what are enzymes ?,DESC,def,1,429
+who discovered oxygen ?,HUM,ind,3,430
+what is bangers and mash ?,DESC,def,1,431
+what is the name given to the tiger at louisiana state university ?,ENTY,animal,2,432
+where are the british crown jewels kept ?,LOC,other,4,433
+who was the first person to reach the north pole ?,HUM,ind,3,434
+what is an ulcer ?,DESC,def,1,435
+what is vertigo ?,DESC,def,1,436
+what is the spirometer test ?,DESC,def,1,437
+when is the official first day of summer ?,NUM,date,5,438
+what does the abbreviation sos mean ?,ABBR,exp,0,439
+what is the smallest bird in britain ?,ENTY,animal,2,440
+who invented trivial pursuit ?,HUM,ind,3,441
+what gasses are in the troposphere ?,ENTY,substance,2,442
+which country has the most water pollution ?,LOC,country,4,443
+what is the scientific name for elephant ?,ENTY,animal,2,444
+who is the actress known for her role in the movie `` gypsy '' ?,HUM,ind,3,445
+what breed of hunting dog did the beverly hillbillies own ?,ENTY,animal,2,446
+what is the rainiest place on earth ?,LOC,other,4,447
+who was the first african american to win the nobel prize in literature ?,HUM,ind,3,448
+when is st. patrick 's day ?,NUM,date,5,449
+what was fdr 's dog 's name ?,ENTY,animal,2,450
+what colors need to be mixed to get the color pink ?,ENTY,color,2,451
+what is the most popular sport in japan ?,ENTY,sport,2,452
+what is the active ingredient in baking soda ?,ENTY,food,2,453
+when was thomas jefferson born ?,NUM,date,5,454
+how cold should a refrigerator be ?,NUM,temp,5,455
+when was the telephone invented ?,NUM,date,5,456
+what is the most common eye color ?,ENTY,color,2,457
+where was the first golf course in the united states ?,LOC,other,4,458
+what is schizophrenia ?,DESC,def,1,459
+what is angiotensin ?,DESC,def,1,460
+what did jesse jackson organize ?,HUM,gr,3,461
+what is new york 's state bird ?,ENTY,animal,2,462
+what is the national park in utah ?,LOC,other,4,463
+what is susan b. anthony 's birthday ?,NUM,date,5,464
+in which state would you find the catskill mountains ?,LOC,state,4,465
+what do you call a word that is spelled the same backwards and forwards ?,ENTY,termeq,2,466
+what are pediatricians ?,DESC,def,1,467
+"what chain store is headquartered in bentonville , arkansas ?",HUM,gr,3,468
+what are solar cells ?,DESC,def,1,469
+what is compounded interest ?,DESC,def,1,470
+what are capers ?,DESC,def,1,471
+what is an antigen ?,DESC,def,1,472
+what currency does luxembourg use ?,ENTY,currency,2,473
+what is the population of venezuela ?,NUM,other,5,474
+what type of polymer is used for bulletproof vests ?,ENTY,other,2,475
+what currency does argentina use ?,ENTY,currency,2,476
+what is a thermometer ?,DESC,def,1,477
+what canadian city has the largest population ?,LOC,city,4,478
+what color are crickets ?,ENTY,color,2,479
+which country gave new york the statue of liberty ?,LOC,country,4,480
+what was the name of the first u.s. satellite sent into space ?,ENTY,product,2,481
+what precious stone is a form of pure carbon ?,ENTY,substance,2,482
+what kind of gas is in a fluorescent bulb ?,ENTY,substance,2,483
+what is rheumatoid arthritis ?,DESC,def,1,484
+"what river runs through rowe , italy ?",LOC,other,4,485
+what is cerebral palsy ?,DESC,def,1,486
+what city is also known as `` the gateway to the west '' ?,LOC,city,4,487
+how far away is the moon ?,NUM,dist,5,488
+what is the source of natural gas ?,ENTY,other,2,489
+in what spacecraft did u.s. astronaut alan shepard make his historic 1961 flight ?,ENTY,veh,2,490
+what is pectin ?,DESC,def,1,491
+what is bio-diversity ?,DESC,def,1,492
+what 's the easiest way to remove wallpaper ?,ENTY,techmeth,2,493
+what year did the titanic start on its journey ?,NUM,date,5,494
+how much of an apple is water ?,NUM,count,5,495
+who was the 22nd president of the us ?,HUM,ind,3,496
+what is the money they use in zambia ?,ENTY,currency,2,497
+how many feet in a mile ?,NUM,count,5,498
+what is the birthstone of october ?,ENTY,substance,2,499
+what is e-coli ?,DESC,def,1,500

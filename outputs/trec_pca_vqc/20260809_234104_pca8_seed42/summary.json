@@ -1,0 +1,14 @@
+{
+  "retained_variance": 0.21998879313468933,
+  "classical_development_accuracy": 0.5833333333333334,
+  "classical_development_macro_f1": 0.5820712849316968,
+  "classical_test_accuracy": 0.582,
+  "classical_test_macro_f1": 0.5366063922584658,
+  "classical_training_seconds": 0.05266919999849051,
+  "vqc_best_epoch": 3,
+  "vqc_development_accuracy": 0.2,
+  "vqc_development_macro_f1": 0.1360838779956427,
+  "vqc_test_accuracy": 0.18,
+  "vqc_test_macro_f1": 0.11321721669285839,
+  "vqc_training_seconds": 3.1524428999982774
+}

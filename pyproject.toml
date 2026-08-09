@@ -14,7 +14,7 @@ packages = [{ include = "qnlp_hpc", from = "src" }]
 # GPU packages live in the optional [gpu] group so CI / Windows can resolve.
 # ---------------------------------------------------------------------------
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
+python = ">=3.11,<3.13"
 numpy = "~1.26"                # 1.26.x — stable ecosystem
 networkx = "^3.0"             # lambeq dependency
 lambeq = "0.5.0"              # QNLP: sentence -> string diagram -> circuit

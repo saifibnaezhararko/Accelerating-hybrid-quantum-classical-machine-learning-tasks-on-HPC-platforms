@@ -1,0 +1,29 @@
+{
+  "train_data": "C:\\Users\\zhaoz\\OneDrive\\\u684c\u9762\\QIntern2026\\Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms\\data\\train_5500.label",
+  "test_data": "C:\\Users\\zhaoz\\OneDrive\\\u684c\u9762\\QIntern2026\\Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms\\data\\TREC_10.label",
+  "samples_per_class": 80,
+  "development_ratio": 0.2,
+  "components": 8,
+  "layers": 2,
+  "epochs": 120,
+  "batch_size": 16,
+  "learning_rate": 0.01,
+  "weight_decay": 1e-05,
+  "patience": 12,
+  "seed": 42,
+  "device": "cpu",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "normalize_embeddings": true,
+  "angle_range": [
+    -3.141592653589793,
+    3.141592653589793
+  ],
+  "label_mapping": {
+    "0": "ABBR",
+    "1": "DESC",
+    "2": "ENTY",
+    "3": "HUM",
+    "4": "LOC",
+    "5": "NUM"
+  }
+}

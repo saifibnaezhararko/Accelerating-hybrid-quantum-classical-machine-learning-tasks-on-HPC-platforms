@@ -1,0 +1,61 @@
+text,coarse_label,fine_label,label,source_line
+what is the term for the side of the mountain that faces the prevailing winds ?,ENTY,termeq,2,2827
+what is the acronym for the national bureau of investigation ?,ABBR,abb,0,2357
+"what does ms. , miss , and mrs. stand for ?",ABBR,exp,0,1198
+what is sap ?,ABBR,exp,0,4258
+why do horseshoes bring luck ?,DESC,reason,1,185
+what does g.m.t. stand for ?,ABBR,exp,0,444
+what people make up half the soviet union 's population ?,HUM,gr,3,5436
+what is ouzo ?,DESC,def,1,4052
+how many `` eyes '' does a coconut have ?,NUM,count,5,3586
+what does the abbreviation cwt. ?,ABBR,exp,0,1258
+what are the ten safest american cities for pedestrians ?,LOC,city,4,3533
+what major airline has the best safety record in the world ?,HUM,gr,3,4457
+what are the top vegetable crops in the world ?,ENTY,food,2,4032
+"when did lucelly garcia , a former ambassador of columbia to honduras , die ?",NUM,date,5,4155
+how many fingers are used to draw a bow ?,NUM,count,5,782
+what is the fare cost for the round trip between new york and london on concorde ?,NUM,money,5,3734
+what is alice cooper 's real name ?,HUM,ind,3,4774
+what is a fear of worms ?,ENTY,dismed,2,2709
+what new england state covers 5.9 square miles ?,LOC,state,4,3910
+what is the exchange rate for australian to american money ?,NUM,money,5,1578
+what are the shortest and the longest songs ever produced ?,ENTY,cremat,2,716
+what do the names andrew and christina mean ?,DESC,def,1,1600
+what spanish artist painted crucifixion ?,HUM,ind,3,495
+what is glass made of ?,ENTY,substance,2,1930
+where did dikembe mutombo go to college ?,LOC,other,4,4273
+what does freddy freeman say to become captain marvel jr. ?,DESC,desc,1,3059
+how do i e-mail someone at aol.com from yahoo.com ?,DESC,manner,1,1472
+how many questions do you have on your database ?,NUM,count,5,1332
+why is the mile 528 feet ?,DESC,reason,1,4301
+where is the kalahari desert ?,LOC,other,4,192
+what is afs ?,ABBR,exp,0,2956
+when did the last americans leave vietnam ?,NUM,date,5,4534
+what is the largest natural lake in pennsylvania ?,LOC,other,4,1499
+what 's distinctive about a palmiped 's feet ?,DESC,desc,1,4611
+how do you find the area of a circle ?,DESC,manner,1,5071
+what actor and actress have made the most movies ?,HUM,ind,3,4102
+what condiment do the dutch dip their french fries in ?,ENTY,food,2,5065
+when was the bill of rights ratified ?,NUM,date,5,2154
+who was the actor who played sam in the movie casablanca ?,HUM,ind,3,3806
+who starred in the movie the war of the worlds ?,HUM,ind,3,4486
+"what was al capone finally imprisoned for , in 1931 ?",DESC,reason,1,2716
+which is the wealthiest country in the world ?,LOC,country,4,676
+what are the largest libraries in the us ?,LOC,other,4,1679
+who is count cinzano ?,HUM,desc,3,2458
+what is the fear of being loved ?,ENTY,dismed,2,706
+what is mikhail gorbachev 's middle initial ?,ABBR,abb,0,4944
+who was the first jockey to ride two triple crown winners ?,HUM,ind,3,3250
+what does cpr stand for ?,ABBR,exp,0,5263
+what year did the vietnam war end ?,NUM,date,5,897
+what new games are available for nintendo 64 ?,ENTY,sport,2,2627
+for what disease is the drug sinemet used as a treatment ?,ENTY,dismed,2,4919
+who should i call to get a tour of the new york stock exchange ?,HUM,ind,3,3197
+what are the rites accompanying the circumcision of a newly born-child in judaism called ?,ENTY,event,2,211
+how do you get silly putty out of fabric ?,DESC,manner,1,3290
+what is the homelite inc. home page ?,LOC,other,4,4489
+where is the virtual desk reference ?,LOC,other,4,3850
+how old was sir edmund hillary when he climbed mt. everest ?,NUM,period,5,5199
+what does sids stand for ?,ABBR,exp,0,519
+what does e.g. stand for ?,ABBR,exp,0,1397
+what countries does the mont blanc tunnel join ?,LOC,country,4,3145
