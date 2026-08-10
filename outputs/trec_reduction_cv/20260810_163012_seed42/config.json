@@ -1,0 +1,21 @@
+{
+  "train_data": "C:\\Users\\zhaoz\\OneDrive\\\u684c\u9762\\QIntern2026\\Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms\\data\\train_5500.label",
+  "official_test_used": false,
+  "samples_per_class": 80,
+  "methods": [
+    "lda"
+  ],
+  "components": 5,
+  "folds": 5,
+  "layers": 2,
+  "epochs": 60,
+  "batch_size": 16,
+  "learning_rate": 0.01,
+  "weight_decay": 1e-05,
+  "seed": 42,
+  "device": "cpu",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_fitted_in_cv": false,
+  "reduction_fitted_inside_each_fold": true,
+  "angle_scaler_fitted_inside_each_fold": true
+}

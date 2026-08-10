@@ -1,0 +1,481 @@
+text,coarse_label,fine_label,label,source_line
+what are the side effects of mevacor ?,DESC,desc,1,4513
+what should the temperature be set at while baking peachy oat muffins ?,NUM,temp,5,5329
+how many people in america snore ?,NUM,count,5,1103
+what was the only country you were allowed to drive into israel from in 1979 ?,LOC,country,4,593
+"who was the columbia pictures head who forged actor cliff robertson 's name on a $1 , 000 check ?",HUM,ind,3,3316
+how many sonnets did shakespeare write ?,NUM,count,5,358
+what is the amish religion ?,DESC,def,1,608
+what is head start ?,DESC,def,1,1637
+how many member states are in the un ?,NUM,count,5,1542
+what does hiv stand for ?,ABBR,exp,0,3788
+who was confucius ?,HUM,desc,3,4537
+independent silversmith 's account for what percentage of silver production ?,NUM,perc,5,3631
+when was the hoover dam constructed ?,NUM,date,5,3705
+what species is a colt ?,ENTY,animal,2,848
+what was queen victoria 's title regarding india ?,HUM,title,3,708
+what is a chinese `` spouting '' bowl ?,DESC,def,1,2710
+what is the average cost for four years of medical school ?,NUM,money,5,2908
+how does salt melt ice and snow ?,DESC,manner,1,3129
+why do movie and tv stars get paid so much ?,DESC,reason,1,4298
+how many electoral votes does it take to win presidency ?,NUM,count,5,1964
+what is the term for the side of the mountain that faces the prevailing winds ?,ENTY,termeq,2,2827
+who was lacan ?,HUM,desc,3,1171
+what river runs through liverpool ?,LOC,other,4,3670
+what is the average time to kiss somene ?,NUM,period,5,3811
+what aesop 's fable has the moral : `` the race is not always to the swift. slow and steady is bound to win '' ?,ENTY,cremat,2,2527
+what 's the highest hand in straight poker ?,ENTY,other,2,2899
+what is the smallest country in africa ?,LOC,country,4,850
+what british prime minister and u.s. president were seventh cousins once-removed ?,HUM,ind,3,4716
+how many feet long is a baseball pitcher 's rubber ?,NUM,count,5,2045
+what was the name of the peace agreement imposed on germany after world war i ?,ENTY,other,2,2681
+what mountain range is traversed by the highest railroad in the world ?,LOC,mount,4,908
+how much electricity does the brain need to work ?,NUM,count,5,1066
+what man-made waterways is 1.76 miles long ?,LOC,other,4,3643
+what russian composer 's prelude in c sharp minor brought him fame and fortune ?,HUM,ind,3,233
+what nevada center has been dubbed the biggest little city in the world ?,LOC,city,4,419
+what is the goat population of the world ?,NUM,count,5,1308
+what city has the two steepest streets in the u.s. ?,LOC,city,4,4985
+what is the abbreviation for original equipment manufacturer ?,ABBR,abb,0,3911
+when is bastille day ?,NUM,date,5,629
+stuart hamblen is considered to be the first singing cowboy of what ?,ENTY,cremat,2,3688
+what is glass made of ?,ENTY,substance,2,1930
+what author of the days of our lives cookbook signed on in 198 as liz chandler in tv 's days of our lives ?,HUM,ind,3,2041
+how many inches over six feet is tom selleck ?,NUM,count,5,4922
+"how long is the world 's largest ship , in meters ?",NUM,dist,5,4056
+what girl 's name is `` teddy '' an affectionate form of ?,HUM,ind,3,316
+"what kind of creatures are black , yellow , and brown bullheads ?",ENTY,animal,2,4952
+when was queen victoria born ?,NUM,date,5,1706
+what city is graced by the arch of titus ?,LOC,city,4,5304
+cnn is the abbreviation for what ?,ABBR,exp,0,262
+"what do the number 1 , 2 , and 4 mean on dr. pepper bottles ?",DESC,def,1,2155
+what should you yell to hail a taxi in madrid ?,DESC,desc,1,1728
+what country was hitler the chancellor of ?,LOC,country,4,3060
+what does u.s.s.r. stand for ?,ABBR,exp,0,1661
+what asian leader was known as the little brown saint ?,HUM,ind,3,668
+which way do you turn your bic to increase the flame - clockwise or counterclockwise ?,LOC,other,4,675
+how many quarters equal a pound ?,NUM,count,5,663
+in what year did joe dimaggio compile his 56-game hitting streak ?,NUM,date,5,5405
+what kind of sport is often associated with hooligans ?,ENTY,sport,2,596
+what kind of animal was winnie the pooh ?,ENTY,animal,2,1444
+what democratic prankster waved the train out of the station while richard nixon spoke from the caboose ?,HUM,ind,3,4212
+what comedian has a legendary reputation for stealing jokes ?,HUM,ind,3,1220
+where can i find information on the cyclone that hit new jersey on 8/28/1941 ?,LOC,other,4,1221
+"what 's the maximum length , in inches , of a first baseman 's glove ?",NUM,count,5,3646
+what is a `` usb '' port on a computer ?,ABBR,exp,0,2138
+who made the largest cocaine seizure in ventura county history ?,HUM,gr,3,3642
+who claimed to be the world 's most perfectly-developed man ?,HUM,ind,3,2883
+cnn is an acronym for what ?,ABBR,exp,0,3411
+how much did a mcdonald 's hamburger cost in 1963 ?,NUM,money,5,5292
+what does shield stand for ?,ABBR,exp,0,2501
+how many home runs did babe ruth hit in his lifetime ?,NUM,count,5,5331
+what are the most albums sold by one artist or band ?,ENTY,cremat,2,2893
+what does bmw stand for ?,ABBR,exp,0,4336
+what is the largest and most expensive freeway construction project in the u.s. right now ?,LOC,other,4,4929
+what does nn o `` mean when used as a prefix in irish surnames ?,ABBR,exp,0,981
+what does nasa stand for ?,ABBR,exp,0,3521
+how many bytes are in a terabyte ?,NUM,count,5,3310
+who is edmund kemper ?,HUM,desc,3,4304
+"in 1990 , what day of the week did christmas fall on ?",NUM,date,5,5036
+when is a woman most fertile ?,NUM,date,5,3017
+what debts did qintex group leave ?,NUM,money,5,3573
+"what famous coach said `` if you can 't beat 'em in the alley , you can 't beat 'em on the ice '' ?",HUM,ind,3,4092
+when was the first barbie produced ?,NUM,date,5,2092
+what is the best hospital for orthopedics in the country ?,LOC,other,4,1605
+what is the vdrl test of blood ?,DESC,def,1,3625
+what is another name for nearsightedness ?,ENTY,termeq,2,3941
+what does vcr stand for ?,ABBR,exp,0,3342
+what is the immaculate conception ?,DESC,def,1,1029
+"what singer became despondent over the death of freddie prinze , quit show business , and then quit the business ?",HUM,ind,3,1001
+what two countries share the khyber pass ?,LOC,country,4,944
+how many queen bees reign in a hive ?,NUM,count,5,4169
+where is los vegas ?,LOC,other,4,3529
+what is dtmf ?,ABBR,exp,0,3140
+in what year did ireland elect its first woman president ?,NUM,date,5,814
+what is the abbreviation of the national bureau of investigation ?,ABBR,abb,0,2650
+how many pins are used in skittles ?,NUM,count,5,4072
+what is a `` false moon '' ?,DESC,def,1,4149
+what was the claim to fame of king camp gillette ?,DESC,reason,1,778
+what do the letters zip stand for in the phrase `` zip code '' ?,ABBR,exp,0,1280
+when did swimming become commonplace ?,NUM,date,5,5222
+what does rca stand for ?,ABBR,exp,0,4600
+what are the three most populated countries in the world ?,LOC,country,4,3151
+what movie did madilyn kahn star in with gene wilder ?,ENTY,cremat,2,485
+where did the 6th annual meeting of indonesia-malaysia forest experts take place ?,LOC,other,4,2566
+what is a first world country ?,DESC,def,1,3125
+what does the name melissa mean ?,DESC,def,1,4581
+what does the `` c '' stand for in the equation e=mc2 ?,ABBR,exp,0,2086
+who liberated 19th century sicily and naples ?,HUM,ind,3,3644
+what makes salt ?,DESC,reason,1,3993
+who was the inventor of the stove ?,HUM,ind,3,1219
+what tv show did john sebastian sing the theme for ?,ENTY,cremat,2,2973
+what do west indian steel bands use as instruments ?,ENTY,instru,2,2313
+what is alice cooper 's real name ?,HUM,ind,3,4774
+what does nafta stand for ?,ABBR,exp,0,829
+why does sound travel quicker through water than air ?,DESC,reason,1,3216
+"what do the letters d.c. stand for in washington , d.c. ?",ABBR,exp,0,1350
+what does the word laser mean ?,ABBR,exp,0,855
+"what tv character said ; `` one of these days , alice , pow , right in the kisser '' ?",HUM,ind,3,2639
+what is ram in the computer ?,ABBR,exp,0,4172
+what 's the only east european country not tied to the ruble ?,LOC,country,4,3786
+what is a handheld pc ?,DESC,def,1,1144
+what is the abbreviated term used for the national bureau of investigation ?,ABBR,abb,0,2380
+what 's the abbreviation for limited partnership ?,ABBR,abb,0,2534
+hitler came to power in germany in what year ?,NUM,date,5,3912
+"what does r.e.m. stand for , as in the rock group r.e.m. ?",ABBR,exp,0,5005
+how long was the oj simpson trial ?,NUM,period,5,3881
+what does ` psi ' stand for ?,ABBR,exp,0,295
+how much money does the sultan of brunei have ?,NUM,money,5,3217
+how can i get started in writing for television ?,DESC,manner,1,4344
+what are hook worms ?,DESC,def,1,164
+what is swap math ?,DESC,def,1,2431
+what two colors are you blind to if you suffer from protanopia ?,ENTY,color,2,632
+what do you call the feeling of having experienced something before ?,ENTY,termeq,2,2066
+what tv quiz show left the air in 1975 to the tune of vera lynn 's we 'll meet again ?,ENTY,cremat,2,4444
+what phenomenon would you expect to read about in the monthly publication the bigfoot news ?,ENTY,event,2,2584
+what are amicable numbers ?,DESC,def,1,1298
+where did gulliver find a race of tiny people ?,LOC,other,4,4932
+"why do people get goosebumps when they have something emotional happen to them , like when they hear a beautiful piece of music , or see something beautiful , or get aroused by someone they love ?",DESC,reason,1,2662
+which country is australia 's largest export market ?,LOC,country,4,686
+what is the fastest commercial automobile that can be bought in the us ?,ENTY,other,2,310
+how many lawyers are there in the state of new jersey ?,NUM,count,5,1312
+where is mozambique located ?,LOC,other,4,817
+where are all european and american eels born ?,LOC,other,4,1666
+what is real time processing ?,DESC,def,1,1529
+what comedienne calls her sister-in-law captain bligh and her mother-in-law moby dick ?,HUM,ind,3,5228
+who shoplifts ?,HUM,ind,3,2280
+what color is the stripe along each side of a coho salmon ?,ENTY,color,2,1720
+what 1964 film introduced the song my kind of town ?,ENTY,cremat,2,2825
+what is difference between a poster and a print ?,DESC,desc,1,3103
+how deep is a fathom ?,NUM,dist,5,5236
+"what cigarette company urged us , `` come to where the flavor is ? ''",HUM,gr,3,2386
+"who played for the chicago bears , houston oilers and oakland raiders in a 26-year pro football career ?",HUM,ind,3,2206
+what is the average age of a member of the team that worked on the manhatten project ?,NUM,period,5,1080
+how long does cocaine stay in your system ?,NUM,period,5,3167
+"name a movie that the actress , sandra bullock , had a role in .",ENTY,cremat,2,3141
+who is the superstar in rent-a-cars ?,HUM,ind,3,508
+what does bud stand for ?,ABBR,exp,0,5059
+what famous husband-and-wife team did radio ads for blue nun wine ?,HUM,ind,3,5029
+why are lions called `` king of the jungle '' ?,DESC,reason,1,2291
+who is considered the first lady of the american stage ?,HUM,ind,3,1783
+who runs andy capp 's favorite pub ?,HUM,ind,3,2031
+what does the abbreviation cwt. ?,ABBR,exp,0,1258
+what country contains the highest point in south america ?,LOC,country,4,2985
+what kind of organization is ` last chance for animals ' ?,HUM,gr,3,1644
+how much of the nation 's children between the ages of two and eleven watch ` the simpsons ' ?,NUM,count,5,1624
+mississippi has what name for a state nickname ?,LOC,state,4,2628
+what do mormons believe ?,DESC,desc,1,36
+who invented the lawnmower ?,HUM,ind,3,3357
+what is thermal equilibrium ?,DESC,def,1,3471
+what is svhs ?,ABBR,exp,0,4252
+what does god create in the first sentence of the bible ?,ENTY,other,2,978
+what was marilyn monroe 's real name ?,HUM,ind,3,2355
+what does s.o.s. stand for ?,ABBR,exp,0,222
+what is the text of the fifth amendment ?,DESC,desc,1,4866
+what does `` b.y.o.b. '' mean ?,ABBR,exp,0,4456
+what are some mythology websites ?,LOC,other,4,3762
+"what island group contains jersey , guernsey , sark and herm ?",LOC,other,4,1791
+what does a dipsomaniac crave ?,ENTY,other,2,1515
+what is the acronym for the rating system for air conditioner efficiency ?,ABBR,abb,0,5310
+"what member of the little rascals has an on-again , off-again sweetheart in darla hood ?",HUM,ind,3,4859
+what do economists do ?,DESC,desc,1,514
+when did mount st. helen last have a major eruption ?,NUM,date,5,4038
+who directed `` jaws '' ?,HUM,ind,3,174
+what does inri stand for when used on jesus ' cross ?,ABBR,exp,0,148
+what actor learned to play the saxophone and speak russian for a role in a movie ?,HUM,ind,3,2400
+what kind of poisoning is known as plumbism ?,ENTY,dismed,2,3492
+how is abigail arcane related to the villainous opponent of the swamp thing ?,DESC,manner,1,2906
+what are the names of all the seas in the world and what ocean do they drain into ?,LOC,other,4,4335
+what is the secret of the universe ?,DESC,desc,1,1923
+how does ultraviolet light damage the dna of skin cells ?,DESC,manner,1,2394
+what did aaron hass write ?,ENTY,cremat,2,1697
+what fossilizes to form coprolite ?,ENTY,other,2,1865
+which thrilled taste buds first - snickers or 3 musketeers ?,ENTY,food,2,3374
+what game is fatal to anybody over 21 ?,ENTY,sport,2,1159
+how is the new ford econoline van f25 v1 engine ?,DESC,manner,1,1226
+what is afs ?,ABBR,exp,0,2956
+how do clouds form ?,DESC,manner,1,1333
+name the ranger who was always after yogi bear .,HUM,ind,3,2972
+what is the temperature today ?,NUM,temp,5,5450
+where is inoco based ?,LOC,other,4,2180
+what city 's theatrical district has been dubbed the roaring forties ?,LOC,city,4,5328
+what d.h. lawrence novel was originally titled tenderness ?,ENTY,cremat,2,4528
+what 1920s cowboy star rode tony the wonder horse ?,HUM,ind,3,46
+who won the first world series ?,HUM,ind,3,1696
+which city did christian crusaders fight to recapture from the muslims ?,LOC,city,4,363
+who is currently the most popular singer in the world ?,HUM,ind,3,4551
+what does the t.s. stand for in t.s. eliot 's name ?,ABBR,exp,0,4055
+what is a golf ball made of ?,ENTY,substance,2,607
+what country boasts the southernmost point in continental europe ?,LOC,country,4,2555
+what does e.g. stand for ?,ABBR,exp,0,1397
+what does ioc stand for ?,ABBR,exp,0,2253
+who invented `` the muppets '' ?,HUM,ind,3,5160
+how many people live in the falklands ?,NUM,count,5,1680
+what two european countries entered the war of american independence against the british ?,LOC,country,4,231
+what does the `` blue ribbon '' stand for ?,ABBR,exp,0,4964
+what are the five basic swimming strokes ?,ENTY,techmeth,2,5247
+what famous events have happened on march 27 ?,ENTY,event,2,1592
+why does a candle need a wick ?,DESC,reason,1,1853
+what disease does katharine hepburn have that makes her voice shake ?,ENTY,dismed,2,1995
+what kind of hat does bat masterson wear ?,ENTY,product,2,1255
+what are super balls made of ?,ENTY,substance,2,4040
+what is the largest museum in the world ?,LOC,other,4,5225
+what attracts tourists to reims ?,LOC,other,4,572
+what happened in dogtown in 1899 to make that year remembered ?,DESC,desc,1,1684
+how long was mao 's 1930s long march ?,NUM,dist,5,1044
+what is the origin of u.s. army sergeant 's stripes ?,DESC,desc,1,3982
+what is a phalanx ?,DESC,def,1,1393
+what is the origin of the term `` buffalo wings '' that is used as a menu item in bars across the nation for chicken wings in a spicey sauce ?,DESC,desc,1,3558
+what sea surrounds the cayman islands ?,LOC,other,4,2141
+when did nixon die ?,NUM,date,5,2980
+what did englishman john hawkins begin selling to new world colonists in 1562 ?,ENTY,other,2,3404
+how do you stop junk snail mail ?,DESC,manner,1,3242
+what percentage of the silver production is done by independent silversmiths ?,NUM,perc,5,3557
+what is eagle 's syndrome styloid process ?,DESC,def,1,202
+"in a computer , what does scsi mean ?",ABBR,exp,0,3662
+what is the origin of the first name ` breony ' ?,DESC,desc,1,2734
+which bourbon king was restored to the french throne during napoleon 's abdication ?,HUM,ind,3,1281
+who shared a new york city apartment with roger maris the year he hit 61 home runs ?,HUM,ind,3,3384
+how much calcium should an adult female have daily ?,NUM,count,5,5143
+"how can people from ireland come to the u.s. , work , and then return to ireland ?",DESC,manner,1,4947
+how old was george washington when he died ?,NUM,period,5,5251
+how long does james bond like his eggs boiled ?,NUM,period,5,3244
+who was the first woman to fly solo across the atlantic ?,HUM,ind,3,1847
+"where can i find a tape or book to help me say , write and understand japanese ?",LOC,other,4,4014
+what country boasts the most dams ?,LOC,country,4,1688
+what was called the world 's largest department store ?,HUM,gr,3,2140
+how fast is a 45mhz processor ?,NUM,speed,5,1495
+what is the abbreviation of general motors ?,ABBR,abb,0,1743
+what is the most common name ?,HUM,ind,3,4873
+what strait links the mediterranean sea and the atlantic ocean ?,LOC,other,4,5202
+how long does it take for your body to restore blood after you donate your blood ?,NUM,period,5,3048
+what 's the international lawn tennis challenge trophy usually called ?,ENTY,termeq,2,2100
+"what former royal palace has served as a granary , prison , arsenal , leper colony , mint , telegraph station and whorehouse before becoming an art museum ?",LOC,other,4,2486
+what is a gandy dancer ?,DESC,def,1,2056
+where can i find information on becoming a journalist ?,LOC,other,4,5444
+what does ekg stand for ?,ABBR,exp,0,5092
+who said `` what contemptible scoundrel stole the cork from my lunch ? '',HUM,ind,3,4658
+"which came first , according to genesis 1 : 2 : 22 - the chicken or the egg ?",ENTY,animal,2,298
+what is the airport code for los angeles international ?,NUM,code,5,4260
+what u.s. state are the finger lakes in ?,LOC,state,4,3531
+what trade did the 15th and 16th century portuguese hope to control between asia and europe ?,ENTY,other,2,4080
+what country did king wenceslas rule ?,LOC,country,4,87
+what is a rhomboideus minor ?,DESC,def,1,858
+what is the full form of .com ?,ABBR,exp,0,5
+cpr is the abbreviation for what ?,ABBR,exp,0,5068
+what document did president andrew johnson want a copy of placed under his head upon his burial ?,ENTY,cremat,2,1682
+what does lol mean ?,ABBR,exp,0,2143
+what is a transistor ?,DESC,def,1,132
+what country was sir edmund hillary born in ?,LOC,country,4,1409
+what is the origin of infinity ?,DESC,desc,1,4510
+where is mile high stadium ?,LOC,other,4,3083
+what is the abbreviation of the international olympic committee ?,ABBR,abb,0,4680
+in what state was there an 11 million gallon oil spill ?,LOC,state,4,1738
+what album put the beatles on the cover of time in 1967 ?,ENTY,cremat,2,158
+what is a fear of clouds ?,ENTY,dismed,2,2024
+what is the full classification of a lady bug ?,ENTY,animal,2,2678
+what is a leaky heart valve ?,DESC,def,1,3637
+how do you find the area of a circle ?,DESC,manner,1,5071
+"what was the name of the first watergate special prosecutor , later fired by nixon ?",HUM,ind,3,2858
+"what is p.m. an abbreviation for , as in 5 p.m. ?",ABBR,exp,0,5261
+what was the name of the lawyer who represented randy steven craft ?,HUM,ind,3,3171
+what sea is bombay on ?,LOC,other,4,5162
+"what river flows through vienna , budapest and belgrade ?",LOC,other,4,2249
+what is dsl ?,ABBR,exp,0,5316
+what 's the meaning of the name tatiana ?,DESC,def,1,4540
+what does the channel espn stand for ?,ABBR,exp,0,3395
+what did the seven dwarfs do for a living ?,HUM,title,3,3023
+what is lmds ?,ABBR,exp,0,4348
+who played the ringo kid in the 1939 film stagecoach ?,HUM,ind,3,611
+what century does captain video live in ?,NUM,date,5,965
+how does lightning travel ?,DESC,manner,1,2687
+what does ph stand for ?,ABBR,exp,0,5013
+"which mosquito 's bite draws blood , dt nn cc dt nn .",ENTY,animal,2,250
+what player squats an average of 3 times during a baseball doubleheader ?,HUM,ind,3,2966
+what is deet ?,ABBR,exp,0,3098
+who was the first actress to appear on a postage stamp ?,HUM,ind,3,2525
+"what schools in the washington , dc nn nn vbp nn nn nn nn .",HUM,gr,3,254
+"where was the ligurian republic , 1797-185 , ?",LOC,other,4,414
+who was president of afghanistan in 1994 ?,HUM,ind,3,270
+what does freddy freeman say to become captain marvel jr. ?,DESC,desc,1,3059
+what year did the united states pass the copyright law ?,NUM,date,5,721
+how many feet high is the hurdle in front of a runner 's steeplechase water jump ?,NUM,count,5,4248
+who wrote the farmer 's almanac ?,HUM,ind,3,2944
+give a reason for american indians oftentimes dropping out of school .,DESC,reason,1,421
+what is mikhail gorbachev 's middle initial ?,ABBR,abb,0,4944
+what song served as the closing theme of the johnny cash show ?,ENTY,cremat,2,446
+what building built in 18 contains 327 miles of book shelves ?,LOC,other,4,3236
+what are the words to the song sung by `` banana in pajamas '' ?,DESC,desc,1,2446
+what presidential administration challenged americans to explore the new frontier ?,HUM,gr,3,3046
+what does the acronym cpr mean ?,ABBR,exp,0,4559
+where did bill gates go to college ?,LOC,other,4,2420
+what does iq stand for ?,ABBR,exp,0,4105
+what are some good medical sites for information ?,LOC,other,4,3515
+name a film in which jude law acted .,ENTY,cremat,2,563
+who invented the road traffic cone ?,HUM,ind,3,2479
+what type of bridge is the golden gate bridge ?,ENTY,other,2,486
+where is south bend ?,LOC,other,4,5402
+what is after death ?,ENTY,other,2,1480
+what is the state nickname of mississippi ?,LOC,state,4,983
+what does elysium mean ?,DESC,def,1,1075
+how many colors are there in a rainbow ?,NUM,count,5,4432
+how many countries are there ?,NUM,count,5,4990
+which doonesbury character was likely to turn into a werewolf ?,HUM,ind,3,304
+how many layers does a bottle of yoo-hoo settle into ?,NUM,count,5,2177
+what do players try to do when the music stops in a game of musical chairs ?,DESC,desc,1,681
+what are the living conditions in cuba ?,DESC,desc,1,885
+what novel inspired the movie bladerunner ?,ENTY,cremat,2,131
+who 's the founder and editor of the national review ?,HUM,ind,3,1825
+what u.s. state is mammoth cave national park in ?,LOC,state,4,5238
+what is html ?,ABBR,exp,0,2693
+what country 's flag is field green ?,LOC,country,4,3314
+what russian city used to be called st. petersburg and petrograd ?,LOC,city,4,3944
+what does the name `` sabrina '' mean ?,DESC,def,1,1587
+when is the thai new year ?,NUM,date,5,2823
+what was the first sam spade novel ?,ENTY,cremat,2,1786
+what are chloroplasts ?,DESC,def,1,5418
+"what california bridge was don brown the first to cross , on may 27 , 1937 ?",LOC,other,4,4218
+what does the number `` 5 '' stand for on fubu clothing ?,ABBR,abb,0,3551
+where did the ukulele originate ?,LOC,other,4,4471
+what does the abbreviation ioc stand for ?,ABBR,exp,0,2593
+what does the e stand for in the equation e=mc2 ?,ABBR,exp,0,3336
+name a technique widely used to detect birth defects ?,ENTY,techmeth,2,223
+where can one find mozambique ?,LOC,other,4,1691
+what are shooting stars ?,DESC,def,1,654
+what was a mae west on a world war ii battleship ?,DESC,def,1,1295
+where is the abominable snowman said to wander ?,LOC,other,4,586
+what is the brand name of the chemical daminozide ?,ENTY,product,2,2940
+"what molecules include fluorine , sodium and magnesium ?",ENTY,substance,2,1575
+"at christmas time , what is the traditional thing to do under the mistletoe ?",ENTY,other,2,3078
+how many calories are there in a big mac ?,NUM,count,5,334
+what is the largest natural lake in pennsylvania ?,LOC,other,4,1499
+what kind of women gave sigmund freud erotic dreams ?,HUM,ind,3,4971
+what is hdlc ?,ABBR,exp,0,3796
+what kind of education do i need to become a flight attendant ?,ENTY,other,2,745
+what war saw battles at parrot 's beak and black virgin ?,ENTY,event,2,1727
+how does color affect a person psychologically ?,DESC,manner,1,4493
+what is the name of the vaccine for chicken pox ?,ENTY,dismed,2,3467
+what 's the geographic term for the submerged fringe of a continent ?,ENTY,termeq,2,3385
+why are so many umbrellas black ?,DESC,reason,1,3952
+what percentage of americans own their homes ?,NUM,perc,5,722
+what is columbia tristar 's phone number ?,NUM,code,5,4494
+what does a heliologist study ?,ENTY,other,2,2921
+what is a fear of sinning ?,ENTY,dismed,2,4083
+where did guinea pigs originate ?,LOC,other,4,1124
+what is meant by `` capital market '' ?,DESC,def,1,4886
+what was the nickname of model leslie hornby ?,HUM,ind,3,4609
+where is the bridge over the river kwai ?,LOC,other,4,3862
+what does hazmat stand for ?,DESC,def,1,2239
+what is ioc an abbreviation of ?,ABBR,exp,0,1988
+what war did johnny reb and billy yank fight ?,ENTY,event,2,3181
+what does the abbreviation aids stand for ?,ABBR,exp,0,31
+what is the abbreviation of the company name ` general motors ' ?,ABBR,abb,0,382
+what is the size of the largest akita ?,NUM,volsize,5,284
+name of the lady the great gatsby pines for ?,HUM,ind,3,4652
+when was the first american encyclopedia published ?,NUM,date,5,656
+who invented batteries ?,HUM,ind,3,1019
+what does g.m.t. stand for ?,ABBR,exp,0,444
+what is drew barrymore 's middle name ?,HUM,ind,3,2072
+who wrote ` hamlet ' ?,HUM,ind,3,2163
+what japanese manufacturer is known for both its pianos and its motorcycles ?,HUM,gr,3,1039
+"why are sometimes your hands cold , but the rest of you isn 't ?",DESC,reason,1,5432
+what does the name billie mean ?,DESC,def,1,434
+what 's the rathaus in frankfurt ?,DESC,def,1,2064
+where can i find detailed information about manchukuo ?,LOC,other,4,2399
+what u.s. state includes the san juan islands ?,LOC,state,4,5072
+when was dubai 's first concrete house built ?,NUM,date,5,4876
+what are some children 's rights ?,DESC,desc,1,3432
+how big is a baby bald eagle ?,NUM,volsize,5,3686
+"what does ms. , miss , and mrs. stand for ?",ABBR,exp,0,1198
+what president was assassinated by charles j. guiteau ?,HUM,ind,3,2043
+what is the acronym for the national bureau of investigation ?,ABBR,abb,0,2357
+what are the two largest birds on earth ?,ENTY,animal,2,1629
+how many equal angles are there in an isosceles triangle ?,NUM,count,5,387
+what is osteichthyes ?,DESC,def,1,3680
+what does cnn stand for ?,ABBR,exp,0,1886
+why can 't ostriches fly ?,DESC,reason,1,2165
+what does the dot on the letter i mean ?,DESC,def,1,4732
+how many major nazi leaders went on trial after the war at nuremberg ?,NUM,count,5,3202
+what country did the mau mau uprising take place in ?,LOC,country,4,3514
+"what tv series saw many of its aquatic scenes shot at silver springs , florida ?",ENTY,cremat,2,2953
+how many languages does the pope speak ?,NUM,count,5,4236
+what level of government or governmental agency is responsible for dealing with racism ?,HUM,gr,3,477
+what is limbo ?,DESC,def,1,3085
+what is rcd ?,ABBR,exp,0,2433
+when was the first wall street journal published ?,NUM,date,5,198
+"when reading classified ads , what does eenty : other stand for ?",ABBR,exp,0,590
+what is the abbreviated form of the national bureau of investigation ?,ABBR,abb,0,2068
+what concerts are held in new york this week ?,ENTY,event,2,3327
+where were the 196 summer olympics held ?,LOC,other,4,3528
+how many grooves are on a dime 's edge ?,NUM,count,5,2891
+what country did the romans call hibernia ?,LOC,country,4,3163
+how does blood clot ?,DESC,manner,1,3014
+what cards are bullets ?,ENTY,other,2,2190
+"who was the first elected mayor of washington , d.c. ?",HUM,ind,3,4765
+the olympic games in which year allowed nadia comaneci to become popular ?,NUM,date,5,5093
+what does `` antidisestablishmentarianism '' mean ?,DESC,def,1,794
+how many types of dogs ' tails are there - three,NUM,count,5,403
+who was randy steven craft 's lawyer ?,HUM,ind,3,502
+what was the name of the daughter of the virginia chief powhatan that married john rolfe ?,HUM,ind,3,691
+what are the most common elements in seawater ?,ENTY,substance,2,1313
+what is the full name of the plo ?,ABBR,exp,0,849
+what costume designer decided that michael jackson should only wear one glove ?,HUM,ind,3,1305
+what does nasdaq stand for ?,ABBR,exp,0,308
+who is johnny carson ?,HUM,desc,3,2410
+how can i trace my family roots ?,DESC,manner,1,2128
+what is the highest continent ?,LOC,other,4,5440
+how old is too old for a child to not be talking ?,NUM,period,5,3704
+what country imposed the berlin blockade in 1948 ?,LOC,country,4,3967
+how many characters are in the chinese alphabet ?,NUM,count,5,4966
+what first-aid product `` helps the hurt stop hurting '' ?,ENTY,product,2,2393
+who was the king who was forced to agree to the magna carta ?,HUM,ind,3,1227
+where in the bible does it tell about jesus christ 's brothers and sisters ?,LOC,other,4,2554
+what time of day did emperor hirohito die ?,NUM,date,5,396
+"what deck of cards includes the wheel of fortune , the lovers , and death ?",ENTY,other,2,506
+where can i get information concerning child custody files for the state of utah ?,LOC,other,4,4792
+why can 't you taste anything when you have a cold ?,DESC,reason,1,2553
+what was mao 's second name ?,HUM,ind,3,469
+what 's the abbreviation for trinitrotoluene ?,ABBR,abb,0,1985
+what brand of jeans did calvin klein admit in a 1984 interview he felt more comfortable wearing ?,ENTY,product,2,3020
+how much money does a back injury lawsuit get ?,NUM,money,5,118
+who invented the fountain ?,HUM,ind,3,4021
+name four comic strips about pilots .,ENTY,cremat,2,4285
+whose cupboard was bare ?,HUM,ind,3,1453
+what are the short- and long-term effects of underage drinking ?,DESC,desc,1,3728
+what is the world record for the longest hair ?,NUM,dist,5,4209
+what is the name of a language spoken by the sioux ?,ENTY,lang,2,3229
+how is a hydrogen bomb different from a nuclear bomb ?,DESC,manner,1,709
+what woman pitcher has struck out ted williams and hank aaron ?,HUM,ind,3,4232
+what are the largest breweries in the world ?,LOC,other,4,1243
+what award is the `` oscar '' of advertising ?,ENTY,other,2,2134
+what is sap ?,ABBR,exp,0,4258
+when was london 's docklands light railway constructed ?,NUM,date,5,2569
+who won oscars for her roles in gone with the wind and a streetcar named desire ?,HUM,ind,3,4798
+what does sids stand for ?,ABBR,exp,0,519
+who portrayed dracula in hammer studios ' films ?,HUM,ind,3,1403
+who won the first general election for president held in malawi in may 1994 ?,HUM,ind,3,5401
+what is bph ?,ABBR,exp,0,309
+what is the abbreviated expression for the national bureau of investigation ?,ABBR,abb,0,669
+how many teaspoons make up a tablespoon ?,NUM,count,5,4392
+where is the virtual desk reference ?,LOC,other,4,3850
+what are the 10 largest cities in the us ?,LOC,city,4,2104
+what 's the first day of the week ?,NUM,date,5,723
+what does btu mean ?,ABBR,exp,0,3622
+what is a fear of home surroundings ?,ENTY,dismed,2,5098
+name the highest mountain .,LOC,mount,4,4337
+what future movie treat was introduced to american colonists in 1603 by native americans ?,ENTY,food,2,3968
+what does snafu stand for ?,ABBR,exp,0,3960
+"where are the apartments in saint john , new brunswick ?",LOC,other,4,3512
+name the largest country in south america .,LOC,country,4,919
+what does msg stand for ?,ABBR,exp,0,3299
+what does cpr stand for ?,ABBR,exp,0,5263
+what is the name of the planet that the ewoks live on ?,LOC,other,4,4955
+what are the names of all the u.s. navy aircraft carriers ?,ENTY,veh,2,1030
+what river does the grand coulee dam dam ?,LOC,other,4,1879
+what was the vietnam war ?,DESC,def,1,2862
+what date is boxing day ?,NUM,date,5,3559
+what does a woman want ?,ENTY,other,2,2532
+what is the abbreviation for micro ?,ABBR,abb,0,305
+what does a&w of root beer fame stand for ?,ABBR,exp,0,2741
+what was simple simon fishing for in his mother 's pail ?,ENTY,other,2,3985
+what letter appears on the cold-water tap in spain ?,ENTY,letter,2,2278

@@ -115,6 +115,8 @@ class AngleEncodedVQC(nn.Module):
         n_layers: int = 2,
         n_classes: int = 6,
         seed: int = 42,
+        measurement_mode: str = "z",
+        data_reuploading: bool = False,
     ) -> None:
         super().__init__()
 
@@ -130,6 +132,13 @@ class AngleEncodedVQC(nn.Module):
         self.n_qubits = n_qubits
         self.n_layers = n_layers
         self.n_classes = n_classes
+        if measurement_mode not in ("z", "z_zz"):
+            raise ValueError(
+                "measurement_mode must be either 'z' or 'z_zz'."
+            )
+
+        self.measurement_mode = measurement_mode
+        self.data_reuploading = data_reuploading
 
         generator = torch.Generator()
         generator.manual_seed(seed)
@@ -148,8 +157,14 @@ class AngleEncodedVQC(nn.Module):
         # Index 0 is Ry; index 1 is Rz.
         self.quantum_parameters = nn.Parameter(initial_parameters)
 
+        measurement_dimension = (
+            n_qubits
+            if measurement_mode == "z"
+            else 2 * n_qubits
+        )
+
         self.classifier = nn.Linear(
-            n_qubits,
+            measurement_dimension,
             n_classes,
         )
 
@@ -168,6 +183,16 @@ class AngleEncodedVQC(nn.Module):
         self.register_buffer(
             "z_signs",
             z_measurement_signs(n_qubits),
+        )
+
+        self.register_buffer(
+            "zz_signs",
+            self.z_signs
+            * torch.roll(
+                self.z_signs,
+                shifts=-1,
+                dims=0,
+            ),
         )
 
     def initial_state(
@@ -215,6 +240,16 @@ class AngleEncodedVQC(nn.Module):
 
         # Hardware-efficient variational layers.
         for layer in range(self.n_layers):
+            # The first encoding happened before the loop. Re-upload before
+            # every subsequent variational layer when enabled.
+            if self.data_reuploading and layer > 0:
+                for qubit in range(self.n_qubits):
+                    state = apply_ry(
+                        state,
+                        inputs[:, qubit],
+                        qubit,
+                        self.n_qubits,
+                    )
             for qubit in range(self.n_qubits):
                 ry_angle = self.quantum_parameters[layer, qubit, 0]
                 rz_angle = self.quantum_parameters[layer, qubit, 1]
@@ -240,9 +275,25 @@ class AngleEncodedVQC(nn.Module):
                 state = state[:, permutation]
 
         probabilities = state.abs().square()
-        expectations = probabilities @ self.z_signs.transpose(0, 1)
 
-        return expectations.to(dtype=torch.float32)
+        z_expectations = (
+                probabilities
+                @ self.z_signs.transpose(0, 1)
+        )
+
+        if self.measurement_mode == "z":
+            quantum_features = z_expectations
+        else:
+            zz_expectations = (
+                    probabilities
+                    @ self.zz_signs.transpose(0, 1)
+            )
+            quantum_features = torch.cat(
+                (z_expectations, zz_expectations),
+                dim=1,
+            )
+
+        return quantum_features.to(dtype=torch.float32)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Return six unnormalised class logits."""
