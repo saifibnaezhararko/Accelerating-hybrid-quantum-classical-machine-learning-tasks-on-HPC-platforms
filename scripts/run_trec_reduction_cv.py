@@ -123,6 +123,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Use all TREC training examples instead of balanced sampling.",
     )
+    parser.add_argument(
+        "--embeddings-npz",
+        type=Path,
+        help="Reuse cached embeddings instead of loading SentenceTransformer.",
+    )
     return parser
 
 
@@ -256,18 +261,46 @@ def main() -> int:
         "during this CV experiment."
     )
 
-    print(f"Loading embedding model: {args.embedding_model}")
-    encoder = SentenceTransformer(
-        args.embedding_model,
-        device=device,
-    )
-
-    embeddings = encode_texts(
-        sampled,
-        encoder,
-        batch_size=args.batch_size,
-    )
     labels = sampled["label"].to_numpy(dtype=np.int64)
+
+    if args.embeddings_npz is not None:
+        embeddings_path = resolve(args.embeddings_npz)
+        print(f"Loading cached embeddings: {embeddings_path}")
+
+        cached = np.load(embeddings_path)
+        embeddings = np.asarray(
+            cached["embeddings"],
+            dtype=np.float32,
+        )
+        cached_labels = np.asarray(
+            cached["labels"],
+            dtype=np.int64,
+        )
+
+        if len(embeddings) != len(sampled):
+            raise SystemExit(
+                "Cached embeddings do not match the sampled dataset size: "
+                f"{len(embeddings)} != {len(sampled)}"
+            )
+
+        if not np.array_equal(cached_labels, labels):
+            raise SystemExit(
+                "Cached embedding labels do not match the current dataset order. "
+                "Use the same --seed and data-selection settings."
+            )
+    else:
+        print(f"Loading embedding model: {args.embedding_model}")
+
+        encoder = SentenceTransformer(
+            args.embedding_model,
+            device=device,
+        )
+
+        embeddings = encode_texts(
+            sampled,
+            encoder,
+            batch_size=args.batch_size,
+        )
 
     np.savez_compressed(
         output_dir / "cv_embeddings.npz",
