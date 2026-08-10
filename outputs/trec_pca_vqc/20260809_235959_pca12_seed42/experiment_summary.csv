@@ -1,2 +1,0 @@
-retained_variance,classical_development_accuracy,classical_development_macro_f1,classical_test_accuracy,classical_test_macro_f1,classical_training_seconds,vqc_best_epoch,vqc_development_accuracy,vqc_development_macro_f1,vqc_test_accuracy,vqc_test_macro_f1,vqc_training_seconds
-0.2603018581867218,0.6666666666666666,0.6660788923719958,0.694,0.6591883740841765,0.04167430003872141,3,0.23958333333333334,0.20924834731756925,0.176,0.17866149933827735,26.31758600001922
