@@ -1,0 +1,7 @@
+,predicted_ABBR,predicted_DESC,predicted_ENTY,predicted_HUM,predicted_LOC,predicted_NUM
+actual_ABBR,17,0,0,0,0,0
+actual_DESC,11,171,25,12,4,9
+actual_ENTY,0,23,197,17,10,3
+actual_HUM,1,6,19,210,7,2
+actual_LOC,0,5,5,8,145,4
+actual_NUM,0,2,3,1,1,172

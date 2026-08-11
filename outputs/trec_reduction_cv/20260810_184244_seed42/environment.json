@@ -1,0 +1,8 @@
+{
+  "python": "3.12.3",
+  "platform": "Linux-6.8.0-137-generic-x86_64-with-glibc2.39",
+  "pytorch": "2.13.0+cu126",
+  "pytorch_cuda_build": "12.6",
+  "cuda_available": true,
+  "scikit_learn": "1.9.0"
+}
