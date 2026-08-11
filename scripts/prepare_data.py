@@ -26,6 +26,12 @@ import json
 import sys
 from pathlib import Path
 
+# Make src/ importable when run as `python scripts/prepare_data.py` without an
+# editable install (`poetry install` / `pip install -e .`). No-op once installed.
+_SRC = Path(__file__).resolve().parent.parent / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
 from qnlp_hpc.data.convert import SUFFIX_FORMATS, ColumnMapping, convert_file
 from qnlp_hpc.data.schema import DatasetValidationError, check_dataset, deduplicate, write_pairs
 from qnlp_hpc.paths import resolve

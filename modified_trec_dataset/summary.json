@@ -1,0 +1,40 @@
+{
+  "filters": {
+    "max_words": 8,
+    "classes": {
+      "0": "DESC",
+      "3": "HUM"
+    },
+    "min_word_freq": 2,
+    "balance": true,
+    "lowercase": true,
+    "strip_punct": true,
+    "split": "pooled-stratified (test_frac=0.2)",
+    "seed": 0
+  },
+  "label_column_map": {
+    "0": 0,
+    "3": 1
+  },
+  "train": {
+    "sentences": 174,
+    "labels": {
+      "0 (DESC)": 87,
+      "3 (HUM)": 87
+    },
+    "vocab_size": 354,
+    "words_min": 2,
+    "words_max": 8
+  },
+  "test": {
+    "sentences": 44,
+    "labels": {
+      "0 (DESC)": 22,
+      "3 (HUM)": 22
+    },
+    "vocab_size": 110,
+    "words_min": 3,
+    "words_max": 8
+  },
+  "test_words_missing_from_train": []
+}

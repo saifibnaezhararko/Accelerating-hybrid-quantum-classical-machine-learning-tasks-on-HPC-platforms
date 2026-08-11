@@ -22,6 +22,12 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
+# Make src/ importable when run as `python scripts/check_backends.py` without an
+# editable install (`poetry install` / `pip install -e .`). No-op once installed.
+_SRC = Path(__file__).resolve().parent.parent / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
 from qnlp_hpc.backends import (
     BACKENDS,
     available_backends,

@@ -54,8 +54,12 @@ def _pennylane_kwargs(
 
     Two different destinations, easy to confuse: ``diff_method`` is a parameter of
     the lambeq model itself, while ``device_options`` go inside ``backend_config``
-    and are forwarded to ``qml.device`` — that is how the Aer plugin is switched to
-    its GPU statevector (``device="GPU"``).
+    and are forwarded to ``qml.device``.
+
+    Note the key naming, which lambeq inherits and which bites on Aer:
+    ``backend_config["backend"]`` is the *PennyLane plugin*, while
+    ``backend_config["device"]`` is renamed by lambeq to ``backend`` and passed to
+    ``qml.device`` as the *simulator's own backend name*. See ``_aer_kwargs``.
     """
 
     def build() -> dict[str, Any]:
@@ -63,6 +67,35 @@ def _pennylane_kwargs(
         if diff_method is not None:
             kwargs["diff_method"] = diff_method
         return kwargs
+
+    return build
+
+
+# Aer's exact-simulation backend. Without it, `qml.device("qiskit.aer", ...)` uses
+# `aer_simulator`, which cannot produce analytic probabilities and silently falls
+# back to sampling. That is fatal rather than merely noisy here: lambeq's circuits
+# post-select (a 3-word MC1 sentence at 2 sentence qubits is 14 qubits, 12 of them
+# post-selected), so post-selection succeeds with probability ~2^-12, no sampled
+# shot survives, and the normalised output is NaN. Verified in
+# pennylane_aer/03_lambeq_aer_backend.py.
+AER_STATEVECTOR = "aer_simulator_statevector"
+
+
+def _aer_kwargs(gpu: bool = False) -> Callable[[], dict[str, Any]]:
+    """Build ``backend_config`` for Qiskit Aer under lambeq's key naming."""
+
+    def build() -> dict[str, Any]:
+        if gpu:
+            # `{"device": "GPU"}` does NOT work: lambeq renames `device` to
+            # `backend`, so qml.device receives backend="GPU" and raises
+            # `Backend 'GPU' does not exist`. The GPU flag lives on the Aer
+            # simulator object, so the only route is a pre-built instance.
+            from qiskit_aer import AerSimulator
+
+            device: Any = AerSimulator(method="statevector", device="GPU")
+        else:
+            device = AER_STATEVECTOR
+        return {"backend_config": {"backend": "qiskit.aer", "device": device}}
 
     return build
 
@@ -157,10 +190,11 @@ BACKENDS: dict[str, BackendSpec] = {
         requires=("pennylane", "pennylane:qiskit.aer", "qiskit-aer", "torch"),
         description=(
             "Qiskit Aer driven through PennyLane — the PyTorch<->Qiskit seam: "
-            "Aer simulates, torch autograd trains (parameter-shift)."
+            "Aer simulates, torch autograd trains (parameter-shift). Pinned to "
+            "the statevector backend; see AER_STATEVECTOR for why."
         ),
         install_hint="poetry install --with quantum",
-        model_kwargs=_pennylane_kwargs("qiskit.aer"),
+        model_kwargs=_aer_kwargs(),
     ),
     "pennylane-qiskit-aer-gpu": BackendSpec(
         name="pennylane-qiskit-aer-gpu",
@@ -171,7 +205,7 @@ BACKENDS: dict[str, BackendSpec] = {
         requires=("pennylane", "pennylane:qiskit.aer", "qiskit-aer:gpu", "torch"),
         description="Same seam, with Aer's GPU statevector device (Experiment 2).",
         install_hint="poetry install --with gpu  # qiskit-aer-gpu, CUDA 12.4-12.6",
-        model_kwargs=_pennylane_kwargs("qiskit.aer", device="GPU"),
+        model_kwargs=_aer_kwargs(gpu=True),
     ),
     "tket-aer": BackendSpec(
         name="tket-aer",

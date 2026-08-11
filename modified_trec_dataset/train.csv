@@ -1,0 +1,175 @@
+label-coarse,label-fine,text,trec_split,label
+3,6,what is the oldest profession,train,1
+3,4,who was the inventor of silly putty,train,1
+3,6,what is the occupation of nicholas cage,train,1
+0,9,what causes pneumonia,train,0
+0,12,what is the design of the ship titanic,train,0
+3,4,who followed caesar,train,1
+3,4,who invented the radio,train,1
+3,4,what actor first portrayed james bond,train,1
+0,9,what is jane goodall known for,train,0
+3,12,who is the queen mother,train,1
+3,4,who was randy steven craft 's lawyer,train,1
+3,5,what is the best college in the country,train,1
+3,4,what was her real name,train,1
+0,7,what is color,train,0
+0,9,why did the chicken cross the road,train,0
+3,4,what actor married john f. kennedy 's sister,train,1
+3,4,who invented silly putty,train,1
+0,9,what is the purpose of a car bra,train,0
+3,12,who is colin powell,train,1
+3,4,who painted the sistine chapel,train,1
+0,7,what is australia day,train,0
+0,7,what is the definition of low island,train,0
+0,12,where did marijuana come from,train,0
+3,4,name the lawyer for randy craft,train,1
+0,7,define cosmology,train,0
+3,4,who made the first gas engine,train,1
+0,0,how do clouds form,train,0
+0,12,what do christian scientists believe in,train,0
+3,4,what two baseball players make up the battery,train,1
+3,5,what university was woodrow wilson president of,train,1
+0,0,how can you prevent it,train,0
+0,9,what causes tuberculosis,train,0
+0,7,what is head start,train,0
+3,4,silly putty was invented by whom,train,1
+0,0,how can someone become a federal agent,train,0
+0,9,why do we have to go to school,train,0
+0,0,how do i write to my congressman,train,0
+0,12,what happened in the long march,train,0
+3,4,what is michael jackson 's middle name,train,1
+0,0,how does one correctly pronounce qigong,train,0
+3,4,who is the father of the computer,train,1
+0,9,what causes rolling thunder,train,0
+3,4,what is the name of miss india 1994,train,1
+3,4,who is the pope,train,1
+0,0,how do you clean up a cache,train,0
+0,12,what is the origin of the word assassinate,train,0
+0,0,how do you address a chinese person,train,0
+0,7,what is the meaning of thalassemia,train,0
+3,4,who is the creator of the muppets,train,1
+0,7,what does storm wave mean in japanese,train,0
+3,4,who was charles lindbergh 's wife,train,1
+0,0,how do i contact answers.com,train,0
+3,5,name pittsburgh 's baseball team,train,1
+0,12,what does choo choo charlie say,train,0
+0,7,what does hazmat stand for,train,0
+0,0,how did names come about,train,0
+3,4,what is her husband 's name,train,1
+3,4,who killed caesar,train,1
+0,9,why does it snow,train,0
+0,7,what is the definition of hazmat,train,0
+0,9,why is jane goodall famous,train,0
+0,7,what is a guild,train,0
+3,4,what engineer invented the pull-tab can,train,1
+3,5,which college did dikembe mutombo attend,train,1
+0,7,what is thalassemia,train,0
+0,7,what is diabetes,train,0
+0,7,what is hydrogen,train,0
+0,12,what is the origin of the christmas tree,train,0
+0,9,why is indiglo called indiglo,train,0
+3,4,what was the name of the muppets creator,train,1
+0,7,what was the vietnam war,train,0
+0,0,how do i tie a tie,train,0
+3,5,which team won the super bowl in 1968,train,1
+3,4,cnn is owned by whom,train,1
+3,4,who is the prime minister of japan,train,1
+3,4,who is the president of the spanish government,train,1
+3,4,who developed potlatch,train,1
+3,4,who was the first king of england,train,1
+0,7,what is butterfield 8 in butterfield 8,train,0
+0,7,what does ouija mean,train,0
+3,5,which college did dikembe mutombo play basketball at,train,1
+0,7,what is a bone marrow transplant,train,0
+3,4,who was the lawyer for randy steven craft,train,1
+0,7,what is time,train,0
+3,4,what is the name of a greek god,train,1
+0,12,what effect does a prism have on light,train,0
+0,12,what are some children 's rights,train,0
+3,4,who killed lee harvey oswald,train,1
+3,12,who is robin williams,train,1
+3,4,who is the leader of india,train,1
+3,12,who is henry butler,train,1
+3,5,who made the first airplane,train,1
+3,12,who is samuel f. pickering,train,1
+0,7,what does the term glory hole mean,train,0
+3,4,what was thatcher 's first name,train,1
+0,7,what is a bone marrow transplant meant for,train,0
+0,12,what are the benefits of home school,train,0
+0,7,what is the definition of a witch,train,0
+0,7,what is proposition 98 about,train,0
+0,9,what makes salt,train,0
+3,12,who is charles lindbergh,train,1
+3,4,who is the prime minister in norway,train,1
+3,4,who was darth vader 's son,train,1
+3,4,who makes the die hard car battery,train,1
+0,0,how does a bill become law,train,0
+0,7,what is a false moon,train,0
+0,0,how is the word qigong pronounced,train,0
+0,0,how does james bond like his martinis,train,0
+3,4,who was the first woman in space,train,1
+3,4,who was the lawyer for randy craft,train,1
+0,12,what is the origin of the word marijuana,train,0
+0,7,what is agent orange,train,0
+3,5,which college did dikembe mutombo play basketball for,train,1
+3,5,what company produces spumante,train,1
+0,12,what is the origin of music,train,0
+3,4,rotary engines used to be made by whom,train,1
+0,12,what will the weather be today,train,0
+0,7,what is sound,train,0
+3,6,what does larry king do for a living,train,1
+3,4,who shot lee harvey oswald,train,1
+0,7,what does the name melissa mean,train,0
+3,6,what does nicholas cage do for a living,train,1
+0,0,how does it make its colors,train,0
+0,12,what is the weather like on the moon,train,0
+0,9,what caused the death of bob marley,train,0
+3,5,what kind of business is 7-eleven,train,1
+0,7,what is sinn fein,train,0
+0,7,what is usenet for the internet,train,0
+0,9,why is chicago named chicago,train,0
+3,4,who owns cnn,train,1
+3,4,what is the most common name,train,1
+3,4,who was the oldest u.s. president,train,1
+3,4,who 's the only president buried in washington,train,1
+3,4,who created the character james bond,train,1
+0,7,what is humidity,train,0
+0,12,what happened to answers.com,train,0
+0,7,define spumante,train,0
+0,0,how was the kennedy money made,train,0
+3,4,who is the head of the world bank,train,1
+3,4,what is the most popular last name,train,1
+0,7,what is the english meaning of caliente,train,0
+3,4,what monarch signed the magna carta,train,1
+3,4,who was the tallest u.s. president,train,1
+3,4,who is the richest person in the world,train,1
+0,7,what was the long march in china,train,0
+3,4,what is michael jackson 's father 's name,train,1
+0,7,what is probability theory,train,0
+3,5,rotary engine cars were made by what company,train,1
+0,12,describe the long march,train,0
+3,4,what english explorer discovered and named virginia,train,1
+3,5,who used to make cars with rotary engines,train,1
+0,7,what is the meaning of caliente in english,train,0
+3,12,who was buffalo bill,train,1
+0,7,what is an atom,test,0
+3,4,who was the first governor of alaska,test,1
+3,5,what is the oldest university in the us,test,1
+3,4,who invented the calculator,test,1
+3,4,who discovered america,test,1
+3,4,who founded american red cross,test,1
+3,4,who is the prime minister of canada,test,1
+3,4,who invented the telephone,test,1
+0,7,what is hypertension,test,0
+0,7,what is home equity,test,0
+3,4,who is the tallest man in the world,test,1
+3,4,who was the first prime minister of canada,test,1
+3,4,who is the governor of alaska,test,1
+0,7,what is pneumonia,test,0
+0,7,what is acid rain,test,0
+3,4,who killed john f. kennedy,test,1
+0,7,what is a panic disorder,test,0
+3,4,what is shakespeare 's nickname,test,1
+0,7,what is nuclear power,test,0
+0,7,what is an earthquake,test,0
+0,7,what are enzymes,test,0

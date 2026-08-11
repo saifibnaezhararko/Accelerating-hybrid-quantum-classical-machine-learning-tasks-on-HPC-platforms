@@ -21,11 +21,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
+
+# Make src/ importable when run as `python scripts/run_sweep.py` without an
+# editable install (`poetry install` / `pip install -e .`). No-op once installed.
+_SRC = Path(__file__).resolve().parent.parent / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
 from qnlp_hpc.config import ConfigError, apply_overrides, load_config
 from qnlp_hpc.paths import OUTPUTS_DIR, resolve

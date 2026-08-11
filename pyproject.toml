@@ -102,6 +102,12 @@ extend-exclude = ["tests/Zijia_spider_test.py"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "UP", "B"]   # pyflakes, pycodestyle, isort, pyupgrade, bugbear
 
+[tool.ruff.lint.per-file-ignores]
+# Scripts insert src/ onto sys.path before importing qnlp_hpc so they run as
+# `python scripts/<name>.py` without an editable install. That sys.path.insert is
+# module-level code before a first-party import, which E402 flags — intentional here.
+"scripts/*.py" = ["E402"]
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]
@@ -118,6 +124,10 @@ packages = ["qnlp_hpc"]
 minversion = "8.0"
 addopts = "-ra --cov=qnlp_hpc --cov-report=term-missing"
 testpaths = ["tests"]
+# Put the src/ layout on sys.path so the suite imports qnlp_hpc without needing
+# an editable install (`poetry install` / `pip install -e .`). Lets a bare
+# `python -m pytest` work from a clean checkout.
+pythonpath = ["src"]
 # Collect only `test_*.py`. Without this, pytest's default also matches
 # `*_test.py`, which would pick up tests/Zijia_spider_test.py and execute a full
 # 150-epoch training run (plus a blocking plt.show()) during collection.

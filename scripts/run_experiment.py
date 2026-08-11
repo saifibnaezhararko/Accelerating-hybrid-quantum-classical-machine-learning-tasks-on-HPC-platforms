@@ -22,7 +22,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+# Make src/ importable when run as `python scripts/run_experiment.py` without an
+# editable install (`poetry install` / `pip install -e .`). No-op once installed.
+_SRC = Path(__file__).resolve().parent.parent / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
 from qnlp_hpc.config import ConfigError, apply_overrides, apply_to_mc1_spider, load_config
 

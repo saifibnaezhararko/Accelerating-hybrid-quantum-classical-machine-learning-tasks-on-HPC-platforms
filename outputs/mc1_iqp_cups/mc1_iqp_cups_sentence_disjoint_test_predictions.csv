@@ -1,14 +1,14 @@
 sentence_1,sentence_2,label,predicted_label,correct,probability_label_0,probability_label_1
-experienced cook prepares meal,experienced chef prepares meal,1,1,True,0.0007721253,0.9992279
-programmer creates code,cook prepares complicated dish,0,0,True,0.9996613,0.00033870162
-chef creates dish,programmer writes advanced code,0,0,True,0.99966,0.00033999377
-experienced chef creates complicated dish,experienced chef prepares meal,1,1,True,0.00077211135,0.9992279
-chef creates tasty meal,cook prepares complicated dish,1,1,True,0.00077210617,0.9992279
-cook prepares complicated dish,hacker writes advanced code,0,0,True,0.99966013,0.0003398868
-cook prepares complicated meal,cook prepares complicated dish,1,1,True,0.0007721099,0.9992279
-hacker creates advanced code,chef creates dish,0,0,True,0.99966025,0.00033977602
-experienced chef prepares meal,programmer creates code,0,0,True,0.9996613,0.00033870808
-hacker creates advanced code,programmer creates code,1,1,True,0.0006361779,0.99936384
-programmer writes advanced code,hacker creates advanced code,1,1,True,0.00063634897,0.9993637
-hacker writes advanced code,chef creates dish,0,0,True,0.99966013,0.0003398865
-programmer creates code,chef creates dish,0,0,True,0.9996613,0.00033870162
+experienced cook prepares meal,experienced chef prepares meal,1,1,True,0.0007824405,0.9992175
+programmer creates code,cook prepares complicated dish,0,0,True,0.9996536,0.00034640412
+chef creates dish,programmer writes advanced code,0,0,True,0.9996524,0.00034766668
+experienced chef creates complicated dish,experienced chef prepares meal,1,1,True,0.00078246475,0.9992175
+chef creates tasty meal,cook prepares complicated dish,1,1,True,0.00078246475,0.9992175
+cook prepares complicated dish,hacker writes advanced code,0,0,True,0.9996524,0.00034759275
+cook prepares complicated meal,cook prepares complicated dish,1,1,True,0.00078246475,0.9992175
+hacker creates advanced code,chef creates dish,0,0,True,0.9996525,0.0003474927
+experienced chef prepares meal,programmer creates code,0,0,True,0.9996536,0.00034639754
+hacker creates advanced code,programmer creates code,1,1,True,0.00064103905,0.99935895
+programmer writes advanced code,hacker creates advanced code,1,1,True,0.0006412434,0.9993587
+hacker writes advanced code,chef creates dish,0,0,True,0.9996524,0.00034759275
+programmer creates code,chef creates dish,0,0,True,0.9996536,0.00034640412

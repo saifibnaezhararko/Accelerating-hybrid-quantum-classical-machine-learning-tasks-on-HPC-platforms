@@ -1,0 +1,45 @@
+label-coarse,label-fine,text,trec_split,label
+3,5,who produces spumante,train,1
+3,4,who was the first american in space,train,1
+0,0,how do you correctly say the word qigong,train,0
+3,4,who invented baseball,train,1
+0,0,how do i start a bank,train,0
+0,9,what is colin powell best known for,train,0
+0,7,what is spumante,train,0
+3,6,what is her profession,train,1
+0,9,what makes thunder,train,0
+3,6,what is nicholas cage 's occupation,train,1
+0,7,what is god,train,0
+0,12,what is the origin of the atom,train,0
+3,4,name the creator of the muppets,train,1
+3,12,who was jane goodall,train,1
+3,12,who is samuel pickering,train,1
+3,4,name randy craft 's lawyer,train,1
+0,7,what is the definition of cosmology,train,0
+0,7,what is a hydrogen bond,train,0
+0,7,what does caliente mean in english,train,0
+0,0,how did bob marley die,train,0
+0,9,what made jane goodall famous,train,0
+0,7,what is a first world country,train,0
+3,4,who created the muppets,train,1
+3,5,what college did dikembe mutombo play basketball for,train,1
+0,9,what causes an earthquake,train,0
+3,6,what is nicholas cage 's profession,train,1
+0,9,colin powell is most famous for what,train,0
+3,6,what does robin williams do,train,1
+3,4,which king signed the magna carta,train,1
+3,4,what was darth vader 's son named,train,1
+3,4,who invented basketball,train,1
+0,7,what does melissa mean,train,0
+3,5,what kind of company is 7-eleven,train,1
+0,7,what is a glory hole,train,0
+3,4,who is the richest woman in the world,train,1
+0,7,what is cosmology,train,0
+0,9,colin powell is famous for what,train,0
+3,6,what is larry king 's occupation,train,1
+3,4,who invented the muppets,train,1
+3,5,what is pittsburgh 's baseball team called,train,1
+0,7,define sinn fein,train,0
+3,4,who is the prime minister of australia,train,1
+0,7,what is a prism,test,0
+0,12,what is the effect of acid rain,test,0
