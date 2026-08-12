@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import platform
-from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -150,11 +149,10 @@ def make_output_directory(
     if explicit_path is not None:
         output_dir = resolve(explicit_path)
     else:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_dir = (
             OUTPUTS_DIR
             / "trec_reduction_cv"
-            / f"{timestamp}_seed{seed}"
+            / f"seed{seed}"
         )
 
     output_dir.mkdir(parents=True, exist_ok=False)
