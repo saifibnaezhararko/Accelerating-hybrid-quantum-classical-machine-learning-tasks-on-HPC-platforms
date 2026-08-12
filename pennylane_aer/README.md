@@ -1,12 +1,14 @@
-# PennyLane + Qiskit Aer: circuits, backend port, and a CNN hybrid
+# PennyLane + Qiskit Aer: circuits, backend port, and two hybrid routes
 
-Software Lead work folder. Four questions, answered with runnable scripts and
+Software Lead work folder. Five questions, answered with runnable scripts and
 measured numbers rather than assertions:
 
 1. Build a PennyLane circuit and run it on Qiskit Aer.
 2. Test Evelyn's `mc1_iqp_cups` code.
 3. Use Qiskit Aer as the backend for the existing lambeq pipeline.
 4. `convert -> CNN -> hybrid quantum PennyLane`.
+5. Run **MC1 through dimensionality reduction** into a narrow circuit, and get
+   the lambeq route's accuracy at 2 qubits instead of 18.
 
 Everything here is additive. **No contributor file was modified.** The only edits
 outside this folder are two bug fixes in `src/qnlp_hpc/backends/registry.py`
@@ -17,11 +19,14 @@ pennylane_aer/
 ├── README.md                      this file
 ├── aer_backend.py                 the Aer backend_config that actually works
 ├── hybrid_cnn_quantum.py          convert / CNN / quantum layer
+├── mc1_reduced.py                 MC1 -> embedding -> PCA/TSVD/UMAP -> circuit
 ├── test_evelyn_iqp.py             25 tests for mc1_iqp_cups
+├── test_mc1_reduced.py            27 tests for the reduced route
 ├── 01_pennylane_aer_circuit.py    PennyLane circuit on Aer, 4 configurations
 ├── 03_lambeq_aer_backend.py       Evelyn's IQP model ported onto Aer
 ├── 04_train_cnn_hybrid.py         hybrid training vs classical control
 ├── 05_performance_plots.py        figures, rendered from the JSON reports
+├── 06_train_mc1_reduced.py        MC1 reduced route: 6 stages, multi-seed
 └── outputs/                       JSON reports + run logs + PNG figures
 ```
 
@@ -266,7 +271,194 @@ step.
 
 ---
 
-## 5. Figures
+## 5. MC1 through dimensionality reduction
+
+`mc1_reduced.py` + `06_train_mc1_reduced.py`. Section 4 applied the
+*embedding -> quantum layer -> classifier* route to TREC; this applies it to
+**MC1**, so it can be compared directly against the lambeq baseline on the same
+sentence-disjoint split:
+
+```
+sentence -> TF-IDF / bag-of-words / BERT -> PCA | TSVD | UMAP -> n_qubits angles
+         -> AngleEmbedding + StronglyEntanglingLayers (re-uploading) -> <Z_i>
+pair     -> |l - r|, l * r  (swap-invariant, as in Evelyn's IQPPairModel) -> head
+```
+
+Split membership is imported from `mc1_iqp_cups.config`, so the train/dev/test
+boundary is Evelyn's, unchanged.
+
+```
+python pennylane_aer/06_train_mc1_reduced.py --qubits 2 --seeds 0-4 \
+    --qubit-sweep 2,3,4,6,8 --keep-history --aer-epochs 40
+```
+
+`--only training,scaling,augmentation,width,aer-eval,aer-training` re-runs a
+subset and merges it into the existing report — so stage 6 can be repeated on a
+GPU node without spending an hour reproducing the rest.
+
+### MC1's topic labels are recoverable from MC1 itself
+
+MC1 labels a pair 1 when the two sentences share a topic and 0 when they do not.
+That makes the sentence graph a **2-colouring problem** — label-1 edges force
+equal colours, label-0 edges force opposite ones. It resolves into exactly 2
+components covering all 83 sentences, and the resulting assignment reproduces
+**all 100 shipped labels with 0 disagreements**. No lexicon was needed, and
+`derive_sentence_topics` raises rather than guess if a future dataset is not
+2-colourable.
+
+This licenses forming *all* pairs within a split: MC1 ships 13 test pairs over
+its 11 test sentences, but all **55** possible pairs carry a label the dataset
+already determined. Nothing crosses the sentence-disjoint boundary, so this adds
+supervision without adding leakage.
+
+| split | sentences | shipped pairs | all pairs |
+|---|---|---|---|
+| train | 58 | 64 | **1,653** |
+| development | 14 | 13 | 91 |
+| test | 11 | 13 | **55** |
+
+Reporting on 55 test pairs instead of 13 also raises the resolution of the
+accuracy estimate from 7.7 points per pair to 1.8.
+
+### Result: the lambeq route's accuracy at 2 qubits
+
+2 qubits, 2 layers, 2 re-uploads, TF-IDF + PCA, 5 seeds, 60 epochs:
+
+| model | quantum params | total params | test (55 pairs, 95% CI) | MC1's own 13 pairs | s/epoch |
+|---|---|---|---|---|---|
+| **quantum (2-qubit circuit)** | 12 | 126 | **1.0000 [1.0000, 1.0000]** | **1.0000** | 0.42 |
+| classical control (Linear + tanh) | 0 | 120 | 1.0000 [1.0000, 1.0000] | 1.0000 | 0.06 |
+| no bottleneck (head only) | 0 | 114 | 1.0000 [1.0000, 1.0000] | 1.0000 | 0.04 |
+
+Against the lambeq baseline (§2) on the identical test pairs:
+
+| | lambeq `cups_reader` + IQP | this route |
+|---|---|---|
+| qubits | 18 | **2** |
+| post-selected qubits | 16 (P ~ 2⁻¹⁶) | **0** |
+| MC1 13-pair test accuracy | 1.0000 (1 seed) | 1.0000 (**5/5 seeds**) |
+| training time | 1308.7 s | **~25 s** |
+| shots / real hardware | impossible (NaN) | works |
+
+**Read the control column before the quantum one.** All three models saturate,
+so the honest statement is that the quantum layer *matches* the controls — it
+does not beat them. On a task a 114-parameter head already solves, a 2-qubit
+circuit cannot demonstrate an advantage; what it demonstrates is that the
+NISQ-shaped route loses nothing while removing 16 qubits and all post-selection.
+
+### Two ablations, and one that changes the answer
+
+**Angle scaling.** Reduced components must be mapped into the rotation range.
+Scaling each component to unit variance (`per-component`) lifts the
+lowest-variance components — which on MC1 carry syntax, not topic — up to the
+amplitude of the topic-carrying one, so the circuit sees noise at signal
+strength. A single `global` scale preserves the variance ordering PCA produced.
+
+| scaling | 2 qubits | 4 qubits |
+|---|---|---|
+| global | **1.0000** | **0.9491** |
+| per-component | 0.9673 | 0.7673 |
+
+The gap widens with width exactly as the mechanism predicts — more retained
+components means more low-variance directions to inflate.
+
+**Augmentation.** Training on MC1's 64 shipped training pairs versus all 1,653
+its training sentences allow, with the evaluation splits held fixed:
+
+| training pairs | test (55) | MC1's own 13 pairs |
+|---|---|---|
+| 64 (shipped) | 0.7673 | 0.7846 |
+| 1,653 (augmented) | **1.0000** | **1.0000** |
+
+**This is the honest caveat on the comparison above.** Trained on the same 64
+pairs the lambeq model saw, this route reaches 0.7846 on the 13 test pairs,
+*below* the lambeq baseline's 1.0000. The advantage comes from the augmented
+supervision and the cost profile — not from the reduced representation being
+intrinsically stronger than `cups_reader` + IQP. Grammar buys sample efficiency;
+this route buys width, shots, and speed.
+
+### More qubits make it worse
+
+Circuit width sweep, 5 seeds per point, classical control swept alongside:
+
+| qubits | explained variance | quantum params | quantum test | classical test |
+|---|---|---|---|---|
+| **2** | 0.385 | 12 | **1.0000 [1.0000, 1.0000]** | 1.0000 |
+| 3 | 0.494 | 18 | 0.8909 [0.7472, 1.0000] | 1.0000 |
+| 4 | 0.596 | 24 | 0.9491 [0.8555, 1.0000] | 1.0000 |
+| 6 | 0.753 | 36 | 0.6764 [0.4602, 0.8925] | 1.0000 |
+| 8 | 0.871 | 48 | 0.6836 [0.4553, 0.9120] | 1.0000 |
+
+Accuracy **falls** as width grows while explained variance *rises*, and the
+classical control stays at 1.0000 throughout — so this is optimisation, not
+representation. The per-epoch histories confirm it: at 4 qubits, seed 3's
+training loss falls 0.67 -> 0.008 while its development loss climbs
+0.70 -> 14.80. The extra circuit parameters memorise the 58 training sentences.
+
+For the Quantum ML Lead: **2 qubits is the right width for MC1**, and any move
+to a larger dataset should re-run this sweep rather than assume more qubits
+help. Regularising the circuit (dropout on the quantum features, stronger weight
+decay, fewer entangling layers) is the obvious next lever and is not tried here.
+
+### Aer: shots work on this route
+
+Weights trained on `default.qubit` are transferred to Aer and evaluated:
+
+| backend | seconds | test (55) | agreement with `default.qubit` | max abs logit diff |
+|---|---|---|---|---|
+| Aer statevector, exact | 3.12 | 1.0000 | 1.0000 | 4.29e-06 |
+| Aer statevector, 1024 shots | 3.00 | **1.0000** | **1.0000** | 9.45e-01 |
+| Aer statevector, 8192 shots | 3.32 | **1.0000** | **1.0000** | 2.63e-01 |
+
+This is the direct contrast with §3. On the lambeq circuits, 1024 shots produce
+**NaN** — 2⁻¹⁶ post-selection means zero shots survive. Here nothing is
+post-selected, so shots merely add sampling noise: the logits move by ~1 at 1024
+shots and **every prediction still matches the exact run**. The decision
+boundary sits far enough from the data to absorb it.
+
+That makes this the configuration to try on real hardware, and the one where
+`lightning.gpu` adjoint differentiation is worth retesting (§3's adjoint
+blocker was post-selection).
+
+### Aer training cost: SPSA is what makes it affordable
+
+Because pair features are indexed from per-sentence circuit outputs, one epoch
+costs **58 circuit evaluations — the number of distinct training sentences — no
+matter that it covers all 1,653 training pairs.** Evelyn's model evaluates two
+circuits per pair.
+
+| diff_method | circuit evals / sentence | s / sentence | projected min / epoch |
+|---|---|---|---|
+| SPSA | 2 | 0.48 | **0.46** |
+| parameter-shift | 24 | 3.33 | 3.22 |
+
+Parameter-shift costs `2 x n_params` evaluations; SPSA costs 2 regardless, which
+is **7.0x cheaper per epoch** at this width.
+
+### Aer trained from scratch, to convergence
+
+Section 4 could only *project* Aer's training cost — 11.4 h for 30 epochs, never
+run. Here the run completes:
+
+```
+40 epochs, SPSA, full batch (all 1,653 pairs), 2 qubits
+24.0 s/epoch  ->  16.0 min total
+selected epoch 17 (minimum development loss)
+test accuracy 1.0000   MC1's own 13 pairs 1.0000
+```
+
+**Qiskit Aer trained this model from random initialisation to the same 1.0000
+the exact simulator reaches**, on a CPU, in 16 minutes.
+
+The step size mattered more than the backend. A first run at lr 0.2 — a value
+tuned against exact gradients — reached only 0.8182, with training loss falling
+while development loss oscillated between 0.64 and 0.95. That looked like SPSA
+being fundamentally noisier, but it was mistuning: on `default.qubit`, SPSA
+reaches 1.0000 at lr 5e-2 and 0.9091 at 2e-1, while backprop reaches 1.0000 at
+both. **A gradient estimated from two evaluations needs a smaller step than an
+exact one.** `--aer-learning-rate` now defaults to 5e-2.
+
+## 6. Figures
 
 `05_performance_plots.py` renders the numbers above straight from
 `outputs/*.json` — it re-runs no experiment, so it is cheap and stays correct
@@ -282,6 +474,9 @@ python pennylane_aer/05_performance_plots.py
 | `05_perf_lambeq_port.png` | 03 | 18-qubit port: Aer at 1.29x baseline with identical predictions, shots invalid |
 | `05_perf_cnn_training.png` | 04 | loss and test-accuracy curves, hybrid vs classical control |
 | `05_perf_epoch_cost.png` | 04 | seconds/epoch across devices — the 1,968x gap the GPU work has to close |
+| `05_perf_mc1_accuracy.png` | 06 | quantum layer vs both controls, and the angle-scaling ablation |
+| `05_perf_mc1_width.png` | 06 | accuracy vs circuit width against rising explained variance |
+| `05_perf_mc1_aer.png` | 06 | Aer exact and shot-based accuracy, and SPSA vs parameter-shift cost |
 
 Ratio-like spreads use a log axis, and on a log axis bar length is meaningless,
 so those figures are dot plots rather than bars. Any run that produced NaN is
@@ -294,16 +489,27 @@ drawn in grey and labelled, never silently omitted.
 - **Adjoint differentiation is still unavailable** for the lambeq path.
   CLAUDE.md §3 lists it as a method to use, but lightning rejects adjoint on
   post-selected circuits, and Aer offers no backprop. Everything falls back to
-  parameter-shift. The CNN-hybrid route in §4 has no post-selection, so it is the
-  configuration where adjoint on `lightning.gpu` is worth retesting first.
+  parameter-shift. The routes in §4 and §5 have no post-selection, so they are
+  where adjoint on `lightning.gpu` is worth retesting first.
 - **Post-selection, not qubit count, is the near-term ceiling** on the lambeq
   route. 18 qubits is easy for any simulator; 2⁻¹⁶ post-selection is what rules
-  out shots and hardware. Worth raising with the Quantum ML Lead before the
-  dataset is scaled further.
+  out shots and hardware. §5 shows the cost of removing it: the reduced route
+  runs at 2 qubits with shots and on hardware, but needs augmented supervision
+  to match `cups_reader` + IQP on MC1's own 64 training pairs. Grammar buys
+  sample efficiency; reduction buys width, shots, and speed.
 - **For the HPC Specialist:** `qiskit-aer` here exposes `['CPU']` only, so both
   GPU backends remain unverified. The GPU config is now at least *correct* —
   `aer_backend_config(gpu=True)` — so it can be tested on the node by running
-  `03_lambeq_aer_backend.py --gpu` and `04_train_cnn_hybrid.py --gpu`.
+  `03_lambeq_aer_backend.py --gpu`, `04_train_cnn_hybrid.py --gpu`, and
+  `06_train_mc1_reduced.py --gpu --only aer-eval,aer-training`. The last is the
+  cheapest GPU smoke test in the folder — it needs no lambeq parse and merges
+  into the existing report.
 - **Batch-size-1 on external simulators** should be assumed when planning GPU
   benchmarks; the win has to come from per-circuit speed, not batching, unless
-  adjoint becomes available.
+  adjoint becomes available. §5 shows a second lever that is not batching:
+  making circuit cost track *distinct sentences* rather than training examples.
+- **SPSA needs a smaller step size than backprop.** Measured on `default.qubit`
+  at 2 qubits, SPSA reaches 1.0000 at lr 5e-2 but only 0.9091 at 2e-1, where
+  backprop reaches 1.0000 at both. A gradient estimated from two evaluations is
+  noisy, and a step size tuned against exact gradients will overshoot it. Worth
+  knowing before SPSA is used for the large HPC runs CLAUDE.md §4 plans.

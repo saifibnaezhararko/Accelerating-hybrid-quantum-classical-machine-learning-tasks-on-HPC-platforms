@@ -1,8 +1,8 @@
 """Performance figures for the pennylane_aer results.
 
-Reads only the JSON reports already written by 01/03/04 — nothing is re-run, so
-this is cheap, deterministic, and safe to regenerate after any of those scripts
-is re-executed (on GPU, for instance).
+Reads only the JSON reports already written by 01/03/04/06 — nothing is re-run,
+so this is cheap, deterministic, and safe to regenerate after any of those
+scripts is re-executed (on GPU, for instance).
 
     PYTHONPATH=src python pennylane_aer/05_performance_plots.py
 
@@ -446,6 +446,385 @@ def figure_epoch_cost(report: dict) -> Path:
     return path
 
 
+def _interval(summary: dict) -> tuple[float, float, float]:
+    """Mean and the two error-bar half-widths, clipped to [0, 1]."""
+    mean = summary["mean"]
+    low = mean - max(0.0, summary["ci_low"])
+    high = min(1.0, summary["ci_high"]) - mean
+    return mean, max(0.0, low), max(0.0, high)
+
+
+def figure_mc1_accuracy(report: dict) -> Path:
+    """06 — the quantum layer against both controls, and the scaling ablation."""
+    training = report["training"]
+    order = ["quantum", "classical", "no-bottleneck"]
+    names = {
+        "quantum": f"quantum\n({report['configuration']['qubits']}-qubit circuit)",
+        "classical": "classical control\n(Linear + tanh)",
+        "no-bottleneck": "no bottleneck\n(head only)",
+    }
+    colors = {"quantum": SERIES_2, "classical": SERIES_1, "no-bottleneck": BASELINE}
+
+    figure, (left, right) = plt.subplots(
+        1, 2, figsize=(11.5, 3.9), gridspec_kw={"width_ratios": [1.25, 1]}
+    )
+
+    positions = list(range(len(order)))
+    means, lows, highs = [], [], []
+    for kind in order:
+        mean, low, high = _interval(training[kind]["test_accuracy"])
+        means.append(mean)
+        lows.append(low)
+        highs.append(high)
+
+    left.barh(
+        positions,
+        means,
+        height=0.45,
+        color=[colors[k] for k in order],
+        zorder=2,
+    )
+    left.errorbar(
+        means,
+        positions,
+        xerr=[lows, highs],
+        fmt="none",
+        ecolor=INK_SECONDARY,
+        elinewidth=1.2,
+        capsize=4,
+        zorder=4,
+    )
+    left.set_yticks(positions)
+    left.set_yticklabels([names[k] for k in order])
+    left.invert_yaxis()
+    clean(left)
+    left.set_xlim(0.4, 1.06)
+    left.axvline(0.5, color=BASELINE, linewidth=1)
+    left.annotate("chance", (0.505, -0.42), color=INK_MUTED, fontsize=8)
+    left.set_xlabel(
+        f"test accuracy over {report['splits']['test']['pairs']} held-out pairs "
+        f"(mean of {len(report['configuration']['seeds'])} seeds, 95% CI)"
+    )
+    for row, kind in enumerate(order):
+        original = training[kind]["test_original_accuracy"]["mean"]
+        left.annotate(
+            f"{means[row]:.3f}   MC1's own 13 pairs: {original:.3f}",
+            (means[row], row),
+            textcoords="offset points",
+            xytext=(8, 0),
+            va="center",
+            color=INK_SECONDARY,
+            fontsize=8.5,
+        )
+    left.set_title("The quantum layer matches the controls - all three saturate")
+
+    ablation = report.get("scaling_ablation")
+    if ablation:
+        labels = ["global\n(one scale for all components)", "per-component\n(unit variance each)"]
+        keys = ["global", "per-component"]
+        ab_means, ab_lows, ab_highs = [], [], []
+        for key in keys:
+            mean, low, high = _interval(ablation[key]["test_accuracy"])
+            ab_means.append(mean)
+            ab_lows.append(low)
+            ab_highs.append(high)
+        right.barh([0, 1], ab_means, height=0.42, color=[SERIES_1, SERIES_2], zorder=2)
+        right.errorbar(
+            ab_means,
+            [0, 1],
+            xerr=[ab_lows, ab_highs],
+            fmt="none",
+            ecolor=INK_SECONDARY,
+            elinewidth=1.2,
+            capsize=4,
+            zorder=4,
+        )
+        right.set_yticks([0, 1])
+        right.set_yticklabels(labels)
+        right.invert_yaxis()
+        clean(right)
+        right.set_xlim(0.4, 1.06)
+        right.axvline(0.5, color=BASELINE, linewidth=1)
+        right.set_xlabel("test accuracy (95% CI)")
+        for row, key in enumerate(keys):
+            train_accuracy = ablation[key].get("train_accuracy", {}).get("mean")
+            note = "" if train_accuracy is None else f"   train {train_accuracy:.3f}"
+            right.annotate(
+                f"{ab_means[row]:.3f}{note}",
+                (ab_means[row], row),
+                textcoords="offset points",
+                xytext=(8, 0),
+                va="center",
+                color=INK_SECONDARY,
+                fontsize=8.5,
+            )
+        right.set_title("Angle scaling decides the result")
+        figure.text(
+            0.56,
+            -0.04,
+            "Per-component scaling lifts the low-variance components - syntax, not topic - to\n"
+            "the amplitude of the topic-carrying one: the circuit sees noise at signal strength.",
+            color=INK_MUTED,
+            fontsize=8.5,
+        )
+
+    configuration = report["configuration"]
+    figure.suptitle(
+        f"MC1 through {configuration['embedding']} + {configuration['reducer']} "
+        f"-> {configuration['qubits']} qubits "
+        f"({configuration['layers']} layers, {configuration['reuploads']} re-uploads, "
+        f"0 post-selected)  |  06_mc1_reduced.json",
+        x=0.005,
+        ha="left",
+        color=INK_MUTED,
+        fontsize=9,
+    )
+    figure.tight_layout(rect=(0, 0, 1, 0.93))
+    path = OUTPUT_DIR / "05_perf_mc1_accuracy.png"
+    figure.savefig(path)
+    plt.close(figure)
+    return path
+
+
+def figure_mc1_width(report: dict) -> Path:
+    """06 — accuracy against circuit width: where the two layers separate."""
+    sweep = report["qubit_sweep"]
+    widths = sorted(int(k) for k in sweep)
+
+    figure, axes = plt.subplots(figsize=(8.6, 4.0))
+    for kind, color, label in (
+        ("quantum", SERIES_2, "quantum layer"),
+        ("classical", SERIES_1, "classical control"),
+    ):
+        means, lows, highs = [], [], []
+        for width in widths:
+            mean, low, high = _interval(sweep[str(width)][kind]["test_accuracy"])
+            means.append(mean)
+            lows.append(low)
+            highs.append(high)
+        axes.errorbar(
+            widths,
+            means,
+            yerr=[lows, highs],
+            color=color,
+            linewidth=2,
+            marker="o",
+            markersize=6,
+            markeredgecolor=SURFACE,
+            markeredgewidth=1.5,
+            capsize=4,
+            elinewidth=1.1,
+            label=label,
+            zorder=3,
+        )
+
+    clean(axes, value_axis="y")
+    axes.set_xticks(widths)
+    axes.set_xlabel("qubits (= retained components)")
+    axes.set_ylabel("test accuracy")
+    axes.set_ylim(0.4, 1.04)
+    axes.axhline(0.5, color=BASELINE, linewidth=1)
+    axes.annotate("chance", (widths[0], 0.508), color=INK_MUTED, fontsize=8)
+    axes.legend(loc="lower right")
+
+    variance = axes.twinx()
+    ratios = [sweep[str(w)].get("explained_variance_ratio") for w in widths]
+    if all(r is not None for r in ratios):
+        variance.plot(
+            widths,
+            ratios,
+            color=INK_MUTED,
+            linewidth=1.4,
+            linestyle=(0, (4, 3)),
+            zorder=1,
+        )
+        variance.set_ylabel("explained variance retained", color=INK_MUTED)
+        variance.set_ylim(0, 1.04)
+        variance.tick_params(length=0)
+        for side in ("top", "left", "bottom"):
+            variance.spines[side].set_visible(False)
+        variance.spines["right"].set_color(BASELINE)
+        variance.annotate(
+            "explained variance",
+            (widths[-1], ratios[-1]),
+            textcoords="offset points",
+            xytext=(-6, 8),
+            ha="right",
+            color=INK_MUTED,
+            fontsize=8.5,
+        )
+
+    axes.set_title("The quantum layer degrades as width grows; the control does not")
+    figure.text(
+        0.005,
+        -0.03,
+        "Explained variance rises with width while quantum accuracy falls, so this is "
+        "optimisation, not representation:\nthe extra circuit parameters memorise the 58 "
+        "training sentences. 2 qubits is the right width for MC1.",
+        color=INK_MUTED,
+        fontsize=8.5,
+    )
+    figure.suptitle(
+        f"MC1, circuit width sweep, {len(report['configuration']['seeds'])} seeds per point"
+        "  |  06_mc1_reduced.json",
+        x=0.005,
+        ha="left",
+        color=INK_MUTED,
+        fontsize=9,
+    )
+    figure.tight_layout(rect=(0, 0, 1, 0.94))
+    path = OUTPUT_DIR / "05_perf_mc1_width.png"
+    figure.savefig(path)
+    plt.close(figure)
+    return path
+
+
+def figure_mc1_aer(report: dict) -> Path:
+    """06 — Aer with shots works here, and SPSA is what makes it trainable."""
+    evaluation = report["aer_evaluation"]
+    training = report.get("aer_training", {})
+    benchmarks = training.get("benchmarks", [])
+
+    figure, (left, right) = plt.subplots(1, 2, figsize=(11.5, 3.9))
+
+    labels = []
+    for record in evaluation["results"]:
+        name = record["backend"].replace("aer-", "Aer ").replace("-", " ")
+        labels.append(name)
+    accuracies = [r["test_accuracy"] for r in evaluation["results"]]
+    agreements = [r["prediction_agreement"] for r in evaluation["results"]]
+    positions = list(range(len(labels)))
+
+    left.barh(
+        [p - 0.19 for p in positions],
+        accuracies,
+        height=0.34,
+        color=SERIES_1,
+        label="test accuracy",
+        zorder=2,
+    )
+    left.barh(
+        [p + 0.19 for p in positions],
+        agreements,
+        height=0.34,
+        color=SERIES_2,
+        label="prediction agreement\nwith default.qubit",
+        zorder=2,
+    )
+    left.axvline(
+        evaluation["reference_accuracy"],
+        color=INK_MUTED,
+        linewidth=1.2,
+        linestyle=(0, (4, 3)),
+        zorder=4,
+    )
+    left.set_yticks(positions)
+    left.set_yticklabels(labels)
+    left.invert_yaxis()
+    clean(left)
+    left.set_xlim(0, 1.18)
+    left.set_xlabel(
+        f"{evaluation['pairs']} held-out pairs "
+        f"from {evaluation['sentences']} sentences ({evaluation['circuit_qubits']} qubits, "
+        f"{evaluation['post_selected_qubits']} post-selected)"
+    )
+    for row, record in enumerate(evaluation["results"]):
+        left.annotate(
+            f"{record['test_accuracy']:.3f}",
+            (record["test_accuracy"], row - 0.19),
+            textcoords="offset points",
+            xytext=(6, 0),
+            va="center",
+            color=INK_SECONDARY,
+            fontsize=8.5,
+        )
+        left.annotate(
+            f"{record['prediction_agreement']:.3f}   max |dlogit| "
+            f"{record['max_abs_logit_difference']:.1e}",
+            (record["prediction_agreement"], row + 0.19),
+            textcoords="offset points",
+            xytext=(6, 0),
+            va="center",
+            color=INK_SECONDARY,
+            fontsize=8.5,
+        )
+    left.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2)
+    left.set_title("Shots work here - the lambeq route returned NaN")
+    figure.text(
+        0.005,
+        -0.04,
+        "Sampling moves the logits by ~1 at 1024 shots, yet every prediction still matches the\n"
+        "exact run: the decision boundary is far enough from the data to survive shot noise.",
+        color=INK_MUTED,
+        fontsize=8.5,
+    )
+
+    if benchmarks:
+        order = sorted(benchmarks, key=lambda b: b["projected_seconds_per_epoch"])
+        names = [b["diff_method"] for b in order]
+        seconds = [b["projected_seconds_per_epoch"] for b in order]
+        rows = list(range(len(order)))
+        floor = min(seconds) * 0.35
+        for row, value in zip(rows, seconds, strict=True):
+            right.plot([floor, value], [row, row], color=GRID, linewidth=1.5, zorder=1)
+        right.scatter(
+            seconds,
+            rows,
+            s=90,
+            color=[SERIES_1, SERIES_2][: len(order)],
+            zorder=3,
+            edgecolors=SURFACE,
+            linewidths=2,
+        )
+        right.set_yticks(rows)
+        right.set_yticklabels(names)
+        right.set_xscale("log")
+        right.set_xlim(floor, max(seconds) * 12)
+        right.invert_yaxis()
+        clean(right)
+        right.set_xlabel("projected seconds per epoch on Aer (log scale)")
+        for row, record in enumerate(order):
+            right.annotate(
+                f"{record['projected_seconds_per_epoch'] / 60:,.1f} min   "
+                f"{record['circuit_evaluations_per_sentence']} circuit evals/sentence",
+                (record["projected_seconds_per_epoch"], row),
+                textcoords="offset points",
+                xytext=(10, 0),
+                va="center",
+                color=INK_SECONDARY,
+                fontsize=8.5,
+            )
+        if len(order) == 2:
+            right.set_title(
+                f"SPSA makes Aer trainable: {seconds[1] / seconds[0]:.0f}x cheaper per epoch"
+            )
+        else:
+            right.set_title("Aer training cost")
+        figure.text(
+            0.56,
+            -0.04,
+            f"One epoch covers all {report['splits']['train']['pairs']:,} training pairs but costs "
+            f"{training.get('sentences_per_epoch', '?')} circuit evaluations -\n"
+            "pair features are indexed from per-sentence outputs, so cost tracks sentences.",
+            color=INK_MUTED,
+            fontsize=8.5,
+        )
+
+    figure.suptitle(
+        "MC1 reduced route on Qiskit Aer, weights transferred from default.qubit"
+        "  |  06_mc1_reduced.json",
+        x=0.005,
+        ha="left",
+        color=INK_MUTED,
+        fontsize=9,
+    )
+    figure.tight_layout(rect=(0, 0, 1, 0.93))
+    path = OUTPUT_DIR / "05_perf_mc1_aer.png"
+    figure.savefig(path)
+    plt.close(figure)
+    return path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.parse_args()
@@ -466,6 +845,14 @@ def main() -> int:
     if hybrid:
         written.append(figure_cnn_training(hybrid))
         written.append(figure_epoch_cost(hybrid))
+
+    reduced = load("06_mc1_reduced.json")
+    if reduced:
+        written.append(figure_mc1_accuracy(reduced))
+        if reduced.get("qubit_sweep"):
+            written.append(figure_mc1_width(reduced))
+        if reduced.get("aer_evaluation"):
+            written.append(figure_mc1_aer(reduced))
 
     for path in written:
         print(f"Wrote {path}")
