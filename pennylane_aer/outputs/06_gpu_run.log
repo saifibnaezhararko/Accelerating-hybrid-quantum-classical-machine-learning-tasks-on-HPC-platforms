@@ -1,0 +1,62 @@
+MC1 through dimensionality reduction
+  embedding=tfidf  reducer=pca  scaling=global  qubits=2  layers=2  reuploads=2
+  explained variance retained: 0.385
+  derived sentence topics: 83 sentences, 2 topics (0 label disagreements)
+  train           58 sentences   1653 pairs  labels {0: 792, 1: 861}
+  development     14 sentences     91 pairs  labels {0: 45, 1: 46}
+  test            11 sentences     55 pairs  labels {0: 28, 1: 27}
+  test_original   11 sentences     13 pairs  labels {0: 7, 1: 6}
+  seeds: [0]
+  merging into the existing 06_mc1_reduced.json
+
+  training seed 0 on default.qubit for the Aer stages
+    reference test accuracy: 1.0000
+
+=== 6. Aer training cost ===
+  spsa               0.64s for 4 sentences (6 pairs)  ->  0.16s/sentence,  0.15 min/epoch (projected, 58 sentences, all 1653 pairs)
+                   gradient reaching circuit weights: 1136.403076
+
+  training on Aer for 40 epochs with diff_method=spsa
+      epoch   1/40  train_loss=0.7225  dev_loss=0.6910  dev_acc=0.505
+      epoch   2/40  train_loss=0.6908  dev_loss=0.6938  dev_acc=0.495
+      epoch   3/40  train_loss=0.6952  dev_loss=0.6969  dev_acc=0.495
+      epoch   4/40  train_loss=0.6973  dev_loss=0.6944  dev_acc=0.527
+      epoch   5/40  train_loss=0.6926  dev_loss=0.6934  dev_acc=0.527
+      epoch   6/40  train_loss=0.6884  dev_loss=0.6947  dev_acc=0.462
+      epoch   7/40  train_loss=0.6893  dev_loss=0.7025  dev_acc=0.495
+      epoch   8/40  train_loss=0.6938  dev_loss=0.7052  dev_acc=0.505
+      epoch   9/40  train_loss=0.6961  dev_loss=0.7054  dev_acc=0.462
+      epoch  10/40  train_loss=0.6942  dev_loss=0.7023  dev_acc=0.484
+      epoch  11/40  train_loss=0.6923  dev_loss=0.6999  dev_acc=0.418
+      epoch  12/40  train_loss=0.6910  dev_loss=0.7001  dev_acc=0.429
+      epoch  13/40  train_loss=0.6902  dev_loss=0.6976  dev_acc=0.527
+      epoch  14/40  train_loss=0.6899  dev_loss=0.6940  dev_acc=0.538
+      epoch  15/40  train_loss=0.6868  dev_loss=0.6920  dev_acc=0.538
+      epoch  16/40  train_loss=0.6827  dev_loss=0.6875  dev_acc=0.473
+      epoch  17/40  train_loss=0.6770  dev_loss=0.6841  dev_acc=0.527
+      epoch  18/40  train_loss=0.6731  dev_loss=0.6827  dev_acc=0.527
+      epoch  19/40  train_loss=0.6706  dev_loss=0.6840  dev_acc=0.484
+      epoch  20/40  train_loss=0.6687  dev_loss=0.6853  dev_acc=0.440
+      epoch  21/40  train_loss=0.6671  dev_loss=0.6900  dev_acc=0.396
+      epoch  22/40  train_loss=0.6711  dev_loss=0.6954  dev_acc=0.396
+      epoch  23/40  train_loss=0.6696  dev_loss=0.6801  dev_acc=0.440
+      epoch  24/40  train_loss=0.6710  dev_loss=0.6878  dev_acc=0.429
+      epoch  25/40  train_loss=0.6634  dev_loss=0.6835  dev_acc=0.473
+      epoch  26/40  train_loss=0.6609  dev_loss=0.6864  dev_acc=0.495
+      epoch  27/40  train_loss=0.6652  dev_loss=0.6999  dev_acc=0.495
+      epoch  28/40  train_loss=0.6737  dev_loss=0.7008  dev_acc=0.516
+      epoch  29/40  train_loss=0.6844  dev_loss=0.6975  dev_acc=0.615
+      epoch  30/40  train_loss=0.6927  dev_loss=0.7038  dev_acc=0.560
+      epoch  31/40  train_loss=0.6940  dev_loss=0.6918  dev_acc=0.549
+      epoch  32/40  train_loss=0.6928  dev_loss=0.6895  dev_acc=0.571
+      epoch  33/40  train_loss=0.6927  dev_loss=0.6866  dev_acc=0.593
+      epoch  34/40  train_loss=0.6819  dev_loss=0.6701  dev_acc=0.648
+      epoch  35/40  train_loss=0.6889  dev_loss=0.6801  dev_acc=0.637
+      epoch  36/40  train_loss=0.6758  dev_loss=0.6479  dev_acc=0.692
+      epoch  37/40  train_loss=0.6829  dev_loss=0.6633  dev_acc=0.681
+      epoch  38/40  train_loss=0.6657  dev_loss=0.6524  dev_acc=0.637
+      epoch  39/40  train_loss=0.6750  dev_loss=0.6644  dev_acc=0.604
+      epoch  40/40  train_loss=0.6640  dev_loss=0.6608  dev_acc=0.604
+    trained on Aer: test=0.5091  MC1 13 pairs=0.6154  9.6s/epoch
+
+Wrote /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/pennylane_aer/outputs/06_mc1_reduced.json

@@ -1,0 +1,22 @@
+MC1 through dimensionality reduction
+  embedding=tfidf  reducer=pca  scaling=global  qubits=2  layers=2  reuploads=2
+  explained variance retained: 0.385
+  derived sentence topics: 83 sentences, 2 topics (0 label disagreements)
+  train           58 sentences   1653 pairs  labels {0: 792, 1: 861}
+  development     14 sentences     91 pairs  labels {0: 45, 1: 46}
+  test            11 sentences     55 pairs  labels {0: 28, 1: 27}
+  test_original   11 sentences     13 pairs  labels {0: 7, 1: 6}
+  seeds: [0]
+
+  training seed 0 on default.qubit for the Aer stages
+    reference test accuracy: 1.0000
+
+=== 6. Aer training cost ===
+  spsa               0.60s for 4 sentences (6 pairs)  ->  0.15s/sentence,  0.15 min/epoch (projected, 58 sentences, all 1653 pairs)
+                   gradient reaching circuit weights: 1415.325317
+
+  training on Aer for 1 epochs with diff_method=spsa
+      epoch   1/1  train_loss=0.7225  dev_loss=0.6904  dev_acc=0.505
+    trained on Aer: test=0.4909  MC1 13 pairs=0.4615  8.8s/epoch
+
+Wrote /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/pennylane_aer/outputs/06_mc1_reduced.json
