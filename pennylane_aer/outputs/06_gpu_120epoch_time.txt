@@ -1,0 +1,23 @@
+	Command being timed: "python pennylane_aer/06_train_mc1_reduced.py --gpu --only aer-training --qubits 2 --layers 2 --reuploads 2 --embedding tfidf --reducer pca --scaling global --seeds 0 --aer-diff spsa --aer-epochs 120 --aer-learning-rate 0.01 --keep-history --verbose"
+	User time (seconds): 1084.17
+	System time (seconds): 12.39
+	Percent of CPU this job got: 101%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 18:05.47
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1228048
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 170068
+	Voluntary context switches: 49098
+	Involuntary context switches: 5489
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 224
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
