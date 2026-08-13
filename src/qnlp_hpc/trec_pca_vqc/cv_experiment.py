@@ -112,6 +112,7 @@ def run_fixed_epoch_vqc(
     device_name: str = "cpu",
     measurement_mode: str = "z",
     data_reuploading: bool = False,
+    track_epoch_history: bool = False,
 ) -> dict[str, object]:
     """Train a VQC for a fixed budget and evaluate once on the outer fold."""
     set_fold_seed(seed)
@@ -192,6 +193,7 @@ def run_fixed_epoch_vqc(
 
     start = time.perf_counter()
     final_training_loss = float("nan")
+    epoch_history: list[dict[str, float | int]] = []
 
     for epoch in range(1, epochs + 1):
         model.train()
@@ -213,21 +215,55 @@ def run_fixed_epoch_vqc(
 
         final_training_loss = total_loss / len(training_tensor)
 
+        if track_epoch_history:
+            training_result = evaluate_fold_vqc(
+                model,
+                training_tensor,
+                training_label_tensor,
+                batch_size=batch_size,
+                device=device,
+            )
+            validation_result = evaluate_fold_vqc(
+                model,
+                validation_tensor,
+                validation_label_tensor,
+                batch_size=batch_size,
+                device=device,
+            )
+            epoch_history.append(
+                {
+                    "epoch": epoch,
+                    "training_loss": training_result["loss"],
+                    "training_accuracy": training_result["accuracy"],
+                    "validation_loss": validation_result["loss"],
+                    "validation_accuracy": validation_result["accuracy"],
+                }
+            )
+
         if epoch == 1 or epoch % 10 == 0 or epoch == epochs:
-            print(
+            message = (
                 f"    epoch {epoch:03d}/{epochs} "
                 f"training_loss={final_training_loss:.4f}"
             )
+            if track_epoch_history:
+                message += (
+                    f", training_accuracy="
+                    f"{epoch_history[-1]['training_accuracy']:.4f}, "
+                    f"validation_accuracy="
+                    f"{epoch_history[-1]['validation_accuracy']:.4f}"
+                )
+            print(message)
 
     training_seconds = time.perf_counter() - start
 
-    validation_result = evaluate_fold_vqc(
-        model,
-        validation_tensor,
-        validation_label_tensor,
-        batch_size=batch_size,
-        device=device,
-    )
+    if not track_epoch_history:
+        validation_result = evaluate_fold_vqc(
+            model,
+            validation_tensor,
+            validation_label_tensor,
+            batch_size=batch_size,
+            device=device,
+        )
 
     return {
         "model": model,
@@ -237,4 +273,5 @@ def run_fixed_epoch_vqc(
         "accuracy": validation_result["accuracy"],
         "macro_f1": validation_result["macro_f1"],
         "confusion_matrix": validation_result["confusion_matrix"],
+        "epoch_history": epoch_history,
     }

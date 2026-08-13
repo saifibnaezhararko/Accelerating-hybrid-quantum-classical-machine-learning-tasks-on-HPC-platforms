@@ -127,6 +127,14 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Reuse cached embeddings instead of loading SentenceTransformer.",
     )
+    parser.add_argument(
+        "--save-epoch-history",
+        action="store_true",
+        help=(
+            "Evaluate and save training/validation accuracy after every VQC "
+            "epoch. This adds evaluation overhead."
+        ),
+    )
     return parser
 
 
@@ -314,6 +322,7 @@ def main() -> int:
     splits = list(splitter.split(embeddings, labels))
 
     result_rows: list[dict[str, object]] = []
+    epoch_history_rows: list[dict[str, object]] = []
 
     for method in args.methods:
         method_directory = output_dir / method
@@ -400,7 +409,19 @@ def main() -> int:
                 device_name=device,
                 measurement_mode=args.measurement_mode,
                 data_reuploading=args.data_reuploading,
+                track_epoch_history=args.save_epoch_history,
             )
+
+            for epoch_row in vqc_result["epoch_history"]:
+                epoch_history_rows.append(
+                    {
+                        "method": method,
+                        "model": vqc_model_name,
+                        "fold": fold_number,
+                        "seed": fold_seed,
+                        **epoch_row,
+                    }
+                )
 
             print(
                 "  VQC validation: "
@@ -445,6 +466,11 @@ def main() -> int:
         output_dir / "cv_summary.csv",
         index=False,
     )
+    if epoch_history_rows:
+        pd.DataFrame(epoch_history_rows).to_csv(
+            output_dir / "epoch_history.csv",
+            index=False,
+        )
 
     configuration = {
         "train_data": str(resolve(args.train_data)),
@@ -466,6 +492,7 @@ def main() -> int:
         "angle_scaler_fitted_inside_each_fold": True,
         "measurement_mode": args.measurement_mode,
         "data_reuploading": args.data_reuploading,
+        "save_epoch_history": args.save_epoch_history,
         "use_full_training": args.use_full_training,
         "class_weighting": "balanced",
     }
