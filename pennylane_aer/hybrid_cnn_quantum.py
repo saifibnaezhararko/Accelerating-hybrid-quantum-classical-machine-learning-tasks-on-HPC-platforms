@@ -115,6 +115,7 @@ def build_quantum_layer(
     n_layers: int,
     backend_config: dict[str, Any] | None = None,
     diff_method: str = "best",
+    gradient_kwargs: dict[str, Any] | None = None,
 ) -> tuple[torch.nn.Module, qml.devices.Device]:
     if backend_config is None:
         device = qml.device("default.qubit", wires=n_qubits)
@@ -126,7 +127,12 @@ def build_quantum_layer(
             config["backend"] = aer_backend
         device = qml.device(plugin, wires=n_qubits, **config)
 
-    @qml.qnode(device, interface="torch", diff_method=diff_method)
+    @qml.qnode(
+        device,
+        interface="torch",
+        diff_method=diff_method,
+        gradient_kwargs=gradient_kwargs,
+    )
     def circuit(inputs, weights):
         qml.AngleEmbedding(inputs, wires=range(n_qubits), rotation="Y")
         qml.StronglyEntanglingLayers(weights, wires=range(n_qubits))
@@ -148,6 +154,7 @@ class HybridTextClassifier(torch.nn.Module):
         dropout: float = 0.3,
         backend_config: dict[str, Any] | None = None,
         diff_method: str = "best",
+        gradient_kwargs: dict[str, Any] | None = None,
         broadcast: bool | None = None,
     ) -> None:
         super().__init__()
@@ -160,7 +167,11 @@ class HybridTextClassifier(torch.nn.Module):
             dropout=dropout,
         )
         self.quantum, self.device = build_quantum_layer(
-            n_qubits, n_layers, backend_config, diff_method
+            n_qubits,
+            n_layers,
+            backend_config,
+            diff_method,
+            gradient_kwargs,
         )
         self.head = torch.nn.Linear(n_qubits, 2)
 

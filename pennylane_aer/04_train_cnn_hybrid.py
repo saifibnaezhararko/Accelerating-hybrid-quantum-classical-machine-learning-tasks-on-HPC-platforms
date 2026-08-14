@@ -48,6 +48,7 @@ def train_model(
     batch_size: int,
     learning_rate: float,
     label: str,
+    gradient_clip: float | None = None,
 ) -> dict[str, object]:
     optimiser = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
     n_train = len(dataset.train_sequences)
@@ -61,6 +62,7 @@ def train_model(
         model.train()
         permutation = torch.randperm(n_train)
         epoch_losses = []
+        epoch_gradient_norms = []
 
         for index in range(0, n_train, batch_size):
             batch = permutation[index : index + batch_size]
@@ -68,6 +70,11 @@ def train_model(
             logits = model(dataset.train_sequences[batch])
             loss = torch.nn.functional.cross_entropy(logits, dataset.train_labels[batch])
             loss.backward()
+            if gradient_clip is not None:
+                gradient_norm = torch.nn.utils.clip_grad_norm_(
+                    model.parameters(), max_norm=gradient_clip
+                )
+                epoch_gradient_norms.append(float(gradient_norm))
             optimiser.step()
             epoch_losses.append(float(loss.detach()))
 
@@ -84,6 +91,9 @@ def train_model(
                 "test_accuracy": test_accuracy,
                 "test_loss": test_loss,
                 "seconds": epoch_seconds,
+                "gradient_norm_mean_before_clipping": (
+                    float(np.mean(epoch_gradient_norms)) if epoch_gradient_norms else None
+                ),
             }
         )
         if epoch % max(1, epochs // 10) == 0 or epoch == 1:
@@ -101,15 +111,15 @@ def train_model(
     final_loss = float(history[-1]["test_loss"])
     quantum_parameters = sum(p.numel() for n, p in model.named_parameters() if "quantum" in n)
     quantum_gradient = sum(
-        float(parameter.grad.abs().sum())
+        float(parameter.grad.detach().pow(2).sum())
         for name, parameter in model.named_parameters()
         if "quantum" in name and parameter.grad is not None
-    )
+    ) ** 0.5
     cnn_gradient = sum(
-        float(parameter.grad.abs().sum())
+        float(parameter.grad.detach().pow(2).sum())
         for name, parameter in model.named_parameters()
         if name.startswith("cnn.") and parameter.grad is not None
-    )
+    ) ** 0.5
 
     print(
         f"    done in {seconds:.1f}s | final test acc {final_accuracy:.4f} "
@@ -131,6 +141,7 @@ def train_model(
         "quantum_parameters": quantum_parameters,
         "cnn_gradient_norm": cnn_gradient,
         "quantum_gradient_norm": quantum_gradient,
+        "gradient_clip": gradient_clip,
         "history": history,
     }
 
@@ -234,6 +245,18 @@ def main() -> int:
         default="parameter-shift",
         help="PennyLane differentiation method for the external Aer simulator.",
     )
+    parser.add_argument(
+        "--aer-spsa-directions",
+        type=int,
+        default=1,
+        help="SPSA perturbation directions averaged per gradient (higher is stabler/slower).",
+    )
+    parser.add_argument(
+        "--aer-gradient-clip",
+        type=float,
+        default=None,
+        help="Optional maximum total gradient L2 norm before each Aer optimiser step.",
+    )
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--learning-rate", type=float, default=5e-3)
     parser.add_argument("--seed", type=int, default=0)
@@ -261,6 +284,10 @@ def main() -> int:
         parser.error("--learning-rate must be positive")
     if arguments.aer_learning_rate is not None and arguments.aer_learning_rate <= 0:
         parser.error("--aer-learning-rate must be positive")
+    if arguments.aer_spsa_directions <= 0:
+        parser.error("--aer-spsa-directions must be positive")
+    if arguments.aer_gradient_clip is not None and arguments.aer_gradient_clip <= 0:
+        parser.error("--aer-gradient-clip must be positive")
 
     if not arguments.data_dir.is_dir():
         print(f"Dataset not found: {arguments.data_dir}\nRun scripts/prepare_trec.py first.")
@@ -317,12 +344,19 @@ def main() -> int:
             f"\n[hybrid-aer] CNN -> PennyLane circuit -> head  ({describe_backend(backend_config)})"
         )
         set_seed(arguments.seed)
+        gradient_kwargs = None
+        if arguments.aer_diff_method == "spsa":
+            gradient_kwargs = {
+                "sampler_rng": np.random.default_rng(arguments.seed),
+                "num_directions": arguments.aer_spsa_directions,
+            }
         hybrid_aer = HybridTextClassifier(
             dataset.vocabulary_size,
             n_qubits=arguments.qubits,
             n_layers=arguments.layers,
             backend_config=backend_config,
             diff_method=arguments.aer_diff_method,
+            gradient_kwargs=gradient_kwargs,
         )
         aer_epochs = arguments.aer_epochs or arguments.epochs
         aer_learning_rate = arguments.aer_learning_rate or arguments.learning_rate
@@ -341,6 +375,7 @@ def main() -> int:
                     batch_size=arguments.aer_batch_size,
                     learning_rate=aer_learning_rate,
                     label=aer_label,
+                    gradient_clip=arguments.aer_gradient_clip,
                 )
             )
         else:
@@ -390,6 +425,8 @@ def main() -> int:
                 "aer_batch_size": arguments.aer_batch_size,
                 "aer_learning_rate": arguments.aer_learning_rate or arguments.learning_rate,
                 "aer_diff_method": arguments.aer_diff_method,
+                "aer_spsa_directions": arguments.aer_spsa_directions,
+                "aer_gradient_clip": arguments.aer_gradient_clip,
                 "results": results,
             },
             indent=2,

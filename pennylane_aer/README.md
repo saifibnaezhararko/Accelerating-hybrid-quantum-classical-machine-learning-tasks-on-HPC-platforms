@@ -267,6 +267,17 @@ row in `outputs/04_cnn_hybrid_quantum.json` records loss, train/test accuracy,
 and measured epoch seconds. When `--gpu` is requested but Aer exposes no GPU,
 the script exits instead of silently running the expensive job on CPU.
 
+For SPSA, the script seeds a persistent perturbation generator from `--seed`.
+`--aer-spsa-directions` averages several directions to trade extra circuit
+evaluations for a less noisy gradient, while `--aer-gradient-clip` limits the
+total gradient norm before the Adam update. A practical stability smoke test is:
+
+```bash
+PYTHONPATH=src python pennylane_aer/04_train_cnn_hybrid.py --gpu --only-aer \
+  --aer-mode train --aer-epochs 1 --aer-diff-method spsa \
+  --aer-spsa-directions 4 --aer-gradient-clip 1.0
+```
+
 ### A third compatibility finding: parameter-shift cannot batch
 
 Running the hybrid on Aer initially failed:
