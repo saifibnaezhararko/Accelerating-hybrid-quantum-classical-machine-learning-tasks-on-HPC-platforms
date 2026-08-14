@@ -1,0 +1,56 @@
+TREC: 174 train / 44 test, vocab 360, max length 8
+Quantum bottleneck: 4 qubits x 2 layers
+
+[classical] CNN -> linear bottleneck -> head
+    epoch   1/20  loss=0.6334  train_acc=0.851  test_acc=0.795  0.5s
+    epoch   2/20  loss=0.4102  train_acc=0.902  test_acc=0.841  0.0s
+    epoch   4/20  loss=0.1999  train_acc=0.983  test_acc=0.932  0.0s
+    epoch   6/20  loss=0.0934  train_acc=1.000  test_acc=0.932  0.0s
+    epoch   8/20  loss=0.0360  train_acc=1.000  test_acc=0.932  0.0s
+    epoch  10/20  loss=0.0414  train_acc=1.000  test_acc=0.955  0.0s
+    epoch  12/20  loss=0.0463  train_acc=1.000  test_acc=0.932  0.0s
+    epoch  14/20  loss=0.0124  train_acc=1.000  test_acc=0.932  0.0s
+    epoch  16/20  loss=0.0130  train_acc=1.000  test_acc=0.932  0.0s
+    epoch  18/20  loss=0.0285  train_acc=1.000  test_acc=0.932  0.0s
+    epoch  20/20  loss=0.0346  train_acc=1.000  test_acc=0.955  0.0s
+    done in 1.3s | final test acc 0.9545 | best 0.9545
+    final-batch gradients: cnn=0.027237  quantum=0.000000
+
+[hybrid] CNN -> PennyLane circuit -> head  (default.qubit)
+    epoch   1/20  loss=0.6905  train_acc=0.672  test_acc=0.727  0.2s
+    epoch   2/20  loss=0.6916  train_acc=0.695  test_acc=0.659  0.2s
+    epoch   4/20  loss=0.6661  train_acc=0.822  test_acc=0.818  0.2s
+    epoch   6/20  loss=0.5671  train_acc=0.931  test_acc=0.864  0.2s
+    epoch   8/20  loss=0.4875  train_acc=0.914  test_acc=0.795  0.2s
+    epoch  10/20  loss=0.4111  train_acc=0.971  test_acc=0.864  0.3s
+    epoch  12/20  loss=0.3139  train_acc=0.971  test_acc=0.818  0.3s
+    epoch  14/20  loss=0.2304  train_acc=0.977  test_acc=0.795  0.2s
+    epoch  16/20  loss=0.1562  train_acc=0.994  test_acc=0.886  0.2s
+    epoch  18/20  loss=0.1365  train_acc=0.994  test_acc=0.841  0.2s
+    epoch  20/20  loss=0.1060  train_acc=0.994  test_acc=0.909  0.2s
+    done in 4.8s | final test acc 0.9091 | best 0.9091
+    final-batch gradients: cnn=5.477791  quantum=0.174970
+
+[hybrid-aer] CNN -> PennyLane circuit -> head  (qiskit.aer:aer_simulator_statevector_gpu, exact)
+    full Aer training: 20 epochs, batch size 4, diff_method=parameter-shift
+    epoch   1/20  loss=0.6802  train_acc=0.713  test_acc=0.682  508.8s
+    epoch   2/20  loss=0.6722  train_acc=0.667  test_acc=0.636  508.1s
+    epoch   4/20  loss=0.6081  train_acc=0.759  test_acc=0.727  508.8s
+    epoch   6/20  loss=0.4390  train_acc=0.897  test_acc=0.909  504.6s
+    epoch   8/20  loss=0.3161  train_acc=0.937  test_acc=0.932  507.6s
+    epoch  10/20  loss=0.3026  train_acc=0.948  test_acc=0.955  507.1s
+    epoch  12/20  loss=0.2215  train_acc=0.966  test_acc=0.955  503.9s
+    epoch  14/20  loss=0.2649  train_acc=0.954  test_acc=0.886  504.8s
+    epoch  16/20  loss=0.1327  train_acc=1.000  test_acc=0.932  506.6s
+    epoch  18/20  loss=0.0780  train_acc=1.000  test_acc=0.977  505.8s
+    epoch  20/20  loss=0.0715  train_acc=0.994  test_acc=0.977  506.5s
+    done in 10127.3s | final test acc 0.9773 | best 0.9773
+    final-batch gradients: cnn=0.061763  quantum=0.013046
+
+=== summary ===
+configuration             test acc    best    s/epoch  q-params
+classical                   0.9545  0.9545       0.06         0
+hybrid-default.qubit        0.9091  0.9091       0.24        24
+hybrid-qiskit-aer-gpu       0.9773  0.9773     506.37        24
+
+Wrote /home/ubuntu/Accelerating-hybrid-quantum-classical-machine-learning-tasks-on-HPC-platforms/pennylane_aer/outputs/04_cnn_hybrid_quantum.json
