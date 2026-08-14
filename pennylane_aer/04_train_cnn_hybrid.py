@@ -94,12 +94,30 @@ def train_model(
             )
 
     seconds = time.perf_counter() - start
-    final_accuracy, final_loss = evaluate(model, dataset.test_sequences, dataset.test_labels)
+    # The final epoch already evaluates the unchanged model on the full test set.
+    # Re-running an external simulator here is expensive and, for stochastic
+    # differentiation methods, can produce a confusing second reported value.
+    final_accuracy = float(history[-1]["test_accuracy"])
+    final_loss = float(history[-1]["test_loss"])
     quantum_parameters = sum(p.numel() for n, p in model.named_parameters() if "quantum" in n)
+    quantum_gradient = sum(
+        float(parameter.grad.abs().sum())
+        for name, parameter in model.named_parameters()
+        if "quantum" in name and parameter.grad is not None
+    )
+    cnn_gradient = sum(
+        float(parameter.grad.abs().sum())
+        for name, parameter in model.named_parameters()
+        if name.startswith("cnn.") and parameter.grad is not None
+    )
 
     print(
         f"    done in {seconds:.1f}s | final test acc {final_accuracy:.4f} "
         f"| best {best_accuracy:.4f}"
+    )
+    print(
+        f"    final-batch gradients: cnn={cnn_gradient:.6f}  "
+        f"quantum={quantum_gradient:.6f}"
     )
     return {
         "configuration": label,
@@ -111,6 +129,8 @@ def train_model(
         "best_test_accuracy": best_accuracy,
         "total_parameters": sum(p.numel() for p in model.parameters()),
         "quantum_parameters": quantum_parameters,
+        "cnn_gradient_norm": cnn_gradient,
+        "quantum_gradient_norm": quantum_gradient,
         "history": history,
     }
 
