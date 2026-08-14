@@ -218,6 +218,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--qubits", type=int, default=4, help="Quantum bottleneck width.")
     parser.add_argument("--layers", type=int, default=2, help="StronglyEntanglingLayers depth.")
+    parser.add_argument("--embedding-dim", type=int, default=32, help="CNN token embedding width.")
+    parser.add_argument("--filters", type=int, default=16, help="CNN filters per kernel size.")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument(
         "--aer-mode",
@@ -274,6 +276,10 @@ def main() -> int:
         parser.error("--only-aer and --skip-aer cannot be used together")
     if arguments.epochs <= 0:
         parser.error("--epochs must be positive")
+    if arguments.embedding_dim <= 0:
+        parser.error("--embedding-dim must be positive")
+    if arguments.filters <= 0:
+        parser.error("--filters must be positive")
     if arguments.aer_epochs is not None and arguments.aer_epochs <= 0:
         parser.error("--aer-epochs must be positive")
     if arguments.batch_size <= 0:
@@ -299,13 +305,22 @@ def main() -> int:
         f"vocab {dataset.vocabulary_size}, max length {dataset.max_length}"
     )
     print(f"Quantum bottleneck: {arguments.qubits} qubits x {arguments.layers} layers")
+    print(
+        f"CNN: embedding_dim={arguments.embedding_dim}, "
+        f"filters={arguments.filters} per kernel"
+    )
 
     results = []
 
     if not arguments.only_aer:
         print("\n[classical] CNN -> linear bottleneck -> head")
         set_seed(arguments.seed)
-        classical = ClassicalTextClassifier(dataset.vocabulary_size, n_qubits=arguments.qubits)
+        classical = ClassicalTextClassifier(
+            dataset.vocabulary_size,
+            n_qubits=arguments.qubits,
+            embedding_dim=arguments.embedding_dim,
+            n_filters=arguments.filters,
+        )
         results.append(
             train_model(
                 classical,
@@ -320,7 +335,11 @@ def main() -> int:
         print("\n[hybrid] CNN -> PennyLane circuit -> head  (default.qubit)")
         set_seed(arguments.seed)
         hybrid = HybridTextClassifier(
-            dataset.vocabulary_size, n_qubits=arguments.qubits, n_layers=arguments.layers
+            dataset.vocabulary_size,
+            n_qubits=arguments.qubits,
+            n_layers=arguments.layers,
+            embedding_dim=arguments.embedding_dim,
+            n_filters=arguments.filters,
         )
         results.append(
             train_model(
@@ -354,6 +373,8 @@ def main() -> int:
             dataset.vocabulary_size,
             n_qubits=arguments.qubits,
             n_layers=arguments.layers,
+            embedding_dim=arguments.embedding_dim,
+            n_filters=arguments.filters,
             backend_config=backend_config,
             diff_method=arguments.aer_diff_method,
             gradient_kwargs=gradient_kwargs,
@@ -417,6 +438,8 @@ def main() -> int:
                 },
                 "qubits": arguments.qubits,
                 "layers": arguments.layers,
+                "embedding_dim": arguments.embedding_dim,
+                "filters": arguments.filters,
                 "seed": arguments.seed,
                 "aer_gpu_available": aer_gpu_available(),
                 "aer_requested": not arguments.skip_aer,

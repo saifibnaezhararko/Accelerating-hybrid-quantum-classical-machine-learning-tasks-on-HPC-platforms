@@ -278,6 +278,11 @@ PYTHONPATH=src python pennylane_aer/04_train_cnn_hybrid.py --gpu --only-aer \
   --aer-spsa-directions 4 --aer-gradient-clip 1.0
 ```
 
+The CNN width is configurable with `--embedding-dim` and `--filters`. For
+example, `--embedding-dim 16 --filters 8 --layers 1` reduces the shared CNN
+backbone substantially and gives the hybrid a 12-parameter quantum block rather
+than the 24 parameters used by the default two-layer circuit.
+
 ### A third compatibility finding: parameter-shift cannot batch
 
 Running the hybrid on Aer initially failed:
