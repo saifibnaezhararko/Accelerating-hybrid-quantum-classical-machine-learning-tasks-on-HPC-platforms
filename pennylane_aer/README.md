@@ -7,8 +7,8 @@ measured numbers rather than assertions:
 2. Test Evelyn's `mc1_iqp_cups` code.
 3. Use Qiskit Aer as the backend for the existing lambeq pipeline.
 4. `convert -> CNN -> hybrid quantum PennyLane`.
-5. Run **MC1 through dimensionality reduction** into a narrow circuit, and get
-   the lambeq route's accuracy at 2 qubits instead of 18.
+5. Run the **raw TREC dataset through dimensionality reduction** into a narrow
+   circuit, on the 6-way task with the official split.
 
 Everything here is additive. **No contributor file was modified.** The only edits
 outside this folder are two bug fixes in `src/qnlp_hpc/backends/registry.py`
@@ -19,16 +19,20 @@ pennylane_aer/
 ├── README.md                      this file
 ├── aer_backend.py                 the Aer backend_config that actually works
 ├── hybrid_cnn_quantum.py          convert / CNN / quantum layer
-├── mc1_reduced.py                 MC1 -> embedding -> PCA/TSVD/UMAP -> circuit
+├── trec_reduced.py                TREC -> TF-IDF -> TSVD/PCA/UMAP -> circuit
 ├── test_evelyn_iqp.py             25 tests for mc1_iqp_cups
-├── test_mc1_reduced.py            27 tests for the reduced route
+├── test_trec_reduced.py           42 tests for the reduced route
 ├── 01_pennylane_aer_circuit.py    PennyLane circuit on Aer, 4 configurations
 ├── 03_lambeq_aer_backend.py       Evelyn's IQP model ported onto Aer
 ├── 04_train_cnn_hybrid.py         hybrid training vs classical control
 ├── 05_performance_plots.py        figures, rendered from the JSON reports
-├── 06_train_mc1_reduced.py        MC1 reduced route: 6 stages, multi-seed
+├── 06_train_trec_reduced.py       TREC reduced route: 5 stages, multi-seed
 └── outputs/                       JSON reports + run logs + PNG figures
 ```
+
+Sections 2 and 3 stay on MC1: they test the Quantum ML Lead's `mc1_iqp_cups`
+model and port *it* onto Aer, so the dataset is fixed by what they examine.
+Section 5 is the dimensionality-reduction route, and it now runs on TREC.
 
 Run anything with `PYTHONPATH=src` from the repo root.
 
@@ -271,198 +275,197 @@ step.
 
 ---
 
-## 5. MC1 through dimensionality reduction
+## 5. TREC through dimensionality reduction
 
-`mc1_reduced.py` + `06_train_mc1_reduced.py`. Section 4 applied the
-*embedding -> quantum layer -> classifier* route to TREC; this applies it to
-**MC1**, so it can be compared directly against the lambeq baseline on the same
-sentence-disjoint split:
+`trec_reduced.py` + `06_train_trec_reduced.py`. Section 4 put a **CNN** in front
+of the quantum layer on a filtered 174-question subset of TREC. This drops the
+CNN, takes the **raw dataset as shipped** in `trec dataset/`, and reduces
+straight from the bag of words:
 
 ```
-sentence -> TF-IDF / bag-of-words / BERT -> PCA | TSVD | UMAP -> n_qubits angles
+question -> TF-IDF -> TruncatedSVD | PCA | UMAP -> n_qubits angles
          -> AngleEmbedding + StronglyEntanglingLayers (re-uploading) -> <Z_i>
-pair     -> |l - r|, l * r  (swap-invariant, as in Evelyn's IQPPairModel) -> head
+         -> Linear -> 6 class logits
 ```
 
-Split membership is imported from `mc1_iqp_cups.config`, so the train/dev/test
-boundary is Evelyn's, unchanged.
+Circuit width is a hyperparameter in the 2-8 qubit range instead of a function
+of sentence length, and nothing is post-selected. TREC questions run to 37
+words, so the lambeq route of sections 2-3 — a qubit per pregroup type — is not
+reachable on this dataset at all.
 
 ```
-python pennylane_aer/06_train_mc1_reduced.py --qubits 2 --seeds 0-4 \
-    --qubit-sweep 2,3,4,6,8 --keep-history --aer-epochs 40
+python pennylane_aer/06_train_trec_reduced.py --qubits 8 --epochs 30 --seeds 0-4
+python pennylane_aer/06_train_trec_reduced.py --only width --width-sweep 2,3,4,6,8 --seeds 0-2
+python pennylane_aer/06_train_trec_reduced.py --only aer-eval,aer-training --seeds 0
 ```
 
-`--only training,scaling,augmentation,width,aer-eval,aer-training` re-runs a
-subset and merges it into the existing report — so stage 6 can be repeated on a
-GPU node without spending an hour reproducing the rest.
+`--only training,scaling,width,aer-eval,aer-training` re-runs a subset and
+merges it into the existing report, so a stage can be repeated on a GPU node
+without reproducing the rest.
 
-### MC1's topic labels are recoverable from MC1 itself
+### The dataset, used as distributed
 
-MC1 labels a pair 1 when the two sentences share a topic and 0 when they do not.
-That makes the sentence graph a **2-colouring problem** — label-1 edges force
-equal colours, label-0 edges force opposite ones. It resolves into exactly 2
-components covering all 83 sentences, and the resulting assignment reproduces
-**all 100 shipped labels with 0 disagreements**. No lexicon was needed, and
-`derive_sentence_topics` raises rather than guess if a future dataset is not
-2-colourable.
+TREC's official 5,452 / 500 split is kept — published numbers are quoted
+against it — and development is carved out of training, stratified:
 
-This licenses forming *all* pairs within a split: MC1 ships 13 test pairs over
-its 11 test sentences, but all **55** possible pairs carry a label the dataset
-already determined. Nothing crosses the sentence-disjoint boundary, so this adds
-supervision without adding leakage.
+| split | questions | DESC | ENTY | ABBR | HUM | NUM | LOC |
+|---|---|---|---|---|---|---|---|
+| train | 4,635 | 988 | 1,062 | 73 | 1,040 | 762 | 710 |
+| development | 817 | 174 | 188 | 13 | 183 | 134 | 125 |
+| test | 500 | 138 | 94 | 9 | 65 | 113 | 81 |
 
-| split | sentences | shipped pairs | all pairs |
-|---|---|---|---|
-| train | 58 | 64 | **1,653** |
-| development | 14 | 13 | 91 |
-| test | 11 | 13 | **55** |
+The classes are badly unbalanced — ABBR is 86 of the 5,452 training rows — so
+the development split is drawn per class rather than uniformly, and **macro-F1
+is reported alongside accuracy**: a model that abandons ABBR entirely loses
+almost no accuracy.
 
-Reporting on 55 test pairs instead of 13 also raises the resolution of the
-accuracy estimate from 7.7 points per pair to 1.8.
+One trap worth recording: **the label order in these CSVs is not the ABBR-first
+order some TREC distributions use.** Here label 0 is DESC and label 2 is ABBR,
+which is only visible by reading the questions — label 2 is "What does INRI
+stand for ?". A wrong constant mislabels every class in the report while every
+accuracy stays correct, so `test_class_names_match_the_question_content` pins
+the order against phrases only one category contains.
 
-### Result: the lambeq route's accuracy at 2 qubits
+### Two reference lines, without which the numbers mean nothing
 
-2 qubits, 2 layers, 2 re-uploads, TF-IDF + PCA, 5 seeds, 60 epochs:
+| | test accuracy |
+|---|---|
+| majority class (always DESC) | 0.2760 |
+| full-dimension logistic regression (8,460 TF-IDF features) | **0.8580** |
 
-| model | quantum params | total params | test (55 pairs, 95% CI) | MC1's own 13 pairs | s/epoch |
+Everything below sits between these. The gap between 0.858 and what the
+reduced route achieves is the price of the reduction itself, and it is by far
+the largest term — **8,460 features into 8 components keeps 5.2% of the
+variance.**
+
+### Result at 8 qubits
+
+8 qubits, 2 layers, 2 re-uploads, TF-IDF + TruncatedSVD, 5 seeds, 30 epochs:
+
+| model | quantum params | total params | test accuracy (95% CI) | macro-F1 | s/epoch |
 |---|---|---|---|---|---|
-| **quantum (2-qubit circuit)** | 12 | 126 | **1.0000 [1.0000, 1.0000]** | **1.0000** | 0.42 |
-| classical control (Linear + tanh) | 0 | 120 | 1.0000 [1.0000, 1.0000] | 1.0000 | 0.06 |
-| no bottleneck (head only) | 0 | 114 | 1.0000 [1.0000, 1.0000] | 1.0000 | 0.04 |
+| quantum (8-qubit circuit) | 48 | 294 | 0.4936 [0.4289, 0.5583] | 0.4951 | 5.64 |
+| classical control (Linear + tanh) | 0 | 318 | 0.5936 [0.5109, 0.6763] | 0.5656 | 0.10 |
+| **no bottleneck (head only)** | 0 | 246 | **0.6068 [0.5769, 0.6367]** | **0.5925** | 0.08 |
 
-Against the lambeq baseline (§2) on the identical test pairs:
+**The quantum layer costs ~11 points against the plainest control**, and is 69x
+slower per epoch. This is the same direction as section 4's CNN hybrid, which lost
+~5 points on a filtered TREC subset — two independent routes to the quantum
+layer now agree that on this dataset it costs accuracy rather than adding it.
 
-| | lambeq `cups_reader` + IQP | this route |
+That is the honest reading: on a 6-way task whose reduced representation is
+already lossy, routing the features through a narrow circuit loses more. The
+quantum layer is not adding capacity here — it is a second bottleneck behind
+the first.
+
+### Angle scaling still decides a lot
+
+| scaling | test accuracy (95% CI) |
+|---|---|
+| global | **0.4936 [0.4289, 0.5583]** |
+| per-component | 0.3544 [0.2839, 0.4249] |
+
+A 14-point gap with non-overlapping intervals. Scaling each component to unit
+variance presents a low-variance direction to the circuit as loudly as the
+leading one; a single global scale keeps the reducer's ordering. The test
+`test_per_component_scaling_flattens_the_component_spreads` pins the mechanism:
+the min/max spread ratio goes from 0.79 under `global` to 0.93+ under
+`per-component`.
+
+### Reducer choice: TSVD or PCA
+
+TruncatedSVD is the default because it consumes the sparse TF-IDF matrix
+directly — densifying TREC's 5,452 x 8,460 matrix costs ~370 MB for no gain.
+One consequence is worth knowing: **TSVD does not centre the data**, so its
+leading direction is the "average question" and loses most of its spread once
+the reduced features are centred. Measured component spreads at 8 components:
+TSVD `[0.071 0.095 0.092 ...]` — component 0 is *not* the widest — against PCA's
+monotone `[0.103 0.092 0.084 ...]`.
+
+It does not translate into a consistent accuracy difference (logistic
+regression on the reduced features, 500 test questions):
+
+| components | TSVD | PCA |
 |---|---|---|
-| qubits | 18 | **2** |
-| post-selected qubits | 16 (P ~ 2⁻¹⁶) | **0** |
-| MC1 13-pair test accuracy | 1.0000 (1 seed) | 1.0000 (**5/5 seeds**) |
-| training time | 1308.7 s | **~25 s** |
-| shots / real hardware | impossible (NaN) | works |
+| 2 | 0.2340 | 0.3300 |
+| 4 | 0.3160 | 0.4700 |
+| 6 | 0.5160 | 0.5080 |
+| 8 | **0.5340** | 0.5160 |
 
-**Read the control column before the quantum one.** All three models saturate,
-so the honest statement is that the quantum layer *matches* the controls — it
-does not beat them. On a task a 114-parameter head already solves, a 2-qubit
-circuit cannot demonstrate an advantage; what it demonstrates is that the
-NISQ-shaped route loses nothing while removing 16 qubits and all post-selection.
+PCA is better at the narrow end, TSVD at the wide end, and the differences are
+within the ~4-point resolution of a 500-question test set. `--reducer pca` is
+available for the narrow-width studies.
 
-### Two ablations, and one that changes the answer
+### Width sweep: both curves rise, and the control stays ahead
 
-**Angle scaling.** Reduced components must be mapped into the rotation range.
-Scaling each component to unit variance (`per-component`) lifts the
-lowest-variance components — which on MC1 carry syntax, not topic — up to the
-amplitude of the topic-carrying one, so the circuit sees noise at signal
-strength. A single `global` scale preserves the variance ordering PCA produced.
-
-| scaling | 2 qubits | 4 qubits |
-|---|---|---|
-| global | **1.0000** | **0.9491** |
-| per-component | 0.9673 | 0.7673 |
-
-The gap widens with width exactly as the mechanism predicts — more retained
-components means more low-variance directions to inflate.
-
-**Augmentation.** Training on MC1's 64 shipped training pairs versus all 1,653
-its training sentences allow, with the evaluation splits held fixed:
-
-| training pairs | test (55) | MC1's own 13 pairs |
-|---|---|---|
-| 64 (shipped) | 0.7673 | 0.7846 |
-| 1,653 (augmented) | **1.0000** | **1.0000** |
-
-**This is the honest caveat on the comparison above.** Trained on the same 64
-pairs the lambeq model saw, this route reaches 0.7846 on the 13 test pairs,
-*below* the lambeq baseline's 1.0000. The advantage comes from the augmented
-supervision and the cost profile — not from the reduced representation being
-intrinsically stronger than `cups_reader` + IQP. Grammar buys sample efficiency;
-this route buys width, shots, and speed.
-
-### More qubits make it worse
-
-Circuit width sweep, 5 seeds per point, classical control swept alongside:
+3 seeds per point, 30 epochs, classical control swept alongside:
 
 | qubits | explained variance | quantum params | quantum test | classical test |
 |---|---|---|---|---|
-| **2** | 0.385 | 12 | **1.0000 [1.0000, 1.0000]** | 1.0000 |
-| 3 | 0.494 | 18 | 0.8909 [0.7472, 1.0000] | 1.0000 |
-| 4 | 0.596 | 24 | 0.9491 [0.8555, 1.0000] | 1.0000 |
-| 6 | 0.753 | 36 | 0.6764 [0.4602, 0.8925] | 1.0000 |
-| 8 | 0.871 | 48 | 0.6836 [0.4553, 0.9120] | 1.0000 |
+| 2 | 0.0147 | 12 | **0.3433 [0.3178, 0.3688]** | 0.2773 [0.0260, 0.5286] |
+| 3 | 0.0235 | 18 | 0.3267 [0.1514, 0.5019] | 0.3907 [0.2211, 0.5602] |
+| 4 | 0.0300 | 24 | 0.3280 [0.3131, 0.3429] | 0.4627 [0.3613, 0.5640] |
+| 6 | 0.0417 | 36 | 0.4153 [0.3275, 0.5031] | 0.5793 [0.5490, 0.6097] |
+| 8 | 0.0524 | 48 | 0.5293 [0.4907, 0.5679] | **0.6060 [0.4425, 0.7695]** |
 
-Accuracy **falls** as width grows while explained variance *rises*, and the
-classical control stays at 1.0000 throughout — so this is optimisation, not
-representation. The per-epoch histories confirm it: at 4 qubits, seed 3's
-training loss falls 0.67 -> 0.008 while its development loss climbs
-0.70 -> 14.80. The extra circuit parameters memorise the 58 training sentences.
+Accuracy **rises** with width for both models, tracking explained variance —
+the reduction is the binding constraint, and 8 qubits is not enough to
+saturate the task. A task whose reduced representation already
+saturates would show the opposite shape, with extra width only adding parameters
+to overfit with.
 
-For the Quantum ML Lead: **2 qubits is the right width for MC1**, and any move
-to a larger dataset should re-run this sweep rather than assume more qubits
-help. Regularising the circuit (dropout on the quantum features, stronger weight
-decay, fewer entangling layers) is the obvious next lever and is not tried here.
+The one width where the circuit leads is **2 qubits**: 0.3433 against 0.2773,
+where the classical control's mean sits on the majority-class rate (0.2760) —
+one of its three seeds collapsed to predicting DESC for everything, which is
+also why its interval is so wide. A re-uploading circuit is a more expressive
+map than `Linear(2, 2) -> tanh` when two dimensions is all there is. Treat this
+as suggestive rather than established: three seeds, overlapping intervals, and
+macro-F1 is poor for both (0.2385 against 0.1830).
 
-### Aer: shots work on this route
+### Aer: the port is exact, but shots are not free here
 
-Weights trained on `default.qubit` are transferred to Aer and evaluated:
+Weights trained on `default.qubit` transferred to Aer, 200 test questions:
 
-| backend | seconds | test (55) | agreement with `default.qubit` | max abs logit diff |
+| backend | seconds | test accuracy | agreement with `default.qubit` | max abs logit diff |
 |---|---|---|---|---|
-| Aer statevector, exact | 3.12 | 1.0000 | 1.0000 | 4.29e-06 |
-| Aer statevector, 1024 shots | 3.00 | **1.0000** | **1.0000** | 9.45e-01 |
-| Aer statevector, 8192 shots | 3.32 | **1.0000** | **1.0000** | 2.63e-01 |
+| Aer statevector, exact | 32.9 | 0.5300 | **1.0000** | 7.63e-06 |
+| Aer statevector, 1024 shots | 30.8 | 0.4550 | 0.7650 | 3.51 |
+| Aer statevector, 8192 shots | 34.8 | 0.5400 | 0.9050 | 1.44 |
 
-This is the direct contrast with §3. On the lambeq circuits, 1024 shots produce
-**NaN** — 2⁻¹⁶ post-selection means zero shots survive. Here nothing is
-post-selected, so shots merely add sampling noise: the logits move by ~1 at 1024
-shots and **every prediction still matches the exact run**. The decision
-boundary sits far enough from the data to absorb it.
+The exact path reproduces the reference to float32 epsilon, so **the port is
+validated**. The shot rows are the interesting ones. Exact simulation
+reproduces every prediction, but at 1024 shots about a quarter of them flip.
 
-That makes this the configuration to try on real hardware, and the one where
-`lightning.gpu` adjoint differentiation is worth retesting (§3's adjoint
-blocker was post-selection).
+Nothing about the circuit changed — what changed is the **margin**. This is a
+6-way task with neighbouring classes close together, so sampling noise of ~3.5
+in logit space crosses decision boundaries. A binary task whose logits sit
+far from the boundary would tolerate the same shot count comfortably. **Shot budgets have to be set from the margin of
+the task, not from the width of the circuit** — worth knowing before anyone
+quotes a shot count for hardware.
 
-### Aer training cost: SPSA is what makes it affordable
+### Aer training on the full dataset is not feasible on this CPU
 
-Because pair features are indexed from per-sentence circuit outputs, one epoch
-costs **58 circuit evaluations — the number of distinct training sentences — no
-matter that it covers all 1,653 training pairs.** Evelyn's model evaluates two
-circuits per pair.
-
-| diff_method | circuit evals / sentence | s / sentence | projected min / epoch |
+| diff_method | circuit evals / question | s / question | projected hours per epoch |
 |---|---|---|---|
-| SPSA | 2 | 0.48 | **0.46** |
-| parameter-shift | 24 | 3.33 | 3.22 |
+| SPSA | 2 | 0.56 | **0.71** |
+| parameter-shift | 96 | 14.89 | 19.17 |
 
-Parameter-shift costs `2 x n_params` evaluations; SPSA costs 2 regardless, which
-is **7.0x cheaper per epoch** at this width.
+Parameter-shift costs `2 x n_params` evaluations; SPSA costs 2 regardless,
+making it **27x cheaper**. Even so, one epoch over the 4,635 training questions
+costs 0.71 h with SPSA, and the 30-epoch schedule used above would take **~21
+hours**. Gradients do reach the circuit in both cases (0.219 and 0.065), so
+this is slow, not broken.
 
-### Aer trained from scratch, to convergence
-
-Section 4 could only *project* Aer's training cost — 11.4 h for 30 epochs, never
-run. Here the run completes:
-
-```
-40 epochs, SPSA, full batch (all 1,653 pairs), 2 qubits
-24.0 s/epoch  ->  16.0 min total
-selected epoch 17 (minimum development loss)
-test accuracy 1.0000   MC1's own 13 pairs 1.0000
-```
-
-**Qiskit Aer trained this model from random initialisation to the same 1.0000
-the exact simulator reaches**, on a CPU, in 16 minutes.
-
-The step size mattered more than the backend. A first run at lr 0.2 — a value
-tuned against exact gradients — reached only 0.8182, with training loss falling
-while development loss oscillated between 0.64 and 0.95. That looked like SPSA
-being fundamentally noisier, but it was mistuning: on `default.qubit`, SPSA
-reaches 1.0000 at lr 5e-2 and 0.9091 at 2e-1, while backprop reaches 1.0000 at
-both. **A gradient estimated from two evaluations needs a smaller step than an
-exact one.** `--aer-learning-rate` now defaults to 5e-2.
+This is CLAUDE.md section 1's problem statement — "more than one hour on a
+CPU-based simulator" — reproduced on a realistic dataset with a model we
+control, and it is the number the GPU work has to attack. At this scale CPU Aer
+stops being a training option and becomes an evaluation-only backend.
 
 ## 6. Figures
 
 `05_performance_plots.py` renders the numbers above straight from
 `outputs/*.json` — it re-runs no experiment, so it is cheap and stays correct
-after any of 01/03/04 is re-executed (on a GPU node, for instance):
+after any of 01/03/04/06 is re-executed (on a GPU node, for instance):
 
 ```
 python pennylane_aer/05_performance_plots.py
@@ -474,9 +477,9 @@ python pennylane_aer/05_performance_plots.py
 | `05_perf_lambeq_port.png` | 03 | 18-qubit port: Aer at 1.29x baseline with identical predictions, shots invalid |
 | `05_perf_cnn_training.png` | 04 | loss and test-accuracy curves, hybrid vs classical control |
 | `05_perf_epoch_cost.png` | 04 | seconds/epoch across devices — the 1,968x gap the GPU work has to close |
-| `05_perf_mc1_accuracy.png` | 06 | quantum layer vs both controls, and the angle-scaling ablation |
-| `05_perf_mc1_width.png` | 06 | accuracy vs circuit width against rising explained variance |
-| `05_perf_mc1_aer.png` | 06 | Aer exact and shot-based accuracy, and SPSA vs parameter-shift cost |
+| `05_perf_trec_accuracy.png` | 06 | quantum layer vs both controls against the two ceilings, and the angle-scaling ablation |
+| `05_perf_trec_width.png` | 06 | accuracy vs circuit width, tracking explained variance |
+| `05_perf_trec_aer.png` | 06 | Aer exact and shot-based accuracy, and SPSA vs parameter-shift cost |
 
 Ratio-like spreads use a log axis, and on a log axis bar length is meaningless,
 so those figures are dot plots rather than bars. Any run that produced NaN is
@@ -493,23 +496,33 @@ drawn in grey and labelled, never silently omitted.
   where adjoint on `lightning.gpu` is worth retesting first.
 - **Post-selection, not qubit count, is the near-term ceiling** on the lambeq
   route. 18 qubits is easy for any simulator; 2⁻¹⁶ post-selection is what rules
-  out shots and hardware. §5 shows the cost of removing it: the reduced route
-  runs at 2 qubits with shots and on hardware, but needs augmented supervision
-  to match `cups_reader` + IQP on MC1's own 64 training pairs. Grammar buys
-  sample efficiency; reduction buys width, shots, and speed.
+  out shots and hardware. It also caps the *dataset*: circuit width follows
+  sentence length, and TREC questions reach 37 words, so §2-3's route cannot be
+  run on TREC at all. §5 is what replaces it, at the cost of the grammar.
+- **The reduction, not the circuit, is the dominant loss on a real dataset.**
+  Full-dimension logistic regression reaches 0.858 on 6-way TREC; the best
+  model on 8 reduced components reaches 0.607, and the quantum layer 0.494.
+  Before more qubits are requested, the question to settle is how many
+  components the task needs — 8 components keep 5.2% of the variance.
+- **Shot budgets follow the decision margin, not the circuit width.** The same
+  8-qubit circuit that reproduces every prediction under exact simulation
+  agrees only 76.5% of the time at 1024 shots on 6-way TREC, and 90.5% at 8192.
+  A shot count validated on a saturated binary task will not transfer.
 - **For the HPC Specialist:** `qiskit-aer` here exposes `['CPU']` only, so both
   GPU backends remain unverified. The GPU config is now at least *correct* —
   `aer_backend_config(gpu=True)` — so it can be tested on the node by running
   `03_lambeq_aer_backend.py --gpu`, `04_train_cnn_hybrid.py --gpu`, and
-  `06_train_mc1_reduced.py --gpu --only aer-eval,aer-training`. The last is the
+  `06_train_trec_reduced.py --gpu --only aer-eval,aer-training`. The last is the
   cheapest GPU smoke test in the folder — it needs no lambeq parse and merges
   into the existing report.
 - **Batch-size-1 on external simulators** should be assumed when planning GPU
   benchmarks; the win has to come from per-circuit speed, not batching, unless
-  adjoint becomes available. §5 shows a second lever that is not batching:
-  making circuit cost track *distinct sentences* rather than training examples.
-- **SPSA needs a smaller step size than backprop.** Measured on `default.qubit`
-  at 2 qubits, SPSA reaches 1.0000 at lr 5e-2 but only 0.9091 at 2e-1, where
-  backprop reaches 1.0000 at both. A gradient estimated from two evaluations is
-  noisy, and a step size tuned against exact gradients will overshoot it. Worth
-  knowing before SPSA is used for the large HPC runs CLAUDE.md §4 plans.
+  adjoint becomes available.
+- **The target to beat is 0.71 h/epoch.** That is SPSA on Aer over TREC's 4,635
+  training questions, measured; parameter-shift is 19.17 h/epoch. A 30-epoch
+  schedule is ~21 hours on this CPU, which is CLAUDE.md §1's problem statement
+  on a realistic dataset.
+- **SPSA needs a smaller step size than backprop.** A gradient estimated from
+  two evaluations is noisy, and a step size tuned against exact gradients will
+  overshoot it. Worth knowing before SPSA is used for the large HPC runs
+  CLAUDE.md §4 plans.

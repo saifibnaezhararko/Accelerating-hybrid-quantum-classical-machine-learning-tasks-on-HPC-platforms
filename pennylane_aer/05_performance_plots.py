@@ -454,19 +454,57 @@ def _interval(summary: dict) -> tuple[float, float, float]:
     return mean, max(0.0, low), max(0.0, high)
 
 
-def figure_mc1_accuracy(report: dict) -> Path:
+def _ceiling_lines(axes, report: dict, horizontal: bool = False) -> None:
+    """Draw the majority-class floor and the full-dimension ceiling.
+
+    A reduced-route accuracy is uninterpretable without them: they bracket what
+    the representation could possibly deliver on this dataset.
+    """
+    ceilings = report.get("ceilings")
+    if not ceilings:
+        return
+    draw = axes.axhline if horizontal else axes.axvline
+    for value, label, style_ in (
+        (ceilings["majority_class_accuracy"], "majority class", (0, (2, 2))),
+        (ceilings["full_dimension_logistic_accuracy"], "full-dimension logistic", (0, (5, 3))),
+    ):
+        draw(value, color=INK_MUTED, linewidth=1.1, linestyle=style_, zorder=1)
+        if horizontal:
+            axes.annotate(
+                label,
+                (axes.get_xlim()[0], value),
+                textcoords="offset points",
+                xytext=(4, 3),
+                color=INK_MUTED,
+                fontsize=8,
+            )
+        else:
+            axes.annotate(
+                label,
+                (value, axes.get_ylim()[0]),
+                textcoords="offset points",
+                xytext=(3, 6),
+                rotation=90,
+                va="bottom",
+                color=INK_MUTED,
+                fontsize=8,
+            )
+
+
+def figure_trec_accuracy(report: dict) -> Path:
     """06 — the quantum layer against both controls, and the scaling ablation."""
     training = report["training"]
+    configuration = report["configuration"]
     order = ["quantum", "classical", "no-bottleneck"]
     names = {
-        "quantum": f"quantum\n({report['configuration']['qubits']}-qubit circuit)",
+        "quantum": f"quantum\n({configuration['qubits']}-qubit circuit)",
         "classical": "classical control\n(Linear + tanh)",
         "no-bottleneck": "no bottleneck\n(head only)",
     }
     colors = {"quantum": SERIES_2, "classical": SERIES_1, "no-bottleneck": BASELINE}
 
     figure, (left, right) = plt.subplots(
-        1, 2, figsize=(11.5, 3.9), gridspec_kw={"width_ratios": [1.25, 1]}
+        1, 2, figsize=(11.5, 3.9), gridspec_kw={"width_ratios": [1.3, 1]}
     )
 
     positions = list(range(len(order)))
@@ -477,13 +515,7 @@ def figure_mc1_accuracy(report: dict) -> Path:
         lows.append(low)
         highs.append(high)
 
-    left.barh(
-        positions,
-        means,
-        height=0.45,
-        color=[colors[k] for k in order],
-        zorder=2,
-    )
+    left.barh(positions, means, height=0.45, color=[colors[k] for k in order], zorder=2)
     left.errorbar(
         means,
         positions,
@@ -498,17 +530,21 @@ def figure_mc1_accuracy(report: dict) -> Path:
     left.set_yticklabels([names[k] for k in order])
     left.invert_yaxis()
     clean(left)
-    left.set_xlim(0.4, 1.06)
-    left.axvline(0.5, color=BASELINE, linewidth=1)
-    left.annotate("chance", (0.505, -0.42), color=INK_MUTED, fontsize=8)
+    left.set_xlim(0, 1.0)
+    _ceiling_lines(left, report)
+    # Seed count comes from the aggregate's own n, not from `configuration`:
+    # --only merges stages written by different runs, so the configuration
+    # block describes whichever stage ran last, not this one.
+    n_seeds = training["quantum"]["test_accuracy"].get("n", len(configuration["seeds"]))
     left.set_xlabel(
-        f"test accuracy over {report['splits']['test']['pairs']} held-out pairs "
-        f"(mean of {len(report['configuration']['seeds'])} seeds, 95% CI)"
+        f"test accuracy on {report['splits']['test']['questions']} held-out questions, "
+        f"{configuration['n_classes']} classes "
+        f"(mean of {n_seeds} seeds, 95% CI)"
     )
     for row, kind in enumerate(order):
-        original = training[kind]["test_original_accuracy"]["mean"]
+        f1 = training[kind]["test_macro_f1"]["mean"]
         left.annotate(
-            f"{means[row]:.3f}   MC1's own 13 pairs: {original:.3f}",
+            f"{means[row]:.3f}   macro-F1 {f1:.3f}",
             (means[row], row),
             textcoords="offset points",
             xytext=(8, 0),
@@ -516,7 +552,7 @@ def figure_mc1_accuracy(report: dict) -> Path:
             color=INK_SECONDARY,
             fontsize=8.5,
         )
-    left.set_title("The quantum layer matches the controls - all three saturate")
+    left.set_title("The quantum bottleneck costs accuracy against its own control")
 
     ablation = report.get("scaling_ablation")
     if ablation:
@@ -543,14 +579,12 @@ def figure_mc1_accuracy(report: dict) -> Path:
         right.set_yticklabels(labels)
         right.invert_yaxis()
         clean(right)
-        right.set_xlim(0.4, 1.06)
-        right.axvline(0.5, color=BASELINE, linewidth=1)
+        right.set_xlim(0, 1.0)
+        _ceiling_lines(right, report)
         right.set_xlabel("test accuracy (95% CI)")
-        for row, key in enumerate(keys):
-            train_accuracy = ablation[key].get("train_accuracy", {}).get("mean")
-            note = "" if train_accuracy is None else f"   train {train_accuracy:.3f}"
+        for row in range(2):
             right.annotate(
-                f"{ab_means[row]:.3f}{note}",
+                f"{ab_means[row]:.3f}",
                 (ab_means[row], row),
                 textcoords="offset points",
                 xytext=(8, 0),
@@ -562,36 +596,35 @@ def figure_mc1_accuracy(report: dict) -> Path:
         figure.text(
             0.56,
             -0.04,
-            "Per-component scaling lifts the low-variance components - syntax, not topic - to\n"
-            "the amplitude of the topic-carrying one: the circuit sees noise at signal strength.",
+            "Per-component scaling lifts the low-variance components to the amplitude of the\n"
+            "leading one, so the circuit sees noise and signal at equal strength.",
             color=INK_MUTED,
             fontsize=8.5,
         )
 
-    configuration = report["configuration"]
     figure.suptitle(
-        f"MC1 through {configuration['embedding']} + {configuration['reducer']} "
-        f"-> {configuration['qubits']} qubits "
-        f"({configuration['layers']} layers, {configuration['reuploads']} re-uploads, "
-        f"0 post-selected)  |  06_mc1_reduced.json",
+        f"TREC ({configuration['n_classes']}-way {configuration['label_column']}) through "
+        f"{configuration['embedding']} + {configuration['reducer']}: "
+        f"{configuration['vocabulary_size']:,} features -> {configuration['qubits']} qubits, "
+        f"0 post-selected  |  06_trec_reduced.json",
         x=0.005,
         ha="left",
         color=INK_MUTED,
         fontsize=9,
     )
     figure.tight_layout(rect=(0, 0, 1, 0.93))
-    path = OUTPUT_DIR / "05_perf_mc1_accuracy.png"
+    path = OUTPUT_DIR / "05_perf_trec_accuracy.png"
     figure.savefig(path)
     plt.close(figure)
     return path
 
 
-def figure_mc1_width(report: dict) -> Path:
-    """06 — accuracy against circuit width: where the two layers separate."""
-    sweep = report["qubit_sweep"]
+def figure_trec_width(report: dict) -> Path:
+    """06 — accuracy against circuit width, against the two reference lines."""
+    sweep = report["width_sweep"]
     widths = sorted(int(k) for k in sweep)
 
-    figure, axes = plt.subplots(figsize=(8.6, 4.0))
+    figure, axes = plt.subplots(figsize=(8.8, 4.2))
     for kind, color, label in (
         ("quantum", SERIES_2, "quantum layer"),
         ("classical", SERIES_1, "classical control"),
@@ -622,30 +655,24 @@ def figure_mc1_width(report: dict) -> Path:
     axes.set_xticks(widths)
     axes.set_xlabel("qubits (= retained components)")
     axes.set_ylabel("test accuracy")
-    axes.set_ylim(0.4, 1.04)
-    axes.axhline(0.5, color=BASELINE, linewidth=1)
-    axes.annotate("chance", (widths[0], 0.508), color=INK_MUTED, fontsize=8)
-    axes.legend(loc="lower right")
+    axes.set_ylim(0, 1.0)
+    _ceiling_lines(axes, report, horizontal=True)
+    axes.legend(loc="lower right", bbox_to_anchor=(1.0, 0.02))
 
     variance = axes.twinx()
     ratios = [sweep[str(w)].get("explained_variance_ratio") for w in widths]
     if all(r is not None for r in ratios):
         variance.plot(
-            widths,
-            ratios,
-            color=INK_MUTED,
-            linewidth=1.4,
-            linestyle=(0, (4, 3)),
-            zorder=1,
+            widths, ratios, color=INK_MUTED, linewidth=1.4, linestyle=(0, (1, 2)), zorder=1
         )
         variance.set_ylabel("explained variance retained", color=INK_MUTED)
-        variance.set_ylim(0, 1.04)
+        variance.set_ylim(0, max(ratios) * 2.2)
         variance.tick_params(length=0)
         for side in ("top", "left", "bottom"):
             variance.spines[side].set_visible(False)
         variance.spines["right"].set_color(BASELINE)
         variance.annotate(
-            "explained variance",
+            f"explained variance ({ratios[-1] * 100:.1f}% at {widths[-1]}q)",
             (widths[-1], ratios[-1]),
             textcoords="offset points",
             xytext=(-6, 8),
@@ -654,43 +681,41 @@ def figure_mc1_width(report: dict) -> Path:
             fontsize=8.5,
         )
 
-    axes.set_title("The quantum layer degrades as width grows; the control does not")
-    figure.text(
-        0.005,
-        -0.03,
-        "Explained variance rises with width while quantum accuracy falls, so this is "
-        "optimisation, not representation:\nthe extra circuit parameters memorise the 58 "
-        "training sentences. 2 qubits is the right width for MC1.",
-        color=INK_MUTED,
-        fontsize=8.5,
+    axes.set_title("Width buys accuracy, and the control stays ahead above 2 qubits")
+    sweep_seeds = sweep[str(widths[0])]["quantum"]["test_accuracy"].get(
+        "n", len(report["configuration"]["seeds"])
     )
     figure.suptitle(
-        f"MC1, circuit width sweep, {len(report['configuration']['seeds'])} seeds per point"
-        "  |  06_mc1_reduced.json",
+        f"TREC, circuit width sweep, {sweep_seeds} seeds per point" "  |  06_trec_reduced.json",
         x=0.005,
         ha="left",
         color=INK_MUTED,
         fontsize=9,
     )
+    figure.text(
+        0.005,
+        -0.03,
+        "A TF-IDF vocabulary of thousands of features squeezed into 2-8 components keeps only\n"
+        "a few percent of the variance: here the reduction, not the optimiser, is the ceiling.",
+        color=INK_MUTED,
+        fontsize=8.5,
+    )
     figure.tight_layout(rect=(0, 0, 1, 0.94))
-    path = OUTPUT_DIR / "05_perf_mc1_width.png"
+    path = OUTPUT_DIR / "05_perf_trec_width.png"
     figure.savefig(path)
     plt.close(figure)
     return path
 
 
-def figure_mc1_aer(report: dict) -> Path:
-    """06 — Aer with shots works here, and SPSA is what makes it trainable."""
+def figure_trec_aer(report: dict) -> Path:
+    """06 — Aer with shots works here, and what SPSA costs on a real dataset."""
     evaluation = report["aer_evaluation"]
     training = report.get("aer_training", {})
     benchmarks = training.get("benchmarks", [])
 
     figure, (left, right) = plt.subplots(1, 2, figsize=(11.5, 3.9))
 
-    labels = []
-    for record in evaluation["results"]:
-        name = record["backend"].replace("aer-", "Aer ").replace("-", " ")
-        labels.append(name)
+    labels = [r["backend"].replace("aer-", "Aer ").replace("-", " ") for r in evaluation["results"]]
     accuracies = [r["test_accuracy"] for r in evaluation["results"]]
     agreements = [r["prediction_agreement"] for r in evaluation["results"]]
     positions = list(range(len(labels)))
@@ -722,10 +747,10 @@ def figure_mc1_aer(report: dict) -> Path:
     left.set_yticklabels(labels)
     left.invert_yaxis()
     clean(left)
-    left.set_xlim(0, 1.18)
+    left.set_xlim(0, 1.25)
     left.set_xlabel(
-        f"{evaluation['pairs']} held-out pairs "
-        f"from {evaluation['sentences']} sentences ({evaluation['circuit_qubits']} qubits, "
+        f"{evaluation['questions']} held-out questions "
+        f"({evaluation['circuit_qubits']} qubits, "
         f"{evaluation['post_selected_qubits']} post-selected)"
     )
     for row, record in enumerate(evaluation["results"]):
@@ -750,25 +775,17 @@ def figure_mc1_aer(report: dict) -> Path:
         )
     left.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2)
     left.set_title("Shots work here - the lambeq route returned NaN")
-    figure.text(
-        0.005,
-        -0.04,
-        "Sampling moves the logits by ~1 at 1024 shots, yet every prediction still matches the\n"
-        "exact run: the decision boundary is far enough from the data to survive shot noise.",
-        color=INK_MUTED,
-        fontsize=8.5,
-    )
 
     if benchmarks:
         order = sorted(benchmarks, key=lambda b: b["projected_seconds_per_epoch"])
         names = [b["diff_method"] for b in order]
-        seconds = [b["projected_seconds_per_epoch"] for b in order]
+        hours = [b["projected_seconds_per_epoch"] / 3600 for b in order]
         rows = list(range(len(order)))
-        floor = min(seconds) * 0.35
-        for row, value in zip(rows, seconds, strict=True):
+        floor = min(hours) * 0.35
+        for row, value in zip(rows, hours, strict=True):
             right.plot([floor, value], [row, row], color=GRID, linewidth=1.5, zorder=1)
         right.scatter(
-            seconds,
+            hours,
             rows,
             s=90,
             color=[SERIES_1, SERIES_2][: len(order)],
@@ -779,15 +796,15 @@ def figure_mc1_aer(report: dict) -> Path:
         right.set_yticks(rows)
         right.set_yticklabels(names)
         right.set_xscale("log")
-        right.set_xlim(floor, max(seconds) * 12)
+        right.set_xlim(floor, max(hours) * 30)
         right.invert_yaxis()
         clean(right)
-        right.set_xlabel("projected seconds per epoch on Aer (log scale)")
+        right.set_xlabel("projected hours per epoch on Aer, full training split (log scale)")
         for row, record in enumerate(order):
             right.annotate(
-                f"{record['projected_seconds_per_epoch'] / 60:,.1f} min   "
-                f"{record['circuit_evaluations_per_sentence']} circuit evals/sentence",
-                (record["projected_seconds_per_epoch"], row),
+                f"{record['projected_seconds_per_epoch'] / 3600:,.1f} h   "
+                f"{record['circuit_evaluations_per_sentence']} circuit evals/question",
+                (record["projected_seconds_per_epoch"] / 3600, row),
                 textcoords="offset points",
                 xytext=(10, 0),
                 va="center",
@@ -795,31 +812,29 @@ def figure_mc1_aer(report: dict) -> Path:
                 fontsize=8.5,
             )
         if len(order) == 2:
-            right.set_title(
-                f"SPSA makes Aer trainable: {seconds[1] / seconds[0]:.0f}x cheaper per epoch"
-            )
+            right.set_title(f"SPSA is {hours[1] / hours[0]:.0f}x cheaper, and still not enough")
         else:
             right.set_title("Aer training cost")
         figure.text(
             0.56,
             -0.04,
-            f"One epoch covers all {report['splits']['train']['pairs']:,} training pairs but costs "
-            f"{training.get('sentences_per_epoch', '?')} circuit evaluations -\n"
-            "pair features are indexed from per-sentence outputs, so cost tracks sentences.",
+            f"One epoch over the {training.get('train_questions', 0):,} training questions costs "
+            f"{hours[0]:.1f} h even with SPSA -\nCLAUDE.md section 1's problem, measured on a "
+            "realistic dataset. This is what the GPU work has to attack.",
             color=INK_MUTED,
             fontsize=8.5,
         )
 
     figure.suptitle(
-        "MC1 reduced route on Qiskit Aer, weights transferred from default.qubit"
-        "  |  06_mc1_reduced.json",
+        "TREC reduced route on Qiskit Aer, weights transferred from default.qubit"
+        "  |  06_trec_reduced.json",
         x=0.005,
         ha="left",
         color=INK_MUTED,
         fontsize=9,
     )
     figure.tight_layout(rect=(0, 0, 1, 0.93))
-    path = OUTPUT_DIR / "05_perf_mc1_aer.png"
+    path = OUTPUT_DIR / "05_perf_trec_aer.png"
     figure.savefig(path)
     plt.close(figure)
     return path
@@ -846,13 +861,13 @@ def main() -> int:
         written.append(figure_cnn_training(hybrid))
         written.append(figure_epoch_cost(hybrid))
 
-    reduced = load("06_mc1_reduced.json")
-    if reduced:
-        written.append(figure_mc1_accuracy(reduced))
-        if reduced.get("qubit_sweep"):
-            written.append(figure_mc1_width(reduced))
+    reduced = load("06_trec_reduced.json")
+    if reduced and reduced.get("training"):
+        written.append(figure_trec_accuracy(reduced))
+        if reduced.get("width_sweep"):
+            written.append(figure_trec_width(reduced))
         if reduced.get("aer_evaluation"):
-            written.append(figure_mc1_aer(reduced))
+            written.append(figure_trec_aer(reduced))
 
     for path in written:
         print(f"Wrote {path}")

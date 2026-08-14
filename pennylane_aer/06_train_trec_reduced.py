@@ -1,15 +1,16 @@
-"""MC1 + dimensionality reduction on PennyLane and Qiskit Aer.
+"""TREC + dimensionality reduction on PennyLane and Qiskit Aer.
 
-Runs the reduced-embedding route against Evelyn's sentence-disjoint MC1 split:
+Runs the reduced-embedding route against TREC's official train/test split:
 
-  * multi-seed training on ``default.qubit`` with two classical controls,
-  * an ablation of the angle-scaling choice, which is what decides the result,
-  * an optional circuit-width sweep over the 2-8 qubit range,
-  * transfer of the trained weights onto Qiskit Aer - exact *and shot-based*,
-    the latter being impossible on the lambeq route (README trap 2),
+  * multi-seed training on ``default.qubit`` with two classical controls and
+    two reference ceilings (full-dimension logistic regression, majority class),
+  * an ablation of the angle-scaling choice,
+  * a circuit-width sweep over the 2-8 qubit range, where TREC - unlike MC1 -
+    has real headroom,
+  * transfer of the trained weights onto Qiskit Aer, exact *and shot-based*,
   * measured Aer training cost, parameter-shift versus SPSA.
 
-Run from the repo root:  python pennylane_aer/06_train_mc1_reduced.py
+Run from the repo root:  python pennylane_aer/06_train_trec_reduced.py
 """
 
 from __future__ import annotations
@@ -30,27 +31,25 @@ for _path in (str(_ROOT / "src"), str(_HERE)):
         sys.path.insert(0, _path)
 
 from aer_backend import aer_backend_config, aer_gpu_available, describe_backend
-from mc1_reduced import (
-    ClassicalPairClassifier,
-    NoBottleneckPairClassifier,
-    QuantumPairClassifier,
+from trec_reduced import (
+    ClassicalSentenceClassifier,
+    NoBottleneckSentenceClassifier,
+    QuantumSentenceClassifier,
     SentenceAngleEncoder,
-    augmented_pairs,
     build_split,
-    derive_sentence_topics,
+    class_names,
     evaluate_split,
-    frame_pairs,
+    load_trec,
     mean_confidence_interval,
-    train_pair_model,
+    stratified_split,
+    train_model,
 )
 
-from qnlp_hpc.mc1_iqp_cups import config as evelyn_config
-from qnlp_hpc.mc1_iqp_cups import data as evelyn_data
-
+DATA_DIR = _ROOT / "trec dataset"
 OUTPUT_DIR = _HERE / "outputs"
-REPORT_PATH = OUTPUT_DIR / "06_mc1_reduced.json"
+REPORT_PATH = OUTPUT_DIR / "06_trec_reduced.json"
 
-ALL_STAGES = frozenset({"training", "scaling", "augmentation", "width", "aer-eval", "aer-training"})
+ALL_STAGES = frozenset({"training", "scaling", "width", "aer-eval", "aer-training"})
 
 
 def set_seed(seed: int) -> None:
@@ -63,25 +62,20 @@ def set_seed(seed: int) -> None:
 # --------------------------------------------------------------------------
 
 
-def prepare_data(arguments, seed: int, augment_train: bool = True):
-    """Build the four evaluation splits for one seed.
+def prepare_data(arguments, seed: int):
+    """Build train/development/test splits for one seed.
 
-    Split membership comes from ``mc1_iqp_cups.config``, so this shares
-    Evelyn's sentence-disjoint boundary exactly and the numbers stay
-    comparable to the lambeq baseline.
-
-    ``augment_train=False`` trains on the 64 pairs MC1 ships for the training
-    split instead of all 1,653 pairs its training sentences can form.  The
-    evaluation splits never change, so the two are directly comparable.
+    TREC's official train/test division is kept; development is carved out of
+    training, stratified, so model selection never touches the test split.
     """
-    frame = evelyn_data.load_mc1(evelyn_config.DATA_PATH)
-    topics = derive_sentence_topics(frame)
-
-    all_sentences = set(frame["sentence_1"]).union(frame["sentence_2"])
-    test_sentences = sorted(evelyn_config.TEST_SENTENCES)
-    development_sentences = sorted(evelyn_config.DEVELOPMENT_SENTENCES)
-    train_sentences = sorted(
-        all_sentences - evelyn_config.TEST_SENTENCES - evelyn_config.DEVELOPMENT_SENTENCES
+    train_frame, test_frame = load_trec(
+        arguments.data_dir,
+        label_column=arguments.label_column,
+        max_words=arguments.max_words,
+        classes=arguments.classes,
+    )
+    train_frame, development_frame = stratified_split(
+        train_frame, arguments.development_fraction, seed
     )
 
     encoder = SentenceAngleEncoder(
@@ -91,64 +85,49 @@ def prepare_data(arguments, seed: int, augment_train: bool = True):
         scaling=arguments.scaling,
         seed=seed,
         bert_model=arguments.bert_model,
-    ).fit(train_sentences)
-
-    train_frame, _, test_frame, _ = evelyn_data.split_sentence_disjoint(frame)
-    train_pairs = (
-        augmented_pairs(train_sentences, topics) if augment_train else frame_pairs(train_frame)
-    )
+        min_document_frequency=arguments.min_document_frequency,
+    ).fit(train_frame["text"].astype(str).tolist())
 
     splits = {
-        "train": build_split("train", train_pairs, encoder, train_sentences),
-        "development": build_split(
-            "development",
-            augmented_pairs(development_sentences, topics),
-            encoder,
-            development_sentences,
-        ),
-        "test": build_split(
-            "test", augmented_pairs(test_sentences, topics), encoder, test_sentences
-        ),
-        # The 13 pairs MC1 actually ships for the test split: the exact set the
-        # lambeq baseline reported 1.0000 on.
-        "test_original": build_split("test_original", frame_pairs(test_frame), encoder),
+        "train": build_split("train", train_frame, encoder),
+        "development": build_split("development", development_frame, encoder),
+        "test": build_split("test", test_frame, encoder),
     }
-    return splits, encoder, topics
+    n_classes = int(train_frame["label"].max()) + 1
+    return splits, encoder, n_classes, train_frame.attrs["label_remap"]
 
 
-def build_model(kind: str, arguments, backend_config=None, diff_method: str = "best"):
+def build_model(kind: str, arguments, n_classes: int, backend_config=None, diff_method="best"):
     if kind == "quantum":
-        return QuantumPairClassifier(
+        return QuantumSentenceClassifier(
             n_qubits=arguments.qubits,
+            n_classes=n_classes,
             n_layers=arguments.layers,
             reuploads=arguments.reuploads,
-            hidden_dim=evelyn_config.CLASSIFIER_HIDDEN_DIM,
-            dropout=evelyn_config.CLASSIFIER_DROPOUT,
+            hidden_dim=arguments.hidden_dim,
+            dropout=arguments.dropout,
             backend_config=backend_config,
             diff_method=diff_method,
         )
     if kind == "classical":
-        return ClassicalPairClassifier(
-            arguments.qubits,
-            evelyn_config.CLASSIFIER_HIDDEN_DIM,
-            evelyn_config.CLASSIFIER_DROPOUT,
+        return ClassicalSentenceClassifier(
+            arguments.qubits, n_classes, arguments.hidden_dim, arguments.dropout
         )
     if kind == "no-bottleneck":
-        return NoBottleneckPairClassifier(
-            arguments.qubits,
-            evelyn_config.CLASSIFIER_HIDDEN_DIM,
-            evelyn_config.CLASSIFIER_DROPOUT,
+        return NoBottleneckSentenceClassifier(
+            arguments.qubits, n_classes, arguments.hidden_dim, arguments.dropout
         )
     raise ValueError(f"Unknown model kind {kind!r}.")
 
 
-def run_one(kind: str, arguments, splits, seed: int, verbose: bool = False):
+def run_one(kind: str, arguments, splits, n_classes: int, seed: int, verbose: bool = False):
     set_seed(seed)
-    model = build_model(kind, arguments)
-    record = train_pair_model(
+    model = build_model(kind, arguments, n_classes)
+    record = train_model(
         model,
         splits["train"],
         splits["development"],
+        n_classes,
         epochs=arguments.epochs,
         batch_size=arguments.batch_size,
         learning_rate=arguments.learning_rate,
@@ -156,9 +135,11 @@ def run_one(kind: str, arguments, splits, seed: int, verbose: bool = False):
         verbose_every=max(1, arguments.epochs // 6) if verbose else 0,
     )
     for name, split in splits.items():
-        accuracy, loss = evaluate_split(model, split)
-        record[f"{name}_accuracy"] = accuracy
-        record[f"{name}_loss"] = loss
+        scores = evaluate_split(model, split, n_classes)
+        record[f"{name}_accuracy"] = scores["accuracy"]
+        record[f"{name}_macro_f1"] = scores["macro_f1"]
+        if name == "test":
+            record["test_confusion"] = scores["confusion"]
     record["model"] = kind
     record["seed"] = seed
     record["parameters"] = sum(p.numel() for p in model.parameters())
@@ -183,12 +164,56 @@ def format_interval(summary: dict) -> str:
 
 
 # --------------------------------------------------------------------------
+# Reference ceilings
+# --------------------------------------------------------------------------
+
+
+def reference_ceilings(arguments, n_classes: int) -> dict:
+    """What the representation costs, independent of any quantum layer.
+
+    Without these two numbers a reduced-route accuracy is uninterpretable: the
+    majority-class rate says what beating chance means on an unbalanced set,
+    and full-dimension logistic regression says how much the reduction to
+    ``n_qubits`` components threw away.
+    """
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.linear_model import LogisticRegression
+
+    train_frame, test_frame = load_trec(
+        arguments.data_dir,
+        label_column=arguments.label_column,
+        max_words=arguments.max_words,
+        classes=arguments.classes,
+    )
+    vectoriser = TfidfVectorizer(
+        token_pattern=r"[a-z0-9']+", lowercase=True, min_df=arguments.min_document_frequency
+    )
+    matrix = vectoriser.fit_transform(train_frame["text"].astype(str))
+    model = LogisticRegression(max_iter=3000).fit(matrix, train_frame["label"])
+    full_dimension = float(
+        model.score(vectoriser.transform(test_frame["text"].astype(str)), test_frame["label"])
+    )
+
+    counts = np.bincount(test_frame["label"].to_numpy(), minlength=n_classes)
+    majority = float(counts.max() / counts.sum())
+
+    print("\n=== reference ceilings (no quantum layer) ===")
+    print(f"  majority class                       {majority:.4f}")
+    print(f"  full-dimension logistic regression   {full_dimension:.4f}  ")
+    print(f"  (TF-IDF vocabulary: {len(vectoriser.vocabulary_)} features)")
+    return {
+        "majority_class_accuracy": majority,
+        "full_dimension_logistic_accuracy": full_dimension,
+        "vocabulary_size": len(vectoriser.vocabulary_),
+    }
+
+
+# --------------------------------------------------------------------------
 # Stages
 # --------------------------------------------------------------------------
 
 
 def stage_training(arguments, seeds: list[int]):
-    """Multi-seed training of the quantum model and both classical controls."""
     print("\n=== 1. multi-seed training on default.qubit ===")
     per_model: dict[str, list[dict]] = {}
     best_model = None
@@ -198,105 +223,76 @@ def stage_training(arguments, seeds: list[int]):
         per_model[kind] = []
         print(f"\n  [{kind}]")
         for seed in seeds:
-            splits, _, _ = prepare_data(arguments, seed)
-            model, record = run_one(kind, arguments, splits, seed, verbose=arguments.verbose)
+            splits, _, n_classes, _ = prepare_data(arguments, seed)
+            model, record = run_one(
+                kind, arguments, splits, n_classes, seed, verbose=arguments.verbose
+            )
             per_model[kind].append(record)
             print(
-                f"    seed {seed}: dev={record['development_accuracy']:.3f}  "
-                f"test={record['test_accuracy']:.3f} ({len(splits['test'])} pairs)  "
-                f"test_original={record['test_original_accuracy']:.3f} "
-                f"({len(splits['test_original'])} pairs)  "
+                f"    seed {seed}: dev={record['development_accuracy']:.4f}  "
+                f"test={record['test_accuracy']:.4f}  "
+                f"macro-F1={record['test_macro_f1']:.4f}  "
                 f"epoch {record['selected_epoch']}  {record['seconds']:.1f}s"
             )
             if kind == "quantum" and record["test_accuracy"] > best_accuracy:
                 best_accuracy = record["test_accuracy"]
-                best_model = (model, seed, splits)
+                best_model = (model, seed, splits, n_classes)
 
-    print(f"\n  {'model':16s} {'test acc (95% CI)':>28s} {'MC1 13 pairs':>14s} {'s/epoch':>9s}")
+    print(
+        f"\n  {'model':16s} {'test acc (95% CI)':>28s} {'macro-F1':>10s} "
+        f"{'q-params':>9s} {'s/epoch':>9s}"
+    )
     summary = {}
     for kind, records in per_model.items():
         test = summarise(records, "test_accuracy")
-        original = summarise(records, "test_original_accuracy")
+        f1 = summarise(records, "test_macro_f1")
         epoch = summarise(records, "seconds_per_epoch")
         summary[kind] = {
             "test_accuracy": test,
-            "test_original_accuracy": original,
+            "test_macro_f1": f1,
             "development_accuracy": summarise(records, "development_accuracy"),
             "seconds_per_epoch": epoch,
             "parameters": records[0]["parameters"],
             "quantum_parameters": records[0]["quantum_parameters"],
+            "seeds": seeds,
             "runs": records,
         }
         print(
-            f"  {kind:16s} {format_interval(test):>28s} "
-            f"{original['mean']:14.4f} {epoch['mean']:9.3f}"
+            f"  {kind:16s} {format_interval(test):>28s} {f1['mean']:10.4f} "
+            f"{records[0]['quantum_parameters']:9d} {epoch['mean']:9.3f}"
         )
 
     return summary, best_model
 
 
 def stage_scaling_ablation(arguments, seeds: list[int]) -> dict:
-    """Global versus per-component angle scaling - the decisive design choice."""
     print("\n=== 2. angle-scaling ablation ===")
     results = {}
-    original_scaling = arguments.scaling
+    original = arguments.scaling
     for scaling in ("global", "per-component"):
         arguments.scaling = scaling
         records = []
         for seed in seeds:
-            splits, encoder, _ = prepare_data(arguments, seed)
-            _, record = run_one("quantum", arguments, splits, seed)
+            splits, _, n_classes, _ = prepare_data(arguments, seed)
+            _, record = run_one("quantum", arguments, splits, n_classes, seed)
             records.append(record)
         test = summarise(records, "test_accuracy")
-        train = summarise(records, "train_accuracy")
-        results[scaling] = {"test_accuracy": test, "train_accuracy": train, "runs": records}
-        print(f"  {scaling:16s} test={format_interval(test)}  train={train['mean']:.4f}")
-    arguments.scaling = original_scaling
-    return results
-
-
-def stage_augmentation_ablation(arguments, seeds: list[int]) -> dict:
-    """MC1's 64 shipped training pairs against all 1,653 its sentences allow.
-
-    Topic labels are derived from MC1's own labels and pairs are formed only
-    within the training sentence set, so this adds supervision without
-    crossing the sentence-disjoint boundary.
-    """
-    print("\n=== 3. training-set augmentation ablation ===")
-    results = {}
-    for augment in (False, True):
-        records = []
-        pairs = 0
-        for seed in seeds:
-            splits, _, _ = prepare_data(arguments, seed, augment_train=augment)
-            pairs = len(splits["train"])
-            _, record = run_one("quantum", arguments, splits, seed)
-            records.append(record)
-        test = summarise(records, "test_accuracy")
-        original = summarise(records, "test_original_accuracy")
-        label = "augmented" if augment else "shipped pairs"
-        results[label] = {
-            "train_pairs": pairs,
+        results[scaling] = {
             "test_accuracy": test,
-            "test_original_accuracy": original,
+            "test_macro_f1": summarise(records, "test_macro_f1"),
+            "seeds": seeds,
             "runs": records,
         }
-        print(
-            f"  {label:16s} {pairs:5d} train pairs  test={format_interval(test)}  "
-            f"MC1 13 pairs={original['mean']:.4f}"
-        )
+        print(f"  {scaling:16s} test={format_interval(test)}")
+    arguments.scaling = original
     return results
 
 
-def stage_qubit_sweep(arguments, seeds: list[int], widths: list[int]) -> dict:
-    """Accuracy against circuit width, quantum layer versus classical control.
-
-    The control is swept too: at the widths where both saturate, the
-    comparison says nothing, and only the narrow end separates them.
-    """
-    print("\n=== 4. circuit-width sweep ===")
+def stage_width_sweep(arguments, seeds: list[int], widths: list[int]) -> dict:
+    """Accuracy against circuit width, quantum layer versus classical control."""
+    print("\n=== 3. circuit-width sweep ===")
     results = {}
-    original_qubits = arguments.qubits
+    original = arguments.qubits
     print(
         f"  {'qubits':>7s} {'evr':>7s} {'q-params':>9s} "
         f"{'quantum test (95% CI)':>28s} {'classical test (95% CI)':>28s}"
@@ -306,25 +302,26 @@ def stage_qubit_sweep(arguments, seeds: list[int], widths: list[int]) -> dict:
         by_kind: dict[str, list[dict]] = {"quantum": [], "classical": []}
         explained = None
         for seed in seeds:
-            splits, encoder, _ = prepare_data(arguments, seed)
+            splits, encoder, n_classes, _ = prepare_data(arguments, seed)
             explained = encoder.explained_variance_ratio
             for kind in by_kind:
-                _, record = run_one(kind, arguments, splits, seed)
+                _, record = run_one(kind, arguments, splits, n_classes, seed)
                 by_kind[kind].append(record)
 
         quantum = summarise(by_kind["quantum"], "test_accuracy")
         classical = summarise(by_kind["classical"], "test_accuracy")
         results[str(width)] = {
             "explained_variance_ratio": explained,
+            "seeds": seeds,
             "quantum_parameters": by_kind["quantum"][0]["quantum_parameters"],
             "quantum": {
                 "test_accuracy": quantum,
-                "development_accuracy": summarise(by_kind["quantum"], "development_accuracy"),
+                "test_macro_f1": summarise(by_kind["quantum"], "test_macro_f1"),
                 "seconds_per_epoch": summarise(by_kind["quantum"], "seconds_per_epoch"),
             },
             "classical": {
                 "test_accuracy": classical,
-                "development_accuracy": summarise(by_kind["classical"], "development_accuracy"),
+                "test_macro_f1": summarise(by_kind["classical"], "test_macro_f1"),
             },
         }
         evr = "n/a" if explained is None else f"{explained:.3f}"
@@ -332,27 +329,35 @@ def stage_qubit_sweep(arguments, seeds: list[int], widths: list[int]) -> dict:
             f"  {width:7d} {evr:>7s} {by_kind['quantum'][0]['quantum_parameters']:9d} "
             f"{format_interval(quantum):>28s} {format_interval(classical):>28s}"
         )
-    arguments.qubits = original_qubits
+    arguments.qubits = original
     return results
 
 
-def stage_aer_evaluation(arguments, trained_model, splits, shot_counts: list[int]) -> dict:
+def stage_aer_evaluation(arguments, trained_model, splits, n_classes, shot_counts) -> dict:
     """Transfer trained weights onto Aer and evaluate, exact and with shots."""
-    print("\n=== 5. Qiskit Aer evaluation (weights transferred from default.qubit) ===")
+    print("\n=== 4. Qiskit Aer evaluation (weights transferred from default.qubit) ===")
     if arguments.gpu and not aer_gpu_available():
         print("  --gpu requested but this Aer build exposes no GPU device; using CPU.")
 
     split = splits["test"]
-    original = splits["test_original"]
+    if arguments.aer_eval_sentences and arguments.aer_eval_sentences < len(split):
+        # Aer costs ~0.3 s per question; the full test split is affordable but
+        # a subset keeps a GPU smoke test quick.  Deterministic prefix, so the
+        # reference and every backend see the same questions.
+        keep = arguments.aer_eval_sentences
+        split = type(split)(
+            name=split.name,
+            sentences=split.sentences[:keep],
+            angles=split.angles[:keep],
+            labels=split.labels[:keep],
+        )
+
     trained_model.eval()
     with torch.no_grad():
-        reference_logits = trained_model(split.angles, split.left, split.right)
+        reference_logits = trained_model(split.angles)
     reference_predictions = reference_logits.argmax(dim=1)
     reference_accuracy = float((reference_predictions == split.labels).float().mean())
-    print(
-        f"  reference (default.qubit): test={reference_accuracy:.4f} on {len(split)} pairs "
-        f"from {len(split.sentences)} sentences"
-    )
+    print(f"  reference (default.qubit): test={reference_accuracy:.4f} on {len(split)} questions")
 
     configurations: list[tuple[str, dict]] = [("aer-exact", aer_backend_config(gpu=arguments.gpu))]
     for shots in shot_counts:
@@ -362,27 +367,24 @@ def stage_aer_evaluation(arguments, trained_model, splits, shot_counts: list[int
 
     results = []
     for label, backend_config in configurations:
-        model = build_model("quantum", arguments, backend_config=backend_config)
+        model = build_model("quantum", arguments, n_classes, backend_config=backend_config)
         model.load_state_dict(trained_model.state_dict())
         model.eval()
 
         start = time.perf_counter()
         with torch.no_grad():
-            logits = model(split.angles, split.left, split.right)
-            original_logits = model(original.angles, original.left, original.right)
+            logits = model(split.angles)
         seconds = time.perf_counter() - start
 
         finite = bool(torch.isfinite(logits).all())
         predictions = logits.argmax(dim=1)
         accuracy = float((predictions == split.labels).float().mean())
-        original_accuracy = float((original_logits.argmax(dim=1) == original.labels).float().mean())
         agreement = float((predictions == reference_predictions).float().mean())
         difference = float((logits - reference_logits).abs().max()) if finite else float("nan")
 
         print(
             f"  {label:18s} {describe_backend(backend_config)}\n"
             f"      {seconds:6.2f}s  finite={finite}  test={accuracy:.4f}  "
-            f"MC1 13 pairs={original_accuracy:.4f}  "
             f"agreement={agreement:.4f}  max|dlogit|={difference:.2e}"
         )
         results.append(
@@ -392,7 +394,6 @@ def stage_aer_evaluation(arguments, trained_model, splits, shot_counts: list[int
                 "seconds": seconds,
                 "finite": finite,
                 "test_accuracy": accuracy,
-                "test_original_accuracy": original_accuracy,
                 "prediction_agreement": agreement,
                 "max_abs_logit_difference": difference,
             }
@@ -400,49 +401,34 @@ def stage_aer_evaluation(arguments, trained_model, splits, shot_counts: list[int
 
     return {
         "reference_accuracy": reference_accuracy,
-        "pairs": len(split),
-        "sentences": len(split.sentences),
+        "questions": len(split),
         "circuit_qubits": arguments.qubits,
         "post_selected_qubits": 0,
         "results": results,
     }
 
 
-def stage_aer_training(arguments, splits, methods: list[str]) -> dict:
-    """Measure - and optionally complete - a training run on Aer.
-
-    Cost here is per *distinct sentence*, not per pair, so one epoch costs the
-    same whether it covers 13 pairs or all 1653.
-    """
-    print("\n=== 6. Aer training cost ===")
+def stage_aer_training(arguments, splits, n_classes, methods: list[str]) -> dict:
+    """Measure - and optionally complete - a training run on Aer."""
+    print("\n=== 5. Aer training cost ===")
     backend_config = aer_backend_config(gpu=arguments.gpu)
     train = splits["train"]
-    n_sentences = len(train.sentences)
+    n_train = len(train)
     results = []
 
     for method in methods:
         set_seed(arguments.seeds_list[0])
-        model = build_model("quantum", arguments, backend_config=backend_config, diff_method=method)
+        model = build_model(
+            "quantum", arguments, n_classes, backend_config=backend_config, diff_method=method
+        )
         optimiser = torch.optim.Adam(model.parameters(), lr=arguments.learning_rate)
         quantum_parameters = sum(p.numel() for n, p in model.named_parameters() if "quantum" in n)
 
-        # One measured step over a subset, then project to a full epoch.
-        subset = torch.arange(min(arguments.aer_probe_sentences, n_sentences))
-        mask = torch.isin(train.left, subset) & torch.isin(train.right, subset)
-        pairs = int(mask.sum())
-        # Project on the sentences the circuit actually ran, not on the subset
-        # size: that is what the cost is proportional to.
-        probe = int(torch.unique(torch.cat((train.left[mask], train.right[mask]))).numel())
-        if probe == 0:
-            raise RuntimeError(
-                "The Aer probe subset produced no pairs; raise --aer-probe-sentences."
-            )
-
+        probe = min(arguments.aer_probe_sentences, n_train)
         model.train()
         start = time.perf_counter()
         optimiser.zero_grad()
-        logits = model(train.angles, train.left[mask], train.right[mask])
-        loss = torch.nn.functional.cross_entropy(logits, train.labels[mask])
+        loss = torch.nn.functional.cross_entropy(model(train.angles[:probe]), train.labels[:probe])
         loss.backward()
         optimiser.step()
         seconds = time.perf_counter() - start
@@ -453,12 +439,12 @@ def stage_aer_training(arguments, splits, methods: list[str]) -> dict:
             if "quantum" in n and p.grad is not None
         )
         per_sentence = seconds / probe
-        projected_epoch = per_sentence * n_sentences
+        projected_epoch = per_sentence * n_train
 
         print(
-            f"  {method:16s} {seconds:6.2f}s for {probe} sentences ({pairs} pairs)  "
-            f"-> {per_sentence:5.2f}s/sentence, {projected_epoch / 60:5.2f} min/epoch "
-            f"(projected, {n_sentences} sentences, all {len(train)} pairs)"
+            f"  {method:16s} {seconds:6.2f}s for {probe} questions  "
+            f"-> {per_sentence:5.2f}s/question, {projected_epoch / 3600:6.2f} h/epoch "
+            f"(projected over {n_train} training questions)"
         )
         print(f"                   gradient reaching circuit weights: {gradient:.6f}")
 
@@ -466,7 +452,6 @@ def stage_aer_training(arguments, splits, methods: list[str]) -> dict:
             {
                 "diff_method": method,
                 "probe_sentences": probe,
-                "probe_pairs": pairs,
                 "measured_seconds": seconds,
                 "seconds_per_sentence": per_sentence,
                 "projected_seconds_per_epoch": projected_epoch,
@@ -481,33 +466,52 @@ def stage_aer_training(arguments, splits, methods: list[str]) -> dict:
     trained = None
     if arguments.aer_epochs > 0:
         method = methods[0]
-        print(f"\n  training on Aer for {arguments.aer_epochs} epochs with diff_method={method}")
+        subset = (
+            min(arguments.aer_train_sentences, n_train)
+            if arguments.aer_train_sentences
+            else n_train
+        )
+        print(
+            f"\n  training on Aer for {arguments.aer_epochs} epochs with diff_method={method} "
+            f"on {subset} of {n_train} training questions"
+        )
+        reduced_train = type(train)(
+            name=train.name,
+            sentences=train.sentences[:subset],
+            angles=train.angles[:subset],
+            labels=train.labels[:subset],
+        )
         set_seed(arguments.seeds_list[0])
-        model = build_model("quantum", arguments, backend_config=backend_config, diff_method=method)
-        record = train_pair_model(
+        model = build_model(
+            "quantum", arguments, n_classes, backend_config=backend_config, diff_method=method
+        )
+        record = train_model(
             model,
-            train,
+            reduced_train,
             splits["development"],
+            n_classes,
             epochs=arguments.aer_epochs,
-            batch_size=len(train),
+            batch_size=subset,
             learning_rate=arguments.aer_learning_rate,
             patience=None,
             verbose_every=1,
         )
         for name, split in splits.items():
-            accuracy, _ = evaluate_split(model, split)
-            record[f"{name}_accuracy"] = accuracy
+            scores = evaluate_split(model, split, n_classes)
+            record[f"{name}_accuracy"] = scores["accuracy"]
+            record[f"{name}_macro_f1"] = scores["macro_f1"]
         record["diff_method"] = method
+        record["training_questions"] = subset
         if not arguments.keep_history:
             record.pop("history", None)
         print(
             f"    trained on Aer: test={record['test_accuracy']:.4f}  "
-            f"MC1 13 pairs={record['test_original_accuracy']:.4f}  "
+            f"macro-F1={record['test_macro_f1']:.4f}  "
             f"{record['seconds_per_epoch']:.1f}s/epoch"
         )
         trained = record
 
-    return {"sentences_per_epoch": n_sentences, "benchmarks": results, "trained": trained}
+    return {"train_questions": n_train, "benchmarks": results, "trained": trained}
 
 
 # --------------------------------------------------------------------------
@@ -531,38 +535,53 @@ def parse_seeds(text: str) -> list[int]:
     return seeds
 
 
+def parse_classes(text: str) -> list[int] | None:
+    if not text.strip():
+        return None
+    return [int(chunk) for chunk in text.split(",") if chunk.strip()]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--qubits", type=int, default=4, help="Circuit width after reduction.")
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
+    parser.add_argument(
+        "--label-column", default="label-coarse", choices=("label-coarse", "label-fine")
+    )
+    parser.add_argument("--max-words", type=int, default=None, help="Drop longer questions.")
+    parser.add_argument("--classes", type=parse_classes, default=None, help="e.g. 0,3")
+    parser.add_argument("--development-fraction", type=float, default=0.15)
+    parser.add_argument("--min-document-frequency", type=int, default=1)
+
+    parser.add_argument("--qubits", type=int, default=8, help="Circuit width after reduction.")
     parser.add_argument("--layers", type=int, default=2, help="StronglyEntanglingLayers depth.")
     parser.add_argument("--reuploads", type=int, default=2, help="Angle re-upload blocks.")
+    parser.add_argument("--hidden-dim", type=int, default=16)
+    parser.add_argument("--dropout", type=float, default=0.05)
     parser.add_argument("--embedding", default="tfidf", choices=("count", "tfidf", "bert"))
-    parser.add_argument("--reducer", default="pca", choices=("pca", "tsvd", "umap"))
+    parser.add_argument("--reducer", default="tsvd", choices=("tsvd", "pca", "umap"))
     parser.add_argument("--scaling", default="global", choices=("global", "per-component"))
     parser.add_argument("--bert-model", default="bert-base-uncased")
-    parser.add_argument("--epochs", type=int, default=60)
+    parser.add_argument("--epochs", type=int, default=40)
     parser.add_argument("--patience", type=int, default=0, help="0 disables early stopping.")
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--learning-rate", type=float, default=2e-2)
     parser.add_argument("--seeds", type=parse_seeds, default="0-4")
-    parser.add_argument("--keep-history", action="store_true", help="Keep per-epoch curves.")
+    parser.add_argument("--keep-history", action="store_true")
     parser.add_argument("--verbose", action="store_true")
 
     parser.add_argument("--skip-ablation", action="store_true")
-    parser.add_argument("--qubit-sweep", default="", help="e.g. 2,3,4,6,8 (empty to skip).")
+    parser.add_argument("--width-sweep", default="", help="e.g. 2,3,4,6,8 (empty to skip).")
     parser.add_argument("--skip-aer", action="store_true")
     parser.add_argument("--aer-shots", default="1024,8192", help="Comma-separated, empty to skip.")
     parser.add_argument("--aer-diff", default="spsa,parameter-shift")
     parser.add_argument("--aer-probe-sentences", type=int, default=4)
+    parser.add_argument("--aer-eval-sentences", type=int, default=200)
     parser.add_argument("--aer-epochs", type=int, default=0, help="Real Aer training epochs.")
+    parser.add_argument("--aer-train-sentences", type=int, default=256)
     parser.add_argument(
         "--aer-learning-rate",
         type=float,
         default=5e-2,
-        # SPSA estimates the gradient from two evaluations, so it needs a
-        # smaller step than exact backprop: measured on default.qubit at 2
-        # qubits, SPSA reaches 1.000 at 5e-2 but only 0.909 at 2e-1, while
-        # backprop reaches 1.000 at both.
         help="Step size for the Aer training run; SPSA needs a smaller one than backprop.",
     )
     parser.add_argument(
@@ -587,34 +606,46 @@ def main() -> int:
     else:
         requested = set(ALL_STAGES)
         if arguments.skip_ablation:
-            requested -= {"scaling", "augmentation"}
+            requested -= {"scaling"}
         if arguments.skip_aer:
             requested -= {"aer-eval", "aer-training"}
-        if not arguments.qubit_sweep:
+        if not arguments.width_sweep:
             requested -= {"width"}
 
-    splits, encoder, topics = prepare_data(arguments, seeds[0])
-    print("MC1 through dimensionality reduction")
+    if not arguments.data_dir.is_dir():
+        print(f"TREC folder not found: {arguments.data_dir}")
+        return 2
+
+    splits, encoder, n_classes, remap = prepare_data(arguments, seeds[0])
+    names = class_names(remap, arguments.label_column)
+
+    print("TREC through dimensionality reduction")
     print(
         f"  embedding={arguments.embedding}  reducer={arguments.reducer}  "
         f"scaling={arguments.scaling}  qubits={arguments.qubits}  "
         f"layers={arguments.layers}  reuploads={arguments.reuploads}"
     )
+    print(f"  vocabulary: {encoder.vocabulary_size} features -> {arguments.qubits} components")
     if encoder.explained_variance_ratio is not None:
-        print(f"  explained variance retained: {encoder.explained_variance_ratio:.3f}")
-    print(f"  derived sentence topics: {len(topics)} sentences, 2 topics (0 label disagreements)")
+        print(f"  explained variance retained: {encoder.explained_variance_ratio:.4f}")
+    print(f"  classes ({n_classes}): {names}")
     for name, split in splits.items():
-        print(
-            f"  {name:14s} {len(split.sentences):3d} sentences  {len(split):5d} pairs  "
-            f"labels {split.label_counts}"
-        )
+        print(f"  {name:14s} {len(split):5d} questions  labels {split.label_counts}")
     print(f"  seeds: {seeds}")
 
+    # Note: with --only, this block describes the run that wrote it last, not
+    # every stage in the merged report.  Each stage stamps its own seeds, and
+    # every aggregate carries n, so per-stage provenance survives the merge.
     report: dict[str, object] = {
         "configuration": {
+            "dataset": str(arguments.data_dir),
+            "label_column": arguments.label_column,
+            "max_words": arguments.max_words,
+            "classes": arguments.classes,
             "qubits": arguments.qubits,
             "layers": arguments.layers,
             "reuploads": arguments.reuploads,
+            "hidden_dim": arguments.hidden_dim,
             "embedding": arguments.embedding,
             "reducer": arguments.reducer,
             "scaling": arguments.scaling,
@@ -622,25 +653,24 @@ def main() -> int:
             "batch_size": arguments.batch_size,
             "learning_rate": arguments.learning_rate,
             "seeds": seeds,
+            "n_classes": n_classes,
+            "class_names": names,
+            "vocabulary_size": encoder.vocabulary_size,
             "explained_variance_ratio": encoder.explained_variance_ratio,
         },
         "splits": {
-            name: {
-                "sentences": len(split.sentences),
-                "pairs": len(split),
-                "labels": split.label_counts,
-            }
+            name: {"questions": len(split), "labels": split.label_counts}
             for name, split in splits.items()
         },
         "aer_gpu_available": aer_gpu_available(),
     }
 
-    # --only merges into the existing report instead of replacing it, so a
-    # single stage can be re-run - on a GPU node, for instance - without
-    # spending an hour reproducing the stages that did not change.
     if requested != ALL_STAGES and REPORT_PATH.exists():
         report = {**json.loads(REPORT_PATH.read_text(encoding="utf-8")), **report}
         print(f"  merging into the existing {REPORT_PATH.name}")
+
+    if "training" in requested:
+        report["ceilings"] = reference_ceilings(arguments, n_classes)
 
     best = None
     if "training" in requested:
@@ -649,33 +679,33 @@ def main() -> int:
 
     if "scaling" in requested:
         report["scaling_ablation"] = stage_scaling_ablation(arguments, seeds)
-    if "augmentation" in requested:
-        report["augmentation_ablation"] = stage_augmentation_ablation(arguments, seeds)
 
-    if "width" in requested and arguments.qubit_sweep:
-        widths = [int(w) for w in arguments.qubit_sweep.split(",") if w.strip()]
-        report["qubit_sweep"] = stage_qubit_sweep(arguments, seeds, widths)
+    if "width" in requested and arguments.width_sweep:
+        widths = [int(w) for w in arguments.width_sweep.split(",") if w.strip()]
+        report["width_sweep"] = stage_width_sweep(arguments, seeds, widths)
 
     if requested & {"aer-eval", "aer-training"}:
         if best is None:
-            # The Aer stages need trained weights to transfer; when stage 1 was
-            # not requested, train the first seed just for that.
             print(f"\n  training seed {seeds[0]} on default.qubit for the Aer stages")
-            reference_splits, _, _ = prepare_data(arguments, seeds[0])
-            model, record = run_one("quantum", arguments, reference_splits, seeds[0])
+            reference_splits, _, reference_classes, _ = prepare_data(arguments, seeds[0])
+            model, record = run_one(
+                "quantum", arguments, reference_splits, reference_classes, seeds[0]
+            )
             print(f"    reference test accuracy: {record['test_accuracy']:.4f}")
-            best = (model, seeds[0], reference_splits)
+            best = (model, seeds[0], reference_splits, reference_classes)
 
-        trained_model, _, best_splits = best
+        trained_model, _, best_splits, best_classes = best
         if "aer-eval" in requested:
             shot_counts = [int(s) for s in arguments.aer_shots.split(",") if s.strip()]
             report["aer_evaluation"] = stage_aer_evaluation(
-                arguments, trained_model, best_splits, shot_counts
+                arguments, trained_model, best_splits, best_classes, shot_counts
             )
         if "aer-training" in requested:
             methods = [m.strip() for m in arguments.aer_diff.split(",") if m.strip()]
             if methods:
-                report["aer_training"] = stage_aer_training(arguments, best_splits, methods)
+                report["aer_training"] = stage_aer_training(
+                    arguments, best_splits, best_classes, methods
+                )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8")
