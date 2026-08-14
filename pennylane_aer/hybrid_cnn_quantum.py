@@ -127,12 +127,18 @@ def build_quantum_layer(
             config["backend"] = aer_backend
         device = qml.device(plugin, wires=n_qubits, **config)
 
-    @qml.qnode(
-        device,
-        interface="torch",
-        diff_method=diff_method,
-        gradient_kwargs=gradient_kwargs,
-    )
+    qnode_options: dict[str, Any] = {}
+    if gradient_kwargs:
+        # PennyLane <=0.41 accepted gradient-transform kwargs directly on
+        # qml.qnode. From 0.42 onward they must be nested under
+        # ``gradient_kwargs``. The GPU server is pinned to 0.40.
+        version = tuple(int(part) for part in qml.__version__.split(".")[:2])
+        if version >= (0, 42):
+            qnode_options["gradient_kwargs"] = gradient_kwargs
+        else:
+            qnode_options.update(gradient_kwargs)
+
+    @qml.qnode(device, interface="torch", diff_method=diff_method, **qnode_options)
     def circuit(inputs, weights):
         qml.AngleEmbedding(inputs, wires=range(n_qubits), rotation="Y")
         qml.StronglyEntanglingLayers(weights, wires=range(n_qubits))
