@@ -1,0 +1,41 @@
+TREC: 174 train / 44 test, vocab 360, max length 8
+Quantum bottleneck: 4 qubits x 1 layers
+CNN: embedding_dim=16, filters=8 per kernel
+
+[classical] CNN -> linear bottleneck -> head
+    epoch   1/100  loss=0.7078  train_acc=0.793  test_acc=0.705  0.5s
+    epoch  10/100  loss=0.1148  train_acc=0.989  test_acc=0.818  0.0s
+    epoch  20/100  loss=0.0312  train_acc=1.000  test_acc=0.886  0.0s
+    epoch  30/100  loss=0.0340  train_acc=1.000  test_acc=0.886  0.0s
+    epoch  40/100  loss=0.0039  train_acc=1.000  test_acc=0.886  0.0s
+    epoch  50/100  loss=0.0027  train_acc=1.000  test_acc=0.864  0.0s
+    epoch  60/100  loss=0.0018  train_acc=1.000  test_acc=0.864  0.0s
+    epoch  70/100  loss=0.0016  train_acc=1.000  test_acc=0.864  0.0s
+    epoch  80/100  loss=0.0012  train_acc=1.000  test_acc=0.864  0.0s
+    epoch  90/100  loss=0.0326  train_acc=1.000  test_acc=0.909  0.0s
+    epoch 100/100  loss=0.0011  train_acc=1.000  test_acc=0.886  0.0s
+    done in 4.8s | final test acc 0.8864 | best 0.9091
+    final-batch gradients: cnn=0.001772  quantum=0.000000
+
+[hybrid] CNN -> PennyLane circuit -> head  (default.qubit)
+    epoch   1/100  loss=0.6931  train_acc=0.511  test_acc=0.500  0.2s
+    epoch  10/100  loss=0.3812  train_acc=0.971  test_acc=0.886  0.2s
+    epoch  20/100  loss=0.0898  train_acc=0.989  test_acc=0.909  0.2s
+    epoch  30/100  loss=0.0555  train_acc=0.994  test_acc=0.864  0.2s
+    epoch  40/100  loss=0.0207  train_acc=1.000  test_acc=0.886  0.2s
+    epoch  50/100  loss=0.0108  train_acc=1.000  test_acc=0.886  0.2s
+    epoch  60/100  loss=0.0120  train_acc=1.000  test_acc=0.886  0.2s
+    epoch  70/100  loss=0.0259  train_acc=1.000  test_acc=0.886  0.2s
+    epoch  80/100  loss=0.0029  train_acc=1.000  test_acc=0.886  0.2s
+    epoch  90/100  loss=0.0029  train_acc=1.000  test_acc=0.886  0.2s
+    epoch 100/100  loss=0.0015  train_acc=1.000  test_acc=0.886  0.2s
+    done in 18.1s | final test acc 0.8864 | best 0.9545
+    final-batch gradients: cnn=0.011568  quantum=0.000931
+
+[hybrid-aer] CNN -> PennyLane circuit -> head  (qiskit.aer:aer_simulator_statevector_gpu, exact)
+    full Aer training: 100 epochs, batch size 4, diff_method=parameter-shift
+    epoch   1/100  loss=0.6938  train_acc=0.546  test_acc=0.477  267.6s
+    epoch  10/100  loss=0.3071  train_acc=0.983  test_acc=0.841  268.4s
+    epoch  20/100  loss=0.0304  train_acc=1.000  test_acc=0.864  267.8s
+    epoch  30/100  loss=0.0139  train_acc=1.000  test_acc=0.932  268.6s
+    epoch  40/100  loss=0.0010  train_acc=1.000  test_acc=0.932  268.5s
