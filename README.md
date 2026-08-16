@@ -5,7 +5,7 @@ Topic-aware QNLP sentence classifier (programming vs cooking), accelerated from 
 
 ## Team Roles
 
-* **Saif Ibna Ezhar Arko — Software Development Lead:** Dependency management, backend integration, CI/CD, data pipeline.
+* **Saif Ibna Ezhar Arko** — **Software Development Lead & Quantum Backend Integration Developer:** Repository, dependency, and CI/CD infrastructure (Poetry dependency groups for CPU / GPU / quantum / data, pre-commit, a two-job GitHub Actions workflow, and the dependency-resolution fixes that made the environment installable from a clean checkout); the unified data pipeline (`acquire → convert → validate → data/processed/`), the experiment configuration layer (`configs/*.yaml`), and the multi-seed sweep runner with 95% confidence-interval aggregation; and the backend layer (`src/qnlp_hpc/backends/`, `scripts/check_backends.py`) that probes, registers, and verifies every simulator with a real forward and backward pass. Author of the **CNN–VQC hybrid pipeline** (pipeline 3 of the final presentation): the TREC reduction script `scripts/prepare_trec.py` and the resulting NISQ-scale [`modified_trec_dataset/`](modified_trec_dataset/) it trains on (174 train / 44 test, class-balanced DESC vs HUM, ≤ 8 words, zero out-of-vocabulary test words by construction), and the `TextCNN → 4-qubit variational circuit → linear head` model in [`pennylane_aer/`](pennylane_aer/) that is trained end-to-end on Qiskit Aer. Also owns the PennyLane–Qiskit Aer integration used by the other pipelines: the validated port of the CPU IQP reference model onto Aer (identical predictions to float32 epsilon), the two silent failure modes it exposed (the default Aer backend is not analytic; lambeq's post-selected circuits return NaN under shots), the GPU-capable Aer device configuration, and the classical controls and runtime baselines against which the hybrid results are read.
 
 * **Evelyn (Yueying) Wu** — **Quantum Machine Learning Researcher & CPU Baseline Developer:** QNLP methodology; SpiderAnsatz model development; implementation of a `cups_reader`–`IQPAnsatz` sentence-pair hybrid QNN with a classical MLP head using lambeq’s `PytorchQuantumModel`; MC1 experiment and sentence-disjoint evaluation design; and development of the modular CPU reference pipeline for training, evaluation, benchmarking, testing, and reproducibility. This CPU pipeline serves as the reference architecture and correctness baseline for the team’s GPU backend implementations and performance comparisons.
 
@@ -235,6 +235,99 @@ script.
 
 Circuit backends need `poetry install --with quantum`; the GPU ones additionally
 need `--with gpu` (or `pennylane-lightning[gpu]`) on a CUDA node.
+
+## CNN–VQC hybrid on TREC
+
+The MC1 pipelines above tie circuit width to sentence grammar, so a longer
+sentence means a wider circuit. The hybrid route decouples the two: a CNN learns
+the sentence features, and the circuit width becomes a hyperparameter.
+
+```
+tokens → trainable embeddings → Conv1d(2,3,4) + max-pool → tanh·π → 4 angles
+       → AngleEmbedding + 2 StronglyEntanglingLayers → 4 ⟨Z⟩ → Linear(4,2)
+```
+
+Nothing is post-selected, so unlike the lambeq circuits this model is valid under
+shots and on real hardware. The `tanh → π` scaling matters: unbounded activations
+would wrap around the Bloch sphere and alias different sentences onto the same
+angle.
+
+### Dataset
+
+`scripts/prepare_trec.py` reduces raw TREC (5,452 questions, ~8,700-word
+vocabulary, up to 37 words) to a NISQ-scale binary subset in
+`modified_trec_dataset/`:
+
+| split | questions | DESC / HUM | vocabulary | words |
+|-------|-----------|------------|------------|-------|
+| train | 174 | 87 / 87 | 354 | 2–8 |
+| test  | 44  | 22 / 22  | 110 | 3–8 |
+
+```bash
+python scripts/prepare_trec.py            # regenerate modified_trec_dataset/
+```
+
+Filters (all CLI-tunable, seed `0`): lowercase, strip punctuation-only tokens,
+≤ 8 words, coarse classes DESC vs HUM, minimum word frequency 2, class-balanced
+downsampling. The official TREC split is unusable after filtering — almost no
+official test question stays inside the filtered training vocabulary — so the two
+files are pooled and re-split 80/20 stratified with a vocabulary-aware draw, which
+gives a test set with **zero out-of-vocabulary words by construction**.
+`--keep-original-split` preserves the official split.
+
+### Results
+
+```bash
+python pennylane_aer/04_train_cnn_hybrid.py            # CPU
+python pennylane_aer/04_train_cnn_hybrid.py --gpu      # route the Aer path through
+                                                       # Aer's GPU statevector
+```
+
+4 qubits × 2 layers, parameter-shift gradients, seed `0`. The classical control is
+the same CNN with the circuit replaced by a linear layer — without it, a hybrid
+accuracy cannot be separated from "the CNN did all the work".
+
+Development box (CPU only), 30 epochs — `pennylane_aer/outputs/`:
+
+| configuration | final test accuracy | best | cost |
+|---|---|---|---|
+| classical CNN control | 0.9091 | 0.9545 | 0.11 s/epoch |
+| hybrid, `default.qubit` | 0.8636 | 0.9091 | 0.70 s/epoch |
+| hybrid, Qiskit Aer | not trained | — | 1368 s/epoch (projected) |
+
+HPC node (Tesla V100S-PCIE-32GB, 32 vCPU, 128 GB RAM, CUDA 12.6, driver 560.x),
+20 epochs — reported in the final presentation:
+
+| configuration | final test accuracy | cost |
+|---|---|---|
+| classical CNN control | 0.9545 | 1.3 s total |
+| **hybrid, Qiskit Aer GPU** | **0.9773** | **506 s/epoch · 10,127 s total** |
+
+The Aer CPU row is a projection by design: the script runs real optimiser steps and
+extrapolates (`benchmark_backend`) rather than pretending to train, because
+1368 s/epoch is not trainable on that machine. That also means the GPU training run
+above is not what `--gpu` produces by default — the committed script benchmarks and
+projects on GPU exactly as it does on CPU.
+
+Aer on GPU runs **2.70× faster than the measured CPU projection**, which is the
+acceleration this project set out to demonstrate — but 506 s/epoch against the
+classical control's 1.3 s for the whole run shows the gradient cost still
+dominates. Aer has no backprop, so PennyLane falls back to parameter-shift, which
+cannot differentiate a broadcasted tape: external simulators must be fed one sample
+at a time, paying `2 × n_params` circuit evaluations per sample and losing batch
+parallelism. GPU acceleration is real here, but it moves an intractable run into a
+slow one rather than into a fast one.
+
+> **Read the accuracy carefully.** One seed and 44 test questions mean a single
+> sample is worth 2.27 percentage points, so the +2.28 points over the classical
+> CNN is one question wide. Multi-seed runs are needed before it is a claim.
+
+The Aer integration itself has two silent failure modes worth knowing before
+reusing it — the default Aer backend is not analytic and quietly samples, and
+lambeq's post-selected circuits return NaN rather than an error under shots. Both
+are documented with measurements in [`pennylane_aer/README.md`](pennylane_aer/README.md),
+along with the validated Aer port of the IQP model and a second dimensionality-reduction
+route on six-class TREC.
 
 ## Benchmark sweeps
 
