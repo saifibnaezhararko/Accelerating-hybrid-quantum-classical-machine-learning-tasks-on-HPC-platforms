@@ -19,7 +19,7 @@ Topic-aware QNLP sentence classifier (programming vs cooking), accelerated from 
 
 ## Docs
 
-* project guide + progress log in [`CLAUDE.md`](CLAUDE.md); layout in [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md).
+* repository layout in [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md); experiment notes in [`pennylane_aer/README.md`](pennylane_aer/README.md).
 
 ## Quick start
 
@@ -358,4 +358,4 @@ by hand from `tests/` if you want the original numbers.
 ## Stack
 
 Python 3.11 · lambeq 0.5.0 · Qiskit 2.x · Qiskit Aer (CPU) / Aer-GPU + cuQuantum (HPC) · pytket.
-See `CLAUDE.md` §7 for full version matrix.
+See [`pyproject.toml`](pyproject.toml) for the full version matrix.

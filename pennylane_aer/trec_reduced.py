@@ -3,7 +3,7 @@
 The lambeq route ties circuit width to sentence length, which is why it was
 demonstrated on MC1's 3-5 word sentences: TREC questions run to 37 words, and a
 qubit per pregroup type is not reachable.  This module takes the other route
-CLAUDE.md section 3 describes - *embedding -> quantum layer -> classifier* - and
+the project methodology describes - *embedding -> quantum layer -> classifier* - and
 applies it to the TREC question-type dataset as shipped:
 
     question -> TF-IDF / bag-of-words / BERT -> TSVD | PCA | UMAP -> n_qubits

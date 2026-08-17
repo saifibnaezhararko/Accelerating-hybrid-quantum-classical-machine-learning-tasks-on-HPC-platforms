@@ -60,7 +60,7 @@ jobs:
   # ---------------------------------------------------------------------------
   test:
     name: Test (CPU, py3.11)
-    runs-on: ubuntu-22.04            # matches target OS (CLAUDE.md §7)
+    runs-on: ubuntu-22.04            # matches target OS (project software stack)
     strategy:
       fail-fast: false
       matrix:

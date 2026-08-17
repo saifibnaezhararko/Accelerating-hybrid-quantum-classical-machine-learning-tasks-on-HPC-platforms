@@ -166,7 +166,7 @@ baseline. The sentence-disjoint split plus `cups_reader` + `IQPAnsatz` fixed it.
 
 ## 3. Qiskit Aer as the lambeq backend
 
-`03_lambeq_aer_backend.py` performs the port CLAUDE.md assigns to the Quantum ML
+`03_lambeq_aer_backend.py` performs the port the work plan assigns to the Quantum ML
 Lead ("port TKet → Qiskit Aer, validate identical predictions"), against the
 model that exists, without editing it.
 
@@ -206,7 +206,7 @@ gradients flow**.
 
 The lambeq route ties circuit width to sentence length (18 qubits for 8 words),
 which does not scale to TREC. `hybrid_cnn_quantum.py` takes the other route from
-CLAUDE.md §3 — *embedding → quantum layer → classifier*:
+the project methodology — *embedding → quantum layer → classifier*:
 
 ```
 convert   TrecDataset   CSV -> vocabulary (train only) -> padded id sequences
@@ -250,8 +250,8 @@ gradient reaching circuit weights: 0.762808
 
 The gradient check matters: it confirms Aer is genuinely training the circuit and
 is merely slow, not broken. **~1950× slower per epoch than `default.qubit`** — this
-is precisely the "more than one hour on a CPU-based simulator" problem CLAUDE.md
-§1 sets out to solve, now reproduced on a model we control.
+is precisely the "more than one hour on a CPU-based simulator" problem the
+project sets out to solve, now reproduced on a model we control.
 
 ### A third compatibility finding: parameter-shift cannot batch
 
@@ -456,7 +456,7 @@ costs 0.71 h with SPSA, and the 30-epoch schedule used above would take **~21
 hours**. Gradients do reach the circuit in both cases (0.219 and 0.065), so
 this is slow, not broken.
 
-This is CLAUDE.md section 1's problem statement — "more than one hour on a
+This is the project's core problem statement — "more than one hour on a
 CPU-based simulator" — reproduced on a realistic dataset with a model we
 control, and it is the number the GPU work has to attack. At this scale CPU Aer
 stops being a training option and becomes an evaluation-only backend.
@@ -490,7 +490,7 @@ drawn in grey and labelled, never silently omitted.
 ## Consequences for the project
 
 - **Adjoint differentiation is still unavailable** for the lambeq path.
-  CLAUDE.md §3 lists it as a method to use, but lightning rejects adjoint on
+  The project methodology lists it as a method to use, but lightning rejects adjoint on
   post-selected circuits, and Aer offers no backprop. Everything falls back to
   parameter-shift. The routes in §4 and §5 have no post-selection, so they are
   where adjoint on `lightning.gpu` is worth retesting first.
@@ -520,9 +520,9 @@ drawn in grey and labelled, never silently omitted.
   adjoint becomes available.
 - **The target to beat is 0.71 h/epoch.** That is SPSA on Aer over TREC's 4,635
   training questions, measured; parameter-shift is 19.17 h/epoch. A 30-epoch
-  schedule is ~21 hours on this CPU, which is CLAUDE.md §1's problem statement
-  on a realistic dataset.
+  schedule is ~21 hours on this CPU, which is the project's core problem
+  statement on a realistic dataset.
 - **SPSA needs a smaller step size than backprop.** A gradient estimated from
   two evaluations is noisy, and a step size tuned against exact gradients will
-  overshoot it. Worth knowing before SPSA is used for the large HPC runs
-  CLAUDE.md §4 plans.
+  overshoot it. Worth knowing before SPSA is used for the large HPC runs the
+  work plan schedules.

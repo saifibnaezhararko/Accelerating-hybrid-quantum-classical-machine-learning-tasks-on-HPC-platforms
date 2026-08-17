@@ -41,9 +41,6 @@ Thumbs.db
 # Large media (kept locally, not tracked)
 *.webm
 
-# Local project guide (not tracked)
-CLAUDE.md
-
 # Proposal / planning docs (kept locally, not tracked)
 *.pdf
 *.docx

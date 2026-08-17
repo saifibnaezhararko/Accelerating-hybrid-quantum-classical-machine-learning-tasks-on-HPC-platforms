@@ -10,7 +10,7 @@ repository = "https://github.com/saifibnaezhararko/Accelerating-hybrid-quantum-c
 packages = [{ include = "qnlp_hpc", from = "src" }]
 
 # ---------------------------------------------------------------------------
-# Runtime dependencies (CPU baseline — see software stack in CLAUDE.md §7).
+# Runtime dependencies (CPU baseline — see the project software stack).
 # GPU packages live in the optional [gpu] group so CI / Windows can resolve.
 # ---------------------------------------------------------------------------
 [tool.poetry.dependencies]
@@ -41,8 +41,8 @@ torch = ">=2.5,<3"
 optional = true
 
 [tool.poetry.group.gpu.dependencies]
-# 0.15.1 is the newest qiskit-aer-gpu on PyPI (the CUDA 12 build). CLAUDE.md section 7
-# asks for 0.17.x, which does not exist under this name: only qiskit-aer-gpu-cu11
+# 0.15.1 is the newest qiskit-aer-gpu on PyPI (the CUDA 12 build). The project software
+# stack asks for 0.17.x, which does not exist under this name: only qiskit-aer-gpu-cu11
 # reached 0.17.2, and that is a CUDA 11 wheel. Requesting ^0.17 made Poetry fail
 # to resolve, which broke `poetry install` in CI even though this group is optional
 # (Poetry locks every group, optional or not).

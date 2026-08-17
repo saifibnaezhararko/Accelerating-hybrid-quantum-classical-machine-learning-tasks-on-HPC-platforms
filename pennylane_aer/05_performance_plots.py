@@ -819,7 +819,7 @@ def figure_trec_aer(report: dict) -> Path:
             0.56,
             -0.04,
             f"One epoch over the {training.get('train_questions', 0):,} training questions costs "
-            f"{hours[0]:.1f} h even with SPSA -\nCLAUDE.md section 1's problem, measured on a "
+            f"{hours[0]:.1f} h even with SPSA -\nthe project's core problem, measured on a "
             "realistic dataset. This is what the GPU work has to attack.",
             color=INK_MUTED,
             fontsize=8.5,

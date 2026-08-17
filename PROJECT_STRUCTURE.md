@@ -1,7 +1,7 @@
 # Project Structure — QNLP-HPC
 
 Week-1 Software Lead deliverable. Defines the repository layout, dependency
-management, and CI. See `CLAUDE.md` §12–13 for role and progress log.
+management, and CI. See [`README.md`](README.md) for roles, run commands and results.
 
 ## Directory layout
 
@@ -13,7 +13,6 @@ qnlp-hpc/
 ├── .pre-commit-config.yaml     # ruff + black + mypy hooks
 ├── README.md
 ├── PROJECT_STRUCTURE.md        # this file
-├── CLAUDE.md                   # project guide + progress log
 ├── qnlp_hpc_setup.sh           # HPC/GPU env bring-up (Linux node)
 │
 ├── .github/
@@ -188,7 +187,7 @@ poetry install --with quantum
 poetry install --with data
 ```
 
-Core runtime deps (per CLAUDE.md §7): `numpy~1.26`, `networkx^3`, `lambeq 0.5.0`,
+Core runtime deps (per the project software stack): `numpy~1.26`, `networkx^3`, `lambeq 0.5.0`,
 `qiskit^2`, `qiskit-aer` (CPU) / `qiskit-aer-gpu` (GPU group), `pytket`, plus
 `torch`, `pandas`, `scikit-learn`, `matplotlib` for the training pipeline.
 
